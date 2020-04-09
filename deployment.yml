@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: group-manager-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: group-manager-front
+  template:
+    metadata:
+      labels:
+        app: group-manager-front
+    spec:
+
+      containers:
+      - name: group-manager-front
+        image: 172.16.98.151:5000/group-manager-front
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: group-manager-front
+  name: group-manager-front
+spec:
+  ports:
+  - port: 80
+    nodePort: 32000
+  selector:
+    app: group-manager-front
+  type: LoadBalancer

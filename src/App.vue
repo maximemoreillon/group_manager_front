@@ -1,32 +1,30 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <AppTemplate
+      applicationName="Group management microservice"
+      v-bind:navigation="navigation"/>
   </div>
 </template>
 
+<script>
+import AppTemplate from '@moreillon/vue_application_template_flex'
+
+export default {
+  name: 'app',
+  components: {
+    AppTemplate
+  },
+  data(){
+    return{
+      navigation : [
+        {route: '/', label: 'Groups', icon: 'account-multiple'},
+        {route: '/search', label: 'Search', icon: 'account-search'},
+      ]
+    }
+  }
+}
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
 
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
 </style>
