@@ -10,7 +10,8 @@ containerization:
   script:
     - >
       docker build
-      --build-arg proxy=$HTTP_PROXY
+      --build-arg HTTP_PROXY=$HTTP_PROXY
+      --build-arg HTTPS_PROXY=$HTTPS_PROXY
       -t ${CONTAINER_REGISTRY}/${APPLICATION_NAME}
       .
     - docker push ${CONTAINER_REGISTRY}/${APPLICATION_NAME}

@@ -1,14 +1,12 @@
 FROM node:latest as build-stage
 
-ARG proxy
-
 
 WORKDIR /app
 COPY package*.json ./
 
 # Proxy configuration
-#RUN npm config set proxy $proxy
-#RUN npm config set https-proxy $proxy
+#RUN npm config set proxy $HTTP_PROXY
+#RUN npm config set https-proxy $HTTPS_PROXY
 
 RUN npm install
 COPY ./ .
