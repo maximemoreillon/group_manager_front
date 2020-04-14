@@ -15,7 +15,7 @@ spec:
 
       containers:
       - name: group-manager-front
-        image: 172.16.98.151:5000/group-manager-front
+        image: ${CONTAINER_REGISTRY}/group-manager-front
         imagePullPolicy: Always
         ports:
         - containerPort: 80
@@ -30,7 +30,7 @@ metadata:
 spec:
   ports:
   - port: 80
-    nodePort: 31100
+    nodePort: ${SERVICE_PORT}
   selector:
     app: group-manager-front
   type: LoadBalancer
