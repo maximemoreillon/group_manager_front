@@ -8,7 +8,12 @@ variables:
 containerization:
   stage: containerization
   script:
-    - docker build -t ${CONTAINER_REGISTRY}/${APPLICATION_NAME} .
+    - >
+      docker build
+      --build-arg http_proxy=$HTTP_PROXY
+      --build-arg https_proxy=$HTTPS_PROXY
+      -t ${CONTAINER_REGISTRY}/${APPLICATION_NAME}
+      .
     - docker push ${CONTAINER_REGISTRY}/${APPLICATION_NAME}
 
 deployment:
