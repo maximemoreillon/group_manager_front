@@ -30,7 +30,7 @@ metadata:
 spec:
   ports:
   - port: 80
-    nodePort: ${SERVICE_PORT}
+    nodePort: 31100
   selector:
     app: group-manager-front
   type: LoadBalancer
