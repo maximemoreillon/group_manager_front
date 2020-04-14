@@ -18,7 +18,6 @@ export default {
     return{
       navigation : [
         {route: '/', label: 'Groups', icon: 'account-multiple'},
-        {route: '/search', label: 'Search', icon: 'account-search'},
       ]
     }
   }
