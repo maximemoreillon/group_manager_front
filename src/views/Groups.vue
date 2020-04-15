@@ -9,17 +9,10 @@
     <h2 class="">Groups ({{groups.length}})</h2>
     <template v-if="!groups.loading">
       <div v-if="groups.length > 0">
-        <div class="">
-          <div
-            class="group"
-            v-for="group in groups"
-            v-on:click="$router.push({name: 'group', query: {id: group.identity.low}})"
-            v-bind:key="group.identity.low">
-            <GroupPreview
-            :group="group"
-            :groupUrl="group_page_url"/>
-          </div>
-        </div>
+        <GroupPreview
+        v-for="group in groups"
+        v-bind:key="group.identity.low"
+        v-bind:group="group"/>
       </div>
       <div class="" v-else>No groups</div>
     </template>
@@ -31,14 +24,10 @@
     <h2 class="">Administrated groups ({{groups_administrated_by_user.length}})</h2>
     <template v-if="!groups_administrated_by_user.loading">
       <div class="" v-if="groups_administrated_by_user.length > 0">
-        <div
-          class="group"
-          v-for="group in groups_administrated_by_user"
-          v-on:click="$router.push({name: 'group', query: {id: group.identity.low}})"
-          v-bind:key="group.identity.low">
-          <GroupPreview
-          :group="group"/>
-        </div>
+        <GroupPreview
+        v-for="group in groups_administrated_by_user"
+        v-bind:key="group.identity.low"
+        v-bind:group="group"/>
       </div>
       <div class="" v-else>No groups</div>
     </template>
@@ -222,17 +211,7 @@ export default {
   height: 250px;
 }
 
-.group {
-  border-bottom: 1px solid #dddddd;
-  margin-bottom: 5px;
-  padding: 5px;
-  cursor: pointer;
 
-}
-
-.group:last-child {
-  border: none;
-}
 
 .group:hover{
   //border-color: #c00000;

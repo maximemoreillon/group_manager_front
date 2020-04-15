@@ -1,22 +1,24 @@
 <template>
-  <a
-  :href="`${profileUrl}?id=${user.identity.low}`"
-  class="user_preview">
+  <div
+    class="user_preview"
+    v-on:click="user_clicked()">
 
     <!-- Avatar -->
     <img
-    class="avatar"
-    :src="avatar_src">
-
-
+      class="avatar"
+      :src="avatar_src">
 
     <!-- User name -->
     <div
-    class="user__display_name">
+      class="user_name">
       {{user.properties.name_kanji}}
     </div>
 
-  </a>
+    <div class="growing_spacer" />
+
+    <slot />
+
+  </div>
 </template>
 
 <script>
@@ -37,13 +39,15 @@ export default {
 
   },
   methods: {
-
+    user_clicked(){
+      window.location.href = `${process.env.VUE_APP_EMPLOYEE_MANAGER_FRONT_URL}?id=${this.user.identity.low}`
+    }
   },
   computed: {
     avatar_src(){
       if(this.user.properties.avatar_src) return this.user.properties.avatar_src
       else return require('@/assets/account.svg')
-    }
+    },
   }
 
 }
@@ -58,18 +62,24 @@ export default {
 
   text-decoration: none;
   color: currentColor;
+
+  padding: 0.25em;
+
+  transition: background-color 0.25s;
+  cursor: pointer;
 }
 
-.user_preview .user__display_name {
-  transition: color 0.25s;
-}
-.user_preview:hover .user__display_name {
-  color: #c00000;
+
+.user_preview:not(:last-child) {
+  border-bottom: 1px solid #dddddd;
 }
 
-.user_preview > *:not(:last-child) {
-  margin-right: 0.2em;
+
+.user_preview:hover {
+  background-color: #eeeeee;
 }
+
+
 
 .avatar {
   width: 1em;
@@ -83,5 +93,9 @@ export default {
 
 .user_info:hover {
   color: #c00000;
+}
+
+.growing_spacer {
+  flex-grow: 1
 }
 </style>

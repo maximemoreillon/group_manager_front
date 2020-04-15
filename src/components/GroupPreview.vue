@@ -1,22 +1,24 @@
 <template>
-  <a
-  :href="`group?id=${group.identity.low}`"
-  class="group_preview">
+  <div
+    v-on:click="group_clicked"
+    class="group_preview">
 
     <!-- Avatar -->
     <img
     class="avatar"
     :src="avatar_src">
 
-
-
     <!-- group name -->
     <div
-    class="group__display_name">
+    class="group_name">
       {{group.properties.name}}
     </div>
 
-  </a>
+    <div class="growing_spacer" />
+
+    <slot />
+
+  </div>
 </template>
 
 <script>
@@ -33,7 +35,9 @@ export default {
 
   },
   methods: {
-
+    group_clicked(){
+      window.location.href =`group?id=${this.group.identity.low}`
+    }
   },
   computed: {
     avatar_src(){
@@ -54,13 +58,19 @@ export default {
 
   text-decoration: none;
   color: currentColor;
+  padding: 0.25em;
+
+  transition: background-color 0.25s;
+  cursor: pointer;
 }
 
-.group_preview .group__display_name {
-  transition: color 0.25s;
+.group_preview:not(:last-child) {
+  border-bottom: 1px solid #dddddd;
 }
-.group_preview:hover .group__display_name {
-  color: #c00000;
+
+
+.group_preview:hover {
+  background-color: #eeeeee;
 }
 
 .group_preview > *:not(:last-child) {
@@ -79,5 +89,9 @@ export default {
 
 .group_info:hover {
   color: #c00000;
+}
+
+.growing_spacer {
+  flex-grow: 1
 }
 </style>

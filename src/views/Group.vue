@@ -35,15 +35,6 @@
           class="avatar"
           v-bind:class="{avatar_clickable: current_user_is_admin_of_group}"
           v-bind:src="group_avatar_src">
-
-        <button
-          type="button"
-          v-on:click="change_avatar()"
-          v-if="current_user_is_admin_of_group">
-          <font-awesome-icon icon="edit"/>
-          <span>Change avatar</span>
-        </button>
-
       </div>
 
 
@@ -53,144 +44,160 @@
 
 
       <!-- members -->
-      <div class="">
-        <h2 class="">Members ({{members.length}})</h2>
+      <div class="section">
+        <h2 class="">Members</h2>
+        <div class="" v-if="members.error">{{members.error}}</div>
+        <Loader v-else-if="members.loading">Loading members</Loader>
+        <template v-else>
 
-        <div class="members_container" v-if="members.length > 0">
-
-          <div class="member"
-            v-for="member in members"
-            v-bind:key="`member_${member.identity.low}`" >
-
+          <div class="members_container" v-if="members.length > 0">
             <UserPreview
-            :user="member"
-            :profileUrl="user_page_url"/>
+              v-bind:user="member"
+              v-for="member in members"
+              v-bind:key="`member_${member.identity.low}`">
+              <!-- Admin controls on member-->
+              <template v-if="!user_is_current_user(member) && current_user_is_admin_of_group">
+                <!-- Button to remove member from group -->
+                <button
+                  type="button"
+                  v-on:click.stop="remove_user_from_group(member)" >
+                  <font-awesome-icon icon="sign-out-alt" />
+                  <span>Remove</span>
+                </button>
 
-            <div class="growing_space"/>
+                <!-- Make user an administrator -->
+                <button
+                  type="button"
+                  v-on:click.stop="make_user_administrator_of_group(member)" >
+                  <font-awesome-icon icon="user-tie"/>
+                  <span>Make admin</span>
+                </button>
+              </template>
 
-            <!-- Admin controls on member-->
-            <template v-if="!user_is_current_user(member) && current_user_is_admin_of_group">
-              <!-- Button to remove member from group -->
-              <button
-                type="button"
-                v-on:click="remove_user_from_group(member)" >
-                <font-awesome-icon icon="sign-out-alt" />
-                <span>Remove</span>
-              </button>
-
-              <!-- Make user an administrator -->
-              <button
-                type="button"
-                v-on:click="make_user_administrator_of_group(member)" >
-                <font-awesome-icon icon="user-tie"/>
-                <span>Make admin</span>
-
-              </button>
-            </template>
-
-            <template v-if="user_is_current_user(member)" >
-              <button
-                type="button"
-                v-on:click="leave_group()"
-                v-if="current_user_is_member_of_group">
-                <font-awesome-icon icon="sign-out-alt"/>
-                <span>Leave</span>
-              </button>
-            </template>
-
+              <template v-if="user_is_current_user(member)" >
+                <!-- button to leave group -->
+                <button
+                  type="button"
+                  v-on:click.stop="leave_group()"
+                  v-if="current_user_is_member_of_group">
+                  <font-awesome-icon icon="sign-out-alt"/>
+                  <span>Leave</span>
+                </button>
+              </template>
+            </UserPreview>
           </div>
-
-        </div>
+          <div class="" v-else>No member</div>
+        </template>
       </div>
 
 
       <!-- Administrators -->
-      <h2 class="">Administrators ({{administrators.length}})</h2>
-      <div class="members_container" v-if="administrators.length > 0">
+      <div class="section">
+        <h2 class="">Administrators</h2>
+        <div class="" v-if="administrators.error">{{administrators.error}}</div>
+        <Loader v-else-if="administrators.loading">Loading administrators</Loader>
+        <template v-else>
+          <div class="members_container" v-if="administrators.length > 0">
+            <UserPreview
+              v-bind:user="administrator"
+              v-for="administrator in administrators"
+              v-bind:key="`administrator_${administrator.identity.low}`">
 
-        <div class="member"
-          v-for="administrator in administrators"
-          v-bind:key="`administrator_${administrator.identity.low}`" >
-
-          <UserPreview
-          :user="administrator"
-          :profileUrl="user_page_url"/>
-
-          <div class="growing_space" />
-
-          <template v-if="!user_is_current_user(administrator)">
-            <!-- Button to remove member from administrators -->
-            <button
-              type="button"
-              v-on:click="remove_user_from_administrators(administrator)"
-              v-if="current_user_is_admin_of_group">
-
-              <font-awesome-icon icon="user-slash"/>
-              <span>Remove from admins</span>
-
-
-            </button>
-          </template>
-
-        </div>
-
+              <!-- Cannot remove oneself from admins -->
+              <template v-if="!user_is_current_user(administrator) && current_user_is_admin_of_group">
+                <!-- Button to remove member from administrators -->
+                <button
+                  type="button"
+                  v-on:click.stop="remove_user_from_administrators(administrator)">
+                  <font-awesome-icon icon="user-slash"/>
+                  <span>Remove from admins</span>
+                </button>
+              </template>
+            </UserPreview>
+          </div>
+          <div class="" v-else>No Administrator</div>
+        </template>
       </div>
+
 
       <!-- Groups -->
-      <h2 class="">Groups ({{groups.length}})</h2>
-      <div class="members_container" v-if="groups.length > 0">
+      <div class="section">
+        <h2 class="">Groups</h2>
+        <div class="" v-if="groups.error">{{groups.error}}</div>
+        <Loader v-else-if="groups.loading">Loading groups</Loader>
+        <template v-else>
+          <div class="members_container" v-if="groups.length > 0">
 
-        <div class="member"
-          v-for="group in groups"
-          v-bind:key="group.identity.low" >
+            <GroupPreview
+              :group="group"
+              v-for="group in groups"
+              v-bind:key="group.identity.low">
 
-          <GroupPreview
-          :group="group"/>
+              <!-- Admin controls on group-->
+              <template v-if="current_user_is_admin_of_group">
+                <!-- Button to remove member from group -->
+                <button
+                  type="button"
+                  v-on:click.stop="remove_group_from_group(group)" >
+                  <font-awesome-icon icon="sign-out-alt"/>
+                  <span>Remove</span>
+                </button>
+              </template>
 
-          <div class="growing_space" />
+            </GroupPreview>
 
-          <!-- Admin controls on group-->
-          <template v-if="current_user_is_admin_of_group">
-            <!-- Button to remove member from group -->
-            <button
-              type="button"
-              v-on:click="remove_group_from_group(group)" >
-              <font-awesome-icon icon="sign-out-alt"/>
-              <span>Remove</span>
-            </button>
+          </div>
+          <div class="" v-else>No groups</div>
+        </template>
 
 
-          </template>
-
-
-        </div>
 
       </div>
+
+
+      <!-- Parent Groups -->
+      <div class="section">
+        <h2 class="">Parent Groups</h2>
+        <div class="" v-if="parent_groups.error">{{parent_groupsparent_groups.error}}</div>
+        <Loader v-else-if="parent_groups.loading">Loading parent groups</Loader>
+        <template v-else>
+          <div class="members_container" v-if="parent_groups.length > 0">
+            <GroupPreview
+            :group="group"
+            v-for="group in parent_groups"
+            v-bind:key="`parent_${group.identity.low}`"/>
+          </div>
+          <div class="" v-else>No parent groups</div>
+        </template>
+      </div>
+
 
 
 
 
       <!-- Admin controls of the group -->
-      <template v-if="current_user_is_admin_of_group">
+      <div class="section" v-if="current_user_is_admin_of_group">
 
         <h2>Admin area</h2>
 
         <div class="">
-          <div class="">
-            <input
-              type="checkbox"
-              v-model="group.properties.restricted"
-              v-on:change="set_group_restriction()"> Restricted
-          </div>
 
+          <h3>Group options</h3>
+          <!-- change avatar -->
+          <button
+            type="button"
+            v-on:click="rename_group()">
+            <font-awesome-icon icon="edit"/>
+            <span>Rename group</span>
+          </button>
 
-          <div class="" v-if="current_user.properties.isAdmin">
-            <input
-              type="checkbox"
-              v-model="group.properties.official"
-              v-on:change="set_group_officiality()"> Official
-          </div>
-
+          <!-- change avatar -->
+          <button
+            type="button"
+            v-on:click="change_avatar()">
+            <font-awesome-icon icon="edit"/>
+            <span>Change group avatar</span>
+          </button>
 
 
           <!-- delete group button -->
@@ -200,6 +207,18 @@
             <font-awesome-icon icon="trash"/>
             <span>Delete group</span>
           </button>
+
+          <input
+            type="checkbox"
+            v-model="group.properties.restricted"
+            v-on:change="set_group_restriction()"> Restricted
+
+
+          <input
+            type="checkbox"
+            v-model="group.properties.official"
+            v-on:change="set_group_officiality()"> Official
+
         </div>
 
 
@@ -219,7 +238,7 @@
             @selection="add_group_to_group($event)"/>
         </div>
 
-      </template>
+      </div>
 
 
 
@@ -295,9 +314,7 @@ export default {
       members: [],
       administrators: [],
       groups: [],
-
-      user_picker_open: false,
-
+      parent_groups: [],
     }
   },
   mounted(){
@@ -322,6 +339,7 @@ export default {
         this.get_members_of_group()
         this.get_administrators_of_group()
         this.get_groups_of_group()
+        this.get_parent_groups_of_group()
       })
       .catch(error => {
         if(error.response) console.log(error.response.data)
@@ -330,30 +348,47 @@ export default {
       .finally(() => this.loading = false)
     },
     get_members_of_group(){
+      this.$set(this.members,'loading',true)
       this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/users_of_group`, {
         params: { id: this.$route.query.id }
       })
       .then(response => {
-        this.members.splice(0,this.members.length)
+        this.members = []
         response.data.forEach((record) => {
           this.members.push(record._fields[record._fieldLookup['user']])
         });
-
        })
-      .catch(error => console.log(error))
+       .catch( () => this.$set(this.members,'error','Error'))
+       .finally(() => this.$set(this.members,'loading',false))
     },
     get_groups_of_group(){
+      this.$set(this.groups,'loading',true)
       this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups_of_group`, {
         params: { id: this.$route.query.id }
       })
       .then(response => {
-        this.groups.splice(0,this.groups.length)
+        this.groups = []
         response.data.forEach((record) => {
           this.groups.push(record._fields[record._fieldLookup['group']])
+        })
+       })
+       .catch( () => this.$set(this.groups,'error','Error'))
+       .finally(() => this.$set(this.groups,'loading',false))
+    },
+    get_parent_groups_of_group(){
+      this.$set(this.parent_groups,'loading',true)
+      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/parent_groups_of_group`, {
+        params: { id: this.$route.query.id }
+      })
+      .then(response => {
+        this.parent_groups = []
+        response.data.forEach((record) => {
+          this.parent_groups.push(record._fields[record._fieldLookup['group']])
         });
 
        })
-      .catch(error => console.log(error))
+      .catch( () => this.$set(this.parent_groups,'error','Error'))
+      .finally(() => this.$set(this.parent_groups,'loading',false))
     },
     delete_group(){
       if(confirm(`Delete ${this.group.properties.name}?`)){
@@ -491,19 +526,31 @@ export default {
       return user.identity.low === this.current_user.identity.low
     },
     change_avatar(){
-      if(this.user_is_current_user){
-        let avatar_src = prompt('URL')
-        if(avatar_src){
-          this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/update_avatar`, {
-            group_id: this.group.identity.low,
-            avatar_src: avatar_src
-          })
-          .then( () => { this.get_group() })
-          .catch(error => {
-            if(error.response) alert(error.response.data)
-            else alert(error)
-          })
-        }
+      let avatar_src = prompt('URL')
+      if(avatar_src){
+        this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/update_avatar`, {
+          group_id: this.group.identity.low,
+          avatar_src: avatar_src
+        })
+        .then( () => { this.get_group() })
+        .catch(error => {
+          if(error.response) alert(error.response.data)
+          else alert(error)
+        })
+      }
+    },
+    rename_group(){
+      let name = prompt('New group name:')
+      if(name){
+        this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/rename_group`, {
+          group_id: this.group.identity.low,
+          name: name
+        })
+        .then( () => { this.get_group() })
+        .catch(error => {
+          if(error.response) alert(error.response.data)
+          else alert(error)
+        })
       }
     }
 
@@ -529,6 +576,10 @@ export default {
         return administrator.identity.low === this.current_user.identity.low
       })
       return !!found
+    },
+    current_user_is_admin(){
+      if(!this.current_user) return false
+      return this.current_user.properties.isAdmin
     },
     group_avatar_src(){
       if(this.group.properties.avatar_src) return this.group.properties.avatar_src
@@ -566,9 +617,7 @@ h1 {
   height: 10vw;
   object-fit: contain;
 }
-.group_name {
-  font-size: 200%;
-}
+
 
 .user_picker{
   height: 250px;
@@ -577,20 +626,6 @@ h1 {
 .members_container{
   max-height: 300px;
   overflow-y: auto;
-}
-.member {
-  display: flex;
-  border-bottom: 1px solid #dddddd;
-  padding: 5px;
-}
-.member:last-child {
-  border: none;
-}
-.member:hover{
-  background-color: #eeeeee;
-}
-.growing_space {
-  flex-grow: 1;
 }
 
 button {
@@ -618,5 +653,9 @@ button > *:not(:last-child){
   display: flex;
   justify-content: center;
   font-size: 150%;
+}
+
+.section {
+
 }
 </style>
