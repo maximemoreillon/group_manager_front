@@ -111,18 +111,21 @@ export default {
       .catch(error => alert(error))
     },
     get_user(){
-      this.axios.get(`${process.env.VUE_APP_EMPLOYEE_MANAGER_URL}/employee`, {
-        params: { user_id: this.$route.query.id }
-      })
-      .then(response => {
+      if(this.$route.query.id){
+        // Todo: stop using employee manager
+        this.axios.get(`${process.env.VUE_APP_EMPLOYEE_MANAGER_URL}/employee`, {
+          params: { user_id: this.$route.query.id }
+        })
+        .then(response => {
 
-        this.user = response.data
+          this.user = response.data
 
-        // passwords should not be messed with
-        delete this.user.properties.password_hashed
+          // passwords should not be messed with
+          delete this.user.properties.password_hashed
 
-      })
-      .catch(error => alert(error))
+        })
+        .catch(error => alert(error))
+      }
     },
 
     get_groups_of_user(){
