@@ -19,6 +19,8 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 80
+      imagePullSecrets:
+      - name: registry-credentials # Credentials to pull image from registry
 
 ---
 apiVersion: v1
