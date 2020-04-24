@@ -111,6 +111,8 @@ export default {
       .catch(error => alert(error))
     },
     get_user(){
+      // used to check if user is current_user
+      // TODO: could be done by comparing route ID instead of full user...
       if(this.$route.query.id){
         // Todo: stop using employee manager
         this.axios.get(`${process.env.VUE_APP_EMPLOYEE_MANAGER_URL}/employee`, {
