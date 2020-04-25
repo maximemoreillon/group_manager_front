@@ -21,18 +21,3 @@ spec:
         - containerPort: 80
       imagePullSecrets:
       - name: registry-credentials # Credentials to pull image from registry
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    run: group-manager-front
-  name: group-manager-front
-spec:
-  ports:
-  - port: 80
-    nodePort: 31100
-  selector:
-    app: group-manager-front
-  type: LoadBalancer
