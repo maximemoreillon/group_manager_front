@@ -111,8 +111,7 @@ export default {
       .catch(error => alert(error))
     },
     get_user(){
-      // used to check if user is current_user
-      // TODO: could be done by comparing route ID instead of full user...
+      // simply used to show the user's name on the page title
       if(this.$route.query.id){
         // Todo: stop using employee manager
         this.axios.get(`${process.env.VUE_APP_EMPLOYEE_MANAGER_URL}/employee`, {
@@ -189,14 +188,12 @@ export default {
 
     },
 
-
-
-
-
-
   },
   computed: {
     user_is_current_user(){
+      // If ID not specified in query, then user is automatically current user
+      if(!this.$route.query.id) return true
+      // If an ID is specified but current user cannot be identified, then user might not be current user
       if(!this.current_user) return false
       return this.current_user.identity.low === this.$route.query.id
     },
