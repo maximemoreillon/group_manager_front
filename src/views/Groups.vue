@@ -36,7 +36,7 @@
 
 
     <!-- Options to create or join a group -->
-    <template v-if="user_is_current_user(user)">
+    <template v-if="user_is_current_user">
 
       <!-- Join a group -->
       <div class="">
@@ -189,16 +189,17 @@ export default {
 
     },
 
-    user_is_current_user(user){
-      if(!this.current_user) return false
-      return user.identity.low === this.$route.query.id
-    }
+
 
 
 
 
   },
   computed: {
+    user_is_current_user(){
+      if(!this.current_user) return false
+      return this.current_user.identity.low === this.$route.query.id
+    },
     group_picker_url(){
       return process.env.VUE_APP_GROUP_MANAGER_API_URL
     },
