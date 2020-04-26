@@ -141,7 +141,13 @@ export default {
           this.groups.push(record._fields[record._fieldLookup['group']])
         });
       })
-      .catch( () => {this.$set(this.groups,'error','Error loading groups')})
+      .catch( (error) => {
+        
+        if(error.response) console.log(error.response.data)
+        else console.log(error)
+
+        this.$set(this.groups,'error','Error loading groups')
+      })
       .finally( () => {this.$set(this.groups,'loading',false)})
     },
 
