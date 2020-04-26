@@ -27,7 +27,7 @@ containerization:
     # Pushing the image to the registry
     - docker push ${CONTAINER_REGISTRY}/${APPLICATION_NAME}
     # Cleanup
-    - docker image rm ${DOCKER_IMAGE}
+    - docker image rm ${CONTAINER_REGISTRY}/${APPLICATION_NAME}
 
 deployment:
   stage: deployment
