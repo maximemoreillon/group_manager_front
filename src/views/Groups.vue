@@ -142,7 +142,7 @@ export default {
         });
       })
       .catch( (error) => {
-        
+
         if(error.response) console.log(error.response.data)
         else console.log(error)
 
@@ -191,8 +191,7 @@ export default {
 
     user_is_current_user(user){
       if(!this.current_user) return false
-      if(!this.user) return false
-      return user.identity.low === this.current_user.identity.low
+      return user.identity.low === this.$route.query.id
     }
 
 
