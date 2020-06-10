@@ -18,12 +18,7 @@ containerization:
     # Copy environment variables from gitlab
     - cp ${ENV} ./.env.production
     # Building the container image
-    - >
-      docker build
-      --build-arg HTTP_PROXY=$HTTP_PROXY
-      --build-arg HTTPS_PROXY=$HTTPS_PROXY
-      -t ${CONTAINER_REGISTRY}/${APPLICATION_NAME}
-      .
+    - > docker build -t ${CONTAINER_REGISTRY}/${APPLICATION_NAME} .
     # Pushing the image to the registry
     - docker push ${CONTAINER_REGISTRY}/${APPLICATION_NAME}
     # Cleanup
