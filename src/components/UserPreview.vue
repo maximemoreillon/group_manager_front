@@ -11,7 +11,7 @@
     <!-- User name -->
     <div
       class="user_name">
-      {{user.properties.name_kanji}}
+      {{user.properties.display_name}}
     </div>
 
     <div class="growing_spacer" />
