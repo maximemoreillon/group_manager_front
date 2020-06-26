@@ -90,6 +90,7 @@ export default {
       user: null,
       current_user: null,
       groups: [],
+      error: null,
 
       groups_administrated_by_user: [],
     }
@@ -167,7 +168,7 @@ export default {
 
     create_group(){
       this.loading = true;
-      this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/create_group`, {
+      this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/group`, {
         name: this.$refs.new_group_name.value,
       })
       .then( (response) => {

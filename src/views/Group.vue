@@ -158,7 +158,7 @@
       <!-- Parent Groups -->
       <div class="section">
         <h2 class="">Parent Groups</h2>
-        <div class="" v-if="parent_groups.error">{{parent_groupsparent_groups.error}}</div>
+        <div class="" v-if="parent_groups.error">{{parent_groups.error}}</div>
         <Loader v-else-if="parent_groups.loading">Loading parent groups</Loader>
         <template v-else>
           <div class="members_container" v-if="parent_groups.length > 0">
@@ -183,41 +183,60 @@
         <div class="">
 
           <h3>Group options</h3>
-          <!-- change avatar -->
-          <button
-            type="button"
-            v-on:click="rename_group()">
-            <font-awesome-icon icon="edit"/>
-            <span>Rename group</span>
-          </button>
 
-          <!-- change avatar -->
-          <button
-            type="button"
-            v-on:click="change_avatar()">
-            <font-awesome-icon icon="edit"/>
-            <span>Change group avatar</span>
-          </button>
+          <table class="group_properties_table">
+            <tr>
+              <td>Group name</td>
+              <td>
+                <input type="text" v-model="group.properties.name">
+              </td>
+            </tr>
+            <tr>
+              <td>Avatar URL</td>
+              <td>
+                <input type="text" v-model="group.properties.avatar_src">
+              </td>
+            </tr>
+            <tr>
+              <td>Restricted</td>
+              <td>
+                <input
+                  type="checkbox"
+                  v-model="group.properties.restricted">
+              </td>
+            </tr>
+            <tr v-if="current_user_is_admin">
+              <td>Official</td>
+              <td>
+                <input
+                  type="checkbox"
+                  v-model="group.properties.official">
+              </td>
+            </tr>
+            <tr>
+              <td>Save modifications</td>
+              <td>
+                <button
+                  type="button"
+                  v-on:click="patch_group()">
+                  <font-awesome-icon icon="save"/>
+                  <span>Save</span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Delete group</td>
+              <td>
+                <button
+                  type="button"
+                  v-on:click="delete_group()">
+                  <font-awesome-icon icon="trash"/>
+                  <span>Delete</span>
+                </button>
+              </td>
+            </tr>
 
-
-          <!-- delete group button -->
-          <button
-            type="button"
-            v-on:click="delete_group()">
-            <font-awesome-icon icon="trash"/>
-            <span>Delete group</span>
-          </button>
-
-          <input
-            type="checkbox"
-            v-model="group.properties.restricted"
-            v-on:change="set_group_restriction()"> Restricted
-
-
-          <input
-            type="checkbox"
-            v-model="group.properties.official"
-            v-on:change="set_group_officiality()"> Official
+          </table>
 
         </div>
 
@@ -275,6 +294,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faEdit,
+  faSave,
   faSignInAlt,
   faSignOutAlt,
   faUserTie,
@@ -285,6 +305,7 @@ import {
 
 library.add(
   faEdit,
+  faSave,
   faSignInAlt,
   faSignOutAlt,
   faUserTie,
@@ -331,9 +352,7 @@ export default {
     },
     get_group(){
       this.loading = true;
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/group`, {
-        params: { id: this.$route.query.id }
-      })
+      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.$route.query.id}`)
       .then(response => {
         this.group = response.data
         this.get_members_of_group()
@@ -349,7 +368,7 @@ export default {
     },
     get_members_of_group(){
       this.$set(this.members,'loading',true)
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/users_of_group`, {
+      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.$route.query.id}/members`, {
         params: { id: this.$route.query.id }
       })
       .then(response => {
@@ -363,7 +382,7 @@ export default {
     },
     get_groups_of_group(){
       this.$set(this.groups,'loading',true)
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups_of_group`, {
+      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.$route.query.id}/groups`, {
         params: { id: this.$route.query.id }
       })
       .then(response => {
@@ -377,9 +396,7 @@ export default {
     },
     get_parent_groups_of_group(){
       this.$set(this.parent_groups,'loading',true)
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/parent_groups_of_group`, {
-        params: { id: this.$route.query.id }
-      })
+      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.$route.query.id}/parent_groups`)
       .then(response => {
         this.parent_groups = []
         response.data.forEach((record) => {
@@ -392,7 +409,7 @@ export default {
     },
     delete_group(){
       if(confirm(`Delete ${this.group.properties.name}?`)){
-        this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/delete_group`, {
+        this.axios.delete(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/group`, {
           id: this.group.identity.low,
         })
         .then( () => {
@@ -403,9 +420,7 @@ export default {
 
     },
     get_administrators_of_group(){
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/administrators_of_group`, {
-        params: { id: this.$route.query.id }
-      })
+      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}/administrators`)
       .then(response => {
         this.administrators.splice(0,this.administrators.length)
         response.data.forEach((record) => {
@@ -436,47 +451,61 @@ export default {
     },
     add_user_to_group(user){
       if(confirm(`Add ${user.properties.name_kanji} to ${this.group.properties.name}?`)){
-        this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/add_user_to_group`, {
-          group_id: this.group.identity.low,
-          user_id: user.identity.low
-        })
+
+        let group_id = this.group.identity.low
+        let user_id = user.identity.low
+        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
+
+        this.axios.post(url)
         .then( () => { this.get_members_of_group() })
         .catch(error => console.log(error))
       }
     },
     remove_user_from_group(user){
-      if(confirm(`Remove ${user.properties.name_kanji} from ${this.group.properties.name}?`))
-      this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/remove_user_from_group`, {
-        group_id: this.group.identity.low,
-        user_id: user.identity.low
-      })
-      .then( () => { this.get_members_of_group() })
-      .catch(error => console.log(error))
+      if(confirm(`Remove ${user.properties.name_kanji} from ${this.group.properties.name}?`)){
+
+        let group_id = this.group.identity.low
+        let user_id = user.identity.low
+        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
+
+        this.axios.delete(url)
+        .then( () => { this.get_members_of_group() })
+        .catch(error => console.log(error))
+      }
     },
     make_user_administrator_of_group(user){
-      if(confirm(`Make ${user.properties.name_kanji} admin of ${this.group.properties.name}?`))
-      this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/make_user_administrator_of_group`, {
-        group_id: this.group.identity.low,
-        user_id: user.identity.low
-      })
-      .then( () => { this.get_administrators_of_group() })
-      .catch(error => console.log(error))
+      if(confirm(`Make ${user.properties.name_kanji} admin of ${this.group.properties.name}?`)){
+
+        let group_id = this.group.identity.low
+        let user_id = user.identity.low
+        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
+
+        this.axios.post(url)
+        .then( () => { this.get_administrators_of_group() })
+        .catch(error => console.log(error))
+      }
+
     },
     remove_user_from_administrators(user){
-      if(confirm(`Remove ${user.properties.name_kanji} from administrators of ${this.group.properties.name}?`))
-      this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/remove_user_from_administrators`, {
-        group_id: this.group.identity.low,
-        user_id: user.identity.low
-      })
-      .then( () => { this.get_administrators_of_group() })
-      .catch(error => console.log(error))
+      if(confirm(`Remove ${user.properties.name_kanji} from administrators of ${this.group.properties.name}?`)){
+        let group_id = this.group.identity.low
+        let user_id = user.identity.low
+        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
+
+        this.axios.delete(url)
+        .then( () => { this.get_administrators_of_group() })
+        .catch(error => console.log(error))
+      }
+
     },
     add_group_to_group(group){
       if(confirm(`Add ${group.properties.name} to ${this.group.properties.name}?`)){
-        this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/add_group_to_group`, {
-          parent_group_id: this.group.identity.low,
-          child_group_id: group.identity.low
-        })
+
+        let parent_group_id = this.group.identity.low
+        let child_group_id = group.identity.low
+        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${parent_group_id}/groups/${child_group_id}`
+
+        this.axios.post(url)
         .then( () => {
           this.get_groups_of_group()
         })
@@ -484,40 +513,27 @@ export default {
       }
     },
     remove_group_from_group(group){
-      if(confirm(`Remove ${group.properties.name} from ${this.group.properties.name}?`))
-      this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/remove_group_from_group`, {
-        parent_group_id: this.group.identity.low,
-        child_group_id: group.identity.low
+      if(confirm(`Remove ${group.properties.name} from ${this.group.properties.name}?`)) {
+        let parent_group_id = this.group.identity.low
+        let child_group_id = group.identity.low
+        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${parent_group_id}/groups/${child_group_id}`
+        this.axios.delete(url)
+        .then( () => { this.get_groups_of_group() })
+        .catch(error => console.log(error))
+      }
+
+    },
+    patch_group(){
+      this.axios.patch(
+        `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}`,
+        this.group.properties
+      )
+      .then( () => {
+        this.get_group()
       })
-      .then( () => { this.get_groups_of_group() })
       .catch(error => console.log(error))
     },
-    set_group_restriction(){
-      if(confirm(`Update restrictions on ${this.group.properties.name}?`)){
-        this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/set_group_restriction`, {
-          id: this.group.identity.low,
-          restricted: this.group.properties.restricted,
-        })
-        .then( (response) => {
-          console.log(response.data)
-          this.get_group()
-        })
-        .catch(error => console.log(error))
-      }
-    },
-    set_group_officiality(){
-      if(confirm(`Update officiality of ${this.group.properties.name}?`)){
-        this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/set_group_officiality`, {
-          id: this.group.identity.low,
-          official: this.group.properties.official,
-        })
-        .then( (response) => {
-          console.log(response.data)
-          this.get_group()
-        })
-        .catch(error => console.log(error))
-      }
-    },
+
     view_profile_of_user(user){
       this.$router.push({name: 'profile', query: {id: user.identity.low}})
     },
@@ -525,34 +541,7 @@ export default {
       if(!this.current_user) return false
       return user.identity.low === this.current_user.identity.low
     },
-    change_avatar(){
-      let avatar_src = prompt('URL')
-      if(avatar_src){
-        this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/update_avatar`, {
-          group_id: this.group.identity.low,
-          avatar_src: avatar_src
-        })
-        .then( () => { this.get_group() })
-        .catch(error => {
-          if(error.response) alert(error.response.data)
-          else alert(error)
-        })
-      }
-    },
-    rename_group(){
-      let name = prompt('New group name:')
-      if(name){
-        this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/rename_group`, {
-          group_id: this.group.identity.low,
-          name: name
-        })
-        .then( () => { this.get_group() })
-        .catch(error => {
-          if(error.response) alert(error.response.data)
-          else alert(error)
-        })
-      }
-    }
+
 
 
 
@@ -657,5 +646,18 @@ button > *:not(:last-child){
 
 .section {
 
+}
+
+.group_properties_table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.group_properties_table td{
+  padding: 0.25em;
+}
+
+.group_properties_table tr:not(:last-child) {
+  border-bottom: 1px solid #dddddd;
 }
 </style>
