@@ -432,9 +432,8 @@ export default {
     },
     leave_group(){
       if(confirm(`Leave ${this.group.properties.name}?`)){
-        this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/leave_group`, {
-          group_id: this.group.identity.low,
-        })
+        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}/leave`
+        this.axios.post(url)
         .then( () => { this.get_members_of_group() })
         .catch(error => console.log(error))
       }
@@ -442,9 +441,8 @@ export default {
     },
     join_group(){
       if(confirm(`Join ${this.group.properties.name}?`)){
-        this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/join_group`, {
-          group_id: this.group.identity.low,
-        })
+        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}/join`
+        this.axios.post(url)
         .then( () => { this.get_members_of_group() })
         .catch(error => console.log(error))
       }
@@ -524,8 +522,8 @@ export default {
 
     },
     patch_group(){
-      this.axios.patch(
-        `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}`,
+      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}`
+      this.axios.patch(url,
         this.group.properties
       )
       .then( () => {

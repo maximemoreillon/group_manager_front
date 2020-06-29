@@ -46,10 +46,10 @@
 
         <div class="group_picker_wrapper">
           <GroupPicker
-            v-bind:apiUrl="group_picker_url"
-            v-on:selection="join_group($event)"
-            :userPageUrl="'http://172.16.98.151:31097/'"
-            groupPageUrl="group"/>
+            v-bind:apiUrl="group_manager_api_url"
+            @selection="join_group($event)"
+            :userPageUrl="user_page_url"
+            groupPageUrl="/group"/>
         </div>
 
       </div>
@@ -93,6 +93,9 @@ export default {
       error: null,
 
       groups_administrated_by_user: [],
+
+      group_manager_api_url : process.env.VUE_APP_GROUP_MANAGER_API_URL,
+      user_page_url : process.env.VUE_APP_EMPLOYEE_MANAGER_FRONT_URL
     }
   },
   mounted(){
@@ -132,9 +135,10 @@ export default {
 
     get_groups_of_user(){
       this.$set(this.groups,'loading',true)
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups_of_user`, {
-        params: {id: this.$route.query.id}
-      })
+
+      let user_id = this.$route.query.id || 'self'
+      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/members/${user_id}/groups`
+      this.axios.get(url)
       .then(response => {
         this.groups = []
         response.data.forEach((record) => {
@@ -153,9 +157,11 @@ export default {
 
     get_groups_administrated_by_user(){
       this.$set(this.groups_administrated_by_user,'loading',true)
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups_of_administrator`, {
-        params: {id: this.$route.query.id}
-      })
+
+      let user_id = this.$route.query.id || 'self'
+      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/administrators/${user_id}/groups`
+
+      this.axios.get(url)
       .then(response => {
         this.groups_administrated_by_user = []
         response.data.forEach((record) => {
@@ -168,7 +174,7 @@ export default {
 
     create_group(){
       this.loading = true;
-      this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/group`, {
+      this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups`, {
         name: this.$refs.new_group_name.value,
       })
       .then( (response) => {
@@ -180,9 +186,8 @@ export default {
     join_group(group){
       if(confirm(`Join ${group.properties.name}?`)){
         this.loading = true;
-        this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/join_group`, {
-          group_id: group.identity.low
-        })
+        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group.identity.low}/join`
+        this.axios.post(url)
         .then( () => { this.get_groups_of_user() })
         .catch( () => {this.error = 'Error loading groups'})
       }
@@ -198,12 +203,6 @@ export default {
       if(!this.current_user) return false
       return this.current_user.identity.low === this.$route.query.id
     },
-    group_picker_url(){
-      return process.env.VUE_APP_GROUP_MANAGER_API_URL
-    },
-    group_page_url() {
-      return `${process.env.VUE_APP_GROUP_MANAGER_FRONT_URL}/group`
-    }
   }
 }
 </script>
