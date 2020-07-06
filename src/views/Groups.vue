@@ -118,15 +118,13 @@ export default {
       // simply used to show the user's name on the page title
       if(this.$route.query.id){
         // Todo: stop using employee manager
-        this.axios.get(`${process.env.VUE_APP_EMPLOYEE_MANAGER_URL}/employee`, {
-          params: { user_id: this.$route.query.id }
-        })
+        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/members/${this.$route.query.id}`
+        this.axios.get(url)
         .then(response => {
 
-          this.user = response.data
+          let record = response.data[0]
 
-          // passwords should not be messed with
-          delete this.user.properties.password_hashed
+          this.user = record._fields[record._fieldLookup['user']]
 
         })
         .catch(error => alert(error))

@@ -396,7 +396,8 @@ export default {
     },
     get_parent_groups_of_group(){
       this.$set(this.parent_groups,'loading',true)
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.$route.query.id}/parent_groups`)
+      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.$route.query.id}/parent_groups`
+      this.axios.get(url)
       .then(response => {
         this.parent_groups = []
         response.data.forEach((record) => {
@@ -409,12 +410,9 @@ export default {
     },
     delete_group(){
       if(confirm(`Delete ${this.group.properties.name}?`)){
-        this.axios.delete(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/group`, {
-          id: this.group.identity.low,
-        })
-        .then( () => {
-          this.$router.push({name: 'groups'})
-         })
+        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}`
+        this.axios.delete(url)
+        .then( () => { this.$router.push({name: 'groups'}) })
         .catch(error => console.log(error))
       }
 

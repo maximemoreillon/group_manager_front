@@ -40,7 +40,7 @@ export default {
   },
   methods: {
     user_clicked(){
-      window.location.href = `${process.env.VUE_APP_EMPLOYEE_MANAGER_FRONT_URL}?id=${this.user.identity.low}`
+      window.location.href = `/?id=${this.user.identity.low}`
     }
   },
   computed: {
