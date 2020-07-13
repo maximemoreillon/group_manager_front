@@ -2,7 +2,7 @@
   <div class="groups">
 
     <h1 class="" >
-      Groups <span v-if="user">Of {{user.properties.name_kanji}}</span>
+      Groups <span v-if="user">Of {{user.properties.display_name}}</span>
     </h1>
 
 
@@ -99,9 +99,10 @@ export default {
     }
   },
   mounted(){
-    this.get_current_user()
-    this.get_user()
 
+    this.get_current_user() // This should be done in Vuex
+
+    this.get_user()
     this.get_groups_of_user()
     this.get_groups_administrated_by_user()
 
@@ -117,7 +118,6 @@ export default {
     get_user(){
       // simply used to show the user's name on the page title
       if(this.$route.query.id){
-        // Todo: stop using employee manager
         let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/members/${this.$route.query.id}`
         this.axios.get(url)
         .then(response => {
