@@ -14,9 +14,13 @@ Vue.use(VueRouter)
   {
     path: '/groups/:group_id',
     name: 'group',
-    component: Group
+    component: Group,
+    alias: '/group',
   },
-  { path: '*', redirect: {name :'groups'}}
+  {
+    path: '*',
+    redirect: {name :'groups'}
+  }
 
 ]
 
