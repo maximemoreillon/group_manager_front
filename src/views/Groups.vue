@@ -5,15 +5,23 @@
       Groups <span v-if="user">Of {{user.properties.display_name}}</span>
     </h1>
 
-
-    <h2 class="">Groups ({{groups.length}})</h2>
+    <h2 class="">Groups</h2>
     <template v-if="!groups.loading">
-      <div v-if="groups.length > 0">
+      <template v-if="groups.length > 0">
+
+        <h3>Official groups ({{official_groups(groups).length}})</h3>
         <GroupPreview
-        v-for="group in groups"
-        v-bind:key="group.identity.low"
-        v-bind:group="group"/>
-      </div>
+          v-for="group in official_groups(groups)"
+          v-bind:key="group.identity.low"
+          v-bind:group="group"/>
+
+        <h3>Non-official groups ({{non_official_groups(groups).length}})</h3>
+        <GroupPreview
+          v-for="group in non_official_groups(groups)"
+          v-bind:key="group.identity.low"
+          v-bind:group="group"/>
+
+      </template>
       <div class="" v-else>No groups</div>
     </template>
     <Loader v-if="groups.loading" message="Loading"/>
@@ -23,12 +31,21 @@
     <!-- Groups administrated by user -->
     <h2 class="">Administrated groups ({{groups_administrated_by_user.length}})</h2>
     <template v-if="!groups_administrated_by_user.loading">
-      <div class="" v-if="groups_administrated_by_user.length > 0">
+      <template class="" v-if="groups_administrated_by_user.length > 0">
+
+        <h3>Official groups ({{official_groups(groups_administrated_by_user).length}})</h3>
         <GroupPreview
-        v-for="group in groups_administrated_by_user"
-        v-bind:key="group.identity.low"
-        v-bind:group="group"/>
-      </div>
+          v-for="group in official_groups(groups_administrated_by_user)"
+          v-bind:key="`administrated_${group.identity.low}`"
+          v-bind:group="group"/>
+
+        <h3>Official groups ({{non_official_groups(groups_administrated_by_user).length}})</h3>
+        <GroupPreview
+          v-for="group in non_official_groups(groups_administrated_by_user)"
+          v-bind:key="`administrated_${group.identity.low}`"
+          v-bind:group="group"/>
+
+      </template>
       <div class="" v-else>No groups</div>
     </template>
     <Loader v-if="groups_administrated_by_user.loading" message="Loading"/>
@@ -117,25 +134,31 @@ export default {
     },
     get_user(){
       // simply used to show the user's name on the page title
-      if(this.$route.query.id){
-        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/members/${this.$route.query.id}`
-        this.axios.get(url)
-        .then(response => {
+      let user_id = this.$route.params.member_id
+        || this.$route.query.id
+        || 'self'
 
-          let record = response.data[0]
+      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/members/${user_id}`
+      this.axios.get(url)
+      .then(response => {
+        let record = response.data[0]
+        this.user = record._fields[record._fieldLookup['user']]
+      })
+      .catch(error => alert(error))
 
-          this.user = record._fields[record._fieldLookup['user']]
-
-        })
-        .catch(error => alert(error))
-      }
     },
 
     get_groups_of_user(){
+
+      let user_id = this.$route.query.id
+        || this.$route.query.user_id
+        || this.$route.params.user_id
+        || 'self'
+
+      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/members/${user_id}/groups`
+
       this.$set(this.groups,'loading',true)
 
-      let user_id = this.$route.query.id || 'self'
-      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/members/${user_id}/groups`
       this.axios.get(url)
       .then(response => {
         this.groups = []
@@ -154,10 +177,15 @@ export default {
     },
 
     get_groups_administrated_by_user(){
-      this.$set(this.groups_administrated_by_user,'loading',true)
 
-      let user_id = this.$route.query.id || 'self'
+      let user_id = this.$route.query.id
+        || this.$route.query.user_id
+        || this.$route.params.user_id
+        || 'self'
+
       let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/administrators/${user_id}/groups`
+
+      this.$set(this.groups_administrated_by_user,'loading',true)
 
       this.axios.get(url)
       .then(response => {
@@ -176,21 +204,32 @@ export default {
         name: this.$refs.new_group_name.value,
       })
       .then( (response) => {
-        this.$router.push({name: 'group', query: {id: response.data.identity.low}})
+        this.$router.push({name: 'group', params: {group_id: response.data.identity.low}})
       })
       .catch( () => {this.error = 'Error loading groups'})
     },
 
     join_group(group){
-      if(confirm(`Join ${group.properties.name}?`)){
-        this.loading = true;
-        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group.identity.low}/join`
-        this.axios.post(url)
-        .then( () => { this.get_groups_of_user() })
-        .catch( () => {this.error = 'Error loading groups'})
-      }
+      if(!confirm(`Join ${group.properties.name}?`)) return
+
+      this.loading = true;
+      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group.identity.low}/join`
+      this.axios.post(url)
+      .then( () => { this.get_groups_of_user() })
+      .catch( () => {this.error = 'Error loading groups'})
+
 
     },
+    official_groups(groups){
+      return groups.filter((group) => {
+        return group.properties.official
+      })
+    },
+    non_official_groups(groups) {
+      return groups.filter((group) => {
+        return !group.properties.official
+      })
+    }
 
   },
   computed: {
@@ -201,6 +240,7 @@ export default {
       if(!this.current_user) return false
       return this.current_user.identity.low === this.$route.query.id
     },
+
   }
 }
 </script>

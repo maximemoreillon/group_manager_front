@@ -12,17 +12,12 @@ Vue.use(VueRouter)
     component: Groups
   },
   {
-    path: '/group',
+    path: '/groups/:group_id',
     name: 'group',
     component: Group
-  }
-  /*
-  {
-    path: '/group',
-    name: 'group',
-    component: () => import('../views/Group.vue')
-  }
-  */
+  },
+  { path: '*', redirect: {name :'groups'}}
+
 ]
 
 const router = new VueRouter({

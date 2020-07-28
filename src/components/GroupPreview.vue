@@ -1,4 +1,5 @@
 <template>
+
   <div
     v-on:click="group_clicked"
     class="group_preview">
@@ -10,7 +11,7 @@
 
     <!-- group name -->
     <div
-    class="group_name">
+      class="group_name">
       {{group.properties.name}}
     </div>
 
@@ -19,6 +20,7 @@
     <slot />
 
   </div>
+
 </template>
 
 <script>
@@ -31,12 +33,11 @@ export default {
   props: {
     group: Object,
   },
-  components: {
+  
 
-  },
   methods: {
     group_clicked(){
-      window.location.href =`group?id=${this.group.identity.low}`
+      this.$router.push({name: 'group', params: {group_id: this.group.identity.low}})
     }
   },
   computed: {

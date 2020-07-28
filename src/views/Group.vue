@@ -328,6 +328,10 @@ export default {
   },
   data(){
     return {
+
+      // Won't be needed anymore
+      picker_api_url: process.env.VUE_APP_GROUP_MANAGER_API_URL,
+
       current_user: null,
       group: null,
       loading: false,
@@ -336,6 +340,12 @@ export default {
       administrators: [],
       groups: [],
       parent_groups: [],
+    }
+  },
+  watch: {
+    group_id(){
+      this.get_current_user()
+      this.get_group()
     }
   },
   mounted(){
@@ -351,8 +361,11 @@ export default {
       .catch(error => console.log(error))
     },
     get_group(){
+
+      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}`
+
       this.loading = true;
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.$route.query.id}`)
+      this.axios.get(url)
       .then(response => {
         this.group = response.data
         this.get_members_of_group()
@@ -368,9 +381,8 @@ export default {
     },
     get_members_of_group(){
       this.$set(this.members,'loading',true)
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.$route.query.id}/members`, {
-        params: { id: this.$route.query.id }
-      })
+      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/members`
+      this.axios.get(url)
       .then(response => {
         this.members = []
         response.data.forEach((record) => {
@@ -382,8 +394,8 @@ export default {
     },
     get_groups_of_group(){
       this.$set(this.groups,'loading',true)
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.$route.query.id}/groups`, {
-        params: { id: this.$route.query.id }
+      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/groups`, {
+        params: { id: this.group_id }
       })
       .then(response => {
         this.groups = []
@@ -391,12 +403,15 @@ export default {
           this.groups.push(record._fields[record._fieldLookup['group']])
         })
        })
-       .catch( () => this.$set(this.groups,'error','Error'))
+       .catch( (error) => {
+         console.log(error)
+         this.$set(this.groups,'error','Error')
+       })
        .finally(() => this.$set(this.groups,'loading',false))
     },
     get_parent_groups_of_group(){
       this.$set(this.parent_groups,'loading',true)
-      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.$route.query.id}/parent_groups`
+      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/parent_groups`
       this.axios.get(url)
       .then(response => {
         this.parent_groups = []
@@ -543,8 +558,10 @@ export default {
 
   },
   computed: {
-    picker_api_url(){
-      return process.env.VUE_APP_GROUP_MANAGER_API_URL
+    group_id(){
+      return this.$route.query.id
+        || this.$route.query.group_id
+        || this.$route.params.group_id
     },
     current_user_is_member_of_group(){
       if(!this.current_user) return false
