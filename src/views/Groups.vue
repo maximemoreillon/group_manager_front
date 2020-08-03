@@ -39,7 +39,7 @@
           v-bind:key="`administrated_${group.identity.low}`"
           v-bind:group="group"/>
 
-        <h3>Official groups ({{non_official_groups(groups_administrated_by_user).length}})</h3>
+        <h3>User-created groups ({{non_official_groups(groups_administrated_by_user).length}})</h3>
         <GroupPreview
           v-for="group in non_official_groups(groups_administrated_by_user)"
           v-bind:key="`administrated_${group.identity.low}`"

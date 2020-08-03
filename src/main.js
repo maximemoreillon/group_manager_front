@@ -16,7 +16,13 @@ router.beforeEach((to, from, next) => {
   var jwt = Vue.$cookies.get("jwt")
   if(jwt) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
-    next();
+    axios.get(`${process.env.VUE_APP_AUTHENTICATION_API_URL}/whoami`)
+    .then(response => {
+      console.log(response.data)
+      next()
+    })
+    .catch(error => console.log(error))
+
   }
   else {
     delete axios.defaults.headers.common['Authorization']
