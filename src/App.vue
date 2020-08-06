@@ -1,8 +1,15 @@
 <template>
   <div id="app">
     <AppTemplate
-      applicationName="Group manager"
-      v-bind:navigation="navigation"/>
+      authenticate
+      applicationName="グループマネージャー">
+      <template v-slot:navigation>
+
+        <router-link :to="{ name: 'groups'}">
+          <span>My groups</span>
+        </router-link>
+      </template>
+    </AppTemplate>
   </div>
 </template>
 
@@ -16,9 +23,7 @@ export default {
   },
   data(){
     return{
-      navigation : [
-        {route: '/', label: 'Groups', icon: 'account-multiple'},
-      ]
+
     }
   }
 }

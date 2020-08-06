@@ -1,9 +1,10 @@
 <template>
   <div class="groups">
 
-    <h1 class="" >
-      Groups <span v-if="user">Of {{user.properties.display_name}}</span>
+    <h1 v-if="user">
+      {{user.properties.display_name}}
     </h1>
+    <h1 v-else>Groups</h1>
 
     <h2 class="">Groups</h2>
     <template v-if="!groups.loading">
@@ -56,35 +57,22 @@
     <template v-if="user_is_current_user">
 
       <!-- Join a group -->
-      <div class="">
-        <h2 class="">
-          Join an existing group
-        </h2>
+      <h2 class="">Join an existing group</h2>
+      <GroupPicker
+        class="group_picker"
+        v-bind:apiUrl="group_manager_api_url"
+        @selection="join_group($event)"
+        :userPageUrl="user_page_url"
+        groupPageUrl="/group"/>
 
-        <div class="group_picker_wrapper">
-          <GroupPicker
-            v-bind:apiUrl="group_manager_api_url"
-            @selection="join_group($event)"
-            :userPageUrl="user_page_url"
-            groupPageUrl="/group"/>
-        </div>
-
-      </div>
 
       <!-- Creating a group -->
-      <div class="">
-        <h2 class="">
-          Create a new group
-        </h2>
-        <form class="" v-on:submit.prevent="create_group()">
-          <input type="text" ref="new_group_name" placeholder="Group name">
-          <input type="submit">
-        </form>
-      </div>
+      <h2 class="">Create a new group</h2>
+      <form class="" v-on:submit.prevent="create_group()">
+        <input type="text" ref="new_group_name" placeholder="Group name">
+        <input type="submit">
+      </form>
     </template>
-
-
-
 
 
   </div>
@@ -253,7 +241,7 @@ export default {
 }
 
 
-.group_picker_wrapper {
+.user_picker, .group_picker{
   height: 250px;
 }
 

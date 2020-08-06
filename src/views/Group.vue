@@ -252,7 +252,7 @@
         <h3 class="">Add groups to {{group.properties.name}}</h3>
         <div class="user_picker">
           <GroupPicker
-            class=""
+            class="group_picker"
             :apiUrl="picker_api_url"
             @selection="add_group_to_group($event)"/>
         </div>
@@ -621,7 +621,7 @@ h1 {
 }
 
 
-.user_picker{
+.user_picker, .group_picker{
   height: 250px;
 }
 

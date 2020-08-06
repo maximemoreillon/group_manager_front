@@ -17,16 +17,16 @@ router.beforeEach((to, from, next) => {
   if(jwt) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
     axios.get(`${process.env.VUE_APP_AUTHENTICATION_API_URL}/whoami`)
-    .then(response => {
-      console.log(response.data)
+    .then(() => {
+      // TODO: Commit current user to store
       next()
     })
-    .catch(error => console.log(error))
+    .catch(error => console.error(error))
 
   }
   else {
     delete axios.defaults.headers.common['Authorization']
-    window.location.href = process.env.VUE_APP_AUTHENTICATION_MANAGER_FRONT_URL;
+    //window.location.href = process.env.VUE_APP_AUTHENTICATION_MANAGER_FRONT_URL;
   }
 })
 
