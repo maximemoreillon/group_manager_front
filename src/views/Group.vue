@@ -252,6 +252,7 @@
         <h3 class="">Add groups to {{group.properties.name}}</h3>
         <div class="user_picker">
           <GroupPicker
+            :usersWithNoGroup="false"
             class="group_picker"
             :apiUrl="picker_api_url"
             @selection="add_group_to_group($event)"/>
