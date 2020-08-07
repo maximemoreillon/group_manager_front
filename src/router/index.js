@@ -5,11 +5,19 @@ import Group from '../views/Group.vue'
 
 Vue.use(VueRouter)
 
-  const routes = [
+const routes = [
+  /*
   {
     path: '/',
     name: 'groups',
     component: Groups
+  },
+  */
+  {
+    path: '/users/:user_id/groups',
+    name: 'groups_of_user',
+    component: Groups,
+    alias: '/members/:member:id/groups'
   },
   {
     path: '/groups/:group_id',
@@ -18,9 +26,15 @@ Vue.use(VueRouter)
     alias: '/group',
   },
   {
+    path: '/about',
+    name: 'about',
+    component: () => import('../views/About.vue')
+  },
+  {
     path: '*',
-    redirect: {name :'groups'}
+    redirect: {name :'groups_of_user', params: {user_id: 'self'}}
   }
+
 
 ]
 

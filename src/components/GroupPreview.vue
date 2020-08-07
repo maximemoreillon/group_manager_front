@@ -33,7 +33,7 @@ export default {
   props: {
     group: Object,
   },
-  
+
 
   methods: {
     group_clicked(){

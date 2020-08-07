@@ -2,11 +2,11 @@
   <div class="groups">
 
     <h1 v-if="user">
-      {{user.properties.display_name}}
+      Groups of {{user.properties.display_name}}
     </h1>
     <h1 v-else>Groups</h1>
 
-    <h2 class="">Groups</h2>
+    <h2 class="">As member ({{groups.length}})</h2>
     <template v-if="!groups.loading">
       <template v-if="groups.length > 0">
 
@@ -30,7 +30,7 @@
 
 
     <!-- Groups administrated by user -->
-    <h2 class="">Administrated groups ({{groups_administrated_by_user.length}})</h2>
+    <h2 class="">As administrator ({{groups_administrated_by_user.length}})</h2>
     <template v-if="!groups_administrated_by_user.loading">
       <template class="" v-if="groups_administrated_by_user.length > 0">
 
@@ -94,7 +94,6 @@ export default {
   data(){
     return {
       user: null,
-      current_user: null,
       groups: [],
       error: null,
 
@@ -104,9 +103,19 @@ export default {
       user_page_url : process.env.VUE_APP_EMPLOYEE_MANAGER_FRONT_URL
     }
   },
+
+
+  beforeRouteUpdate (to, from, next) {
+    next()
+    this.$nextTick().then(() => {
+      this.get_user()
+      this.get_groups_of_user()
+      this.get_groups_administrated_by_user()
+    })
+  },
+
   mounted(){
 
-    this.get_current_user() // This should be done in Vuex
 
     this.get_user()
     this.get_groups_of_user()
@@ -114,16 +123,11 @@ export default {
 
   },
   methods: {
-    get_current_user(){
-      this.axios.get(`${process.env.VUE_APP_AUTHENTICATION_MANAGER_URL}/whoami`)
-      .then(response => {
-        this.current_user = response.data
-      })
-      .catch(error => alert(error))
-    },
+
     get_user(){
       // simply used to show the user's name on the page title
       let user_id = this.$route.params.member_id
+        || this.$route.params.user_id
         || this.$route.query.id
         || 'self'
 
@@ -226,8 +230,8 @@ export default {
       // If ID not specified in query, then user is automatically current user
       if(!this.$route.query.id) return true
       // If an ID is specified but current user cannot be identified, then user might not be current user
-      if(!this.current_user) return false
-      return this.current_user.identity.low === this.$route.query.id
+      if(!this.$store.state.current_user) return false
+      return this.$store.state.current_user.identity.low === this.$route.query.id
     },
 
   }

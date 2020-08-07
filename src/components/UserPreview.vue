@@ -1,7 +1,9 @@
 <template>
+
   <div
     class="user_preview"
-    v-on:click="user_clicked()">
+    :class="{self: user.identity.low === $store.state.current_user.identity.low}"
+    @click="user_clicked()">
 
     <!-- Avatar -->
     <img
@@ -11,14 +13,18 @@
     <!-- User name -->
     <div
       class="user_name">
-      {{user.properties.display_name}}
+      {{user.properties.display_name
+        || user.properties.name_kanji
+        || user.properties.name}}
     </div>
 
     <div class="growing_spacer" />
 
+    <!-- slot for additional stuff like buttons -->
     <slot />
 
   </div>
+
 </template>
 
 <script>
@@ -31,7 +37,6 @@ export default {
   props: {
     user: Object,
     currentUser: Object,
-    apiUrl: String,
     profileUrl: String,
 
   },
@@ -40,7 +45,7 @@ export default {
   },
   methods: {
     user_clicked(){
-      window.location.href = `/?id=${this.user.identity.low}`
+      this.$router.push({ name: 'groups_of_user', params: {user_id: this.user.identity.low} })
     }
   },
   computed: {
@@ -70,8 +75,15 @@ export default {
 }
 
 
+
+
 .user_preview:not(:last-child) {
   border-bottom: 1px solid #dddddd;
+}
+
+.user_preview.self {
+  border: 1px solid #c00000;
+  //background-color: #ffdddddd;
 }
 
 

@@ -17,8 +17,8 @@ router.beforeEach((to, from, next) => {
   if(jwt) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
     axios.get(`${process.env.VUE_APP_AUTHENTICATION_API_URL}/whoami`)
-    .then(() => {
-      // TODO: Commit current user to store
+    .then((response) => {
+      store.commit('set_current_user',response.data)
       next()
     })
     .catch(error => console.error(error))
