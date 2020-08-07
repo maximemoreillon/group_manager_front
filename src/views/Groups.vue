@@ -60,6 +60,7 @@
       <h2 class="">Join an existing group</h2>
       <GroupPicker
         class="group_picker"
+        :usersWithNoGroup="false"
         v-bind:apiUrl="group_manager_api_url"
         @selection="join_group($event)"
         :userPageUrl="user_page_url"
