@@ -39,206 +39,188 @@
 
 
 
-
-
-
-
       <!-- members -->
-      <div class="section">
-        <h2 class="">Members</h2>
-        <div class="" v-if="members.error">{{members.error}}</div>
-        <Loader v-else-if="members.loading">Loading members</Loader>
-        <template v-else>
+      <h2 class="">Members</h2>
+      <div class="" v-if="members.error">{{members.error}}</div>
+      <Loader v-else-if="members.loading">Loading members</Loader>
+      <template v-else>
 
-          <div class="members_container" v-if="members.length > 0">
-            <UserPreview
-              v-bind:user="member"
-              v-for="member in members"
-              v-bind:key="`member_${member.identity.low}`">
-              <!-- Admin controls on member-->
-              <template v-if="!user_is_current_user(member) && current_user_is_admin_of_group">
-                <!-- Button to remove member from group -->
-                <button
-                  type="button"
-                  v-on:click.stop="remove_user_from_group(member)" >
-                  <font-awesome-icon icon="sign-out-alt" />
-                  <span>Remove</span>
-                </button>
+        <div class="members_container" v-if="members.length > 0">
+          <UserPreview
+            v-bind:user="member"
+            v-for="member in members"
+            v-bind:key="`member_${member.identity.low}`">
+            <!-- Admin controls on member-->
+            <template v-if="!user_is_current_user(member) && current_user_is_admin_of_group">
+              <!-- Button to remove member from group -->
+              <button
+                type="button"
+                v-on:click.stop="remove_user_from_group(member)" >
+                <font-awesome-icon icon="sign-out-alt" />
+                <span>Remove</span>
+              </button>
 
-                <!-- Make user an administrator -->
-                <button
-                  type="button"
-                  v-on:click.stop="make_user_administrator_of_group(member)" >
-                  <font-awesome-icon icon="user-tie"/>
-                  <span>Make admin</span>
-                </button>
-              </template>
+              <!-- Make user an administrator -->
+              <button
+                type="button"
+                v-on:click.stop="make_user_administrator_of_group(member)" >
+                <font-awesome-icon icon="user-tie"/>
+                <span>Make admin</span>
+              </button>
+            </template>
 
-              <template v-if="user_is_current_user(member)" >
-                <!-- button to leave group -->
-                <button
-                  type="button"
-                  v-on:click.stop="leave_group()"
-                  v-if="current_user_is_member_of_group">
-                  <font-awesome-icon icon="sign-out-alt"/>
-                  <span>Leave</span>
-                </button>
-              </template>
-            </UserPreview>
-          </div>
-          <div class="" v-else>No member</div>
-        </template>
-      </div>
+            <template v-if="user_is_current_user(member)" >
+              <!-- button to leave group -->
+              <button
+                type="button"
+                v-on:click.stop="leave_group()"
+                v-if="current_user_is_member_of_group">
+                <font-awesome-icon icon="sign-out-alt"/>
+                <span>Leave</span>
+              </button>
+            </template>
+          </UserPreview>
+        </div>
+        <div class="" v-else>No member</div>
+      </template>
 
 
       <!-- Administrators -->
-      <div class="section">
-        <h2 class="">Administrators</h2>
-        <div class="" v-if="administrators.error">{{administrators.error}}</div>
-        <Loader v-else-if="administrators.loading">Loading administrators</Loader>
-        <template v-else>
-          <div class="members_container" v-if="administrators.length > 0">
-            <UserPreview
-              v-bind:user="administrator"
-              v-for="administrator in administrators"
-              v-bind:key="`administrator_${administrator.identity.low}`">
+      <h2 class="">Administrators</h2>
+      <div class="" v-if="administrators.error">{{administrators.error}}</div>
+      <Loader v-else-if="administrators.loading">Loading administrators</Loader>
+      <template v-else>
+        <div class="members_container" v-if="administrators.length > 0">
+          <UserPreview
+            v-bind:user="administrator"
+            v-for="administrator in administrators"
+            v-bind:key="`administrator_${administrator.identity.low}`">
 
-              <!-- Cannot remove oneself from admins -->
-              <template v-if="!user_is_current_user(administrator) && current_user_is_admin_of_group">
-                <!-- Button to remove member from administrators -->
-                <button
-                  type="button"
-                  v-on:click.stop="remove_user_from_administrators(administrator)">
-                  <font-awesome-icon icon="user-slash"/>
-                  <span>Remove from admins</span>
-                </button>
-              </template>
-            </UserPreview>
-          </div>
-          <div class="" v-else>No Administrator</div>
-        </template>
-      </div>
+            <!-- Cannot remove oneself from admins -->
+            <template v-if="!user_is_current_user(administrator) && current_user_is_admin_of_group">
+              <!-- Button to remove member from administrators -->
+              <button
+                type="button"
+                v-on:click.stop="remove_user_from_administrators(administrator)">
+                <font-awesome-icon icon="user-slash"/>
+                <span>Remove from admins</span>
+              </button>
+            </template>
+          </UserPreview>
+        </div>
+        <div class="" v-else>No Administrator</div>
+      </template>
 
 
       <!-- Groups -->
-      <div class="section">
-        <h2 class="">Groups</h2>
-        <div class="" v-if="groups.error">{{groups.error}}</div>
-        <Loader v-else-if="groups.loading">Loading groups</Loader>
-        <template v-else>
-          <div class="members_container" v-if="groups.length > 0">
+      <h2 class="">Groups</h2>
+      <div class="" v-if="groups.error">{{groups.error}}</div>
+      <Loader v-else-if="groups.loading">Loading groups</Loader>
+      <template v-else>
+        <div class="members_container" v-if="groups.length > 0">
 
-            <GroupPreview
-              :group="group"
-              v-for="group in groups"
-              v-bind:key="group.identity.low">
+          <GroupPreview
+            :group="group"
+            v-for="group in groups"
+            v-bind:key="group.identity.low">
 
-              <!-- Admin controls on group-->
-              <template v-if="current_user_is_admin_of_group">
-                <!-- Button to remove member from group -->
-                <button
-                  type="button"
-                  v-on:click.stop="remove_group_from_group(group)" >
-                  <font-awesome-icon icon="sign-out-alt"/>
-                  <span>Remove</span>
-                </button>
-              </template>
+            <!-- Admin controls on group-->
+            <template v-if="current_user_is_admin_of_group">
+              <!-- Button to remove member from group -->
+              <button
+                type="button"
+                v-on:click.stop="remove_group_from_group(group)" >
+                <font-awesome-icon icon="sign-out-alt"/>
+                <span>Remove</span>
+              </button>
+            </template>
 
-            </GroupPreview>
+          </GroupPreview>
 
-          </div>
-          <div class="" v-else>No groups</div>
-        </template>
-
-
-
-      </div>
-
+        </div>
+        <div class="" v-else>No groups</div>
+      </template>
 
       <!-- Parent Groups -->
-      <div class="section">
-        <h2 class="">Parent Groups</h2>
-        <div class="" v-if="parent_groups.error">{{parent_groups.error}}</div>
-        <Loader v-else-if="parent_groups.loading">Loading parent groups</Loader>
-        <template v-else>
-          <div class="members_container" v-if="parent_groups.length > 0">
-            <GroupPreview
-            :group="group"
-            v-for="group in parent_groups"
-            v-bind:key="`parent_${group.identity.low}`"/>
-          </div>
-          <div class="" v-else>No parent groups</div>
-        </template>
-      </div>
+      <h2 class="">Parent Groups</h2>
+      <div class="" v-if="parent_groups.error">{{parent_groups.error}}</div>
+      <Loader v-else-if="parent_groups.loading">Loading parent groups</Loader>
+      <template v-else>
+        <div class="members_container" v-if="parent_groups.length > 0">
+          <GroupPreview
+          :group="group"
+          v-for="group in parent_groups"
+          v-bind:key="`parent_${group.identity.low}`"/>
+        </div>
+        <div class="" v-else>No parent groups</div>
+      </template>
 
 
 
 
 
       <!-- Admin controls of the group -->
-      <div class="section" v-if="current_user_is_admin_of_group">
+      <template v-if="current_user_is_admin_of_group">
 
         <h2>Admin area</h2>
 
-        <div class="">
 
-          <h3>Group options</h3>
+        <h3>Group options</h3>
 
-          <table class="group_properties_table">
-            <tr>
-              <td>Group name</td>
-              <td>
-                <input type="text" v-model="group.properties.name">
-              </td>
-            </tr>
-            <tr>
-              <td>Avatar URL</td>
-              <td>
-                <input type="text" v-model="group.properties.avatar_src">
-              </td>
-            </tr>
-            <tr>
-              <td>Restricted</td>
-              <td>
-                <input
-                  type="checkbox"
-                  v-model="group.properties.restricted">
-              </td>
-            </tr>
-            <tr v-if="current_user_is_admin">
-              <td>Official</td>
-              <td>
-                <input
-                  type="checkbox"
-                  v-model="group.properties.official">
-              </td>
-            </tr>
-            <tr>
-              <td>Save modifications</td>
-              <td>
-                <button
-                  type="button"
-                  v-on:click="patch_group()">
-                  <font-awesome-icon icon="save"/>
-                  <span>Save</span>
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>Delete group</td>
-              <td>
-                <button
-                  type="button"
-                  v-on:click="delete_group()">
-                  <font-awesome-icon icon="trash"/>
-                  <span>Delete</span>
-                </button>
-              </td>
-            </tr>
+        <table class="group_properties_table">
+          <tr>
+            <td>Group name</td>
+            <td>
+              <input type="text" v-model="group.properties.name">
+            </td>
+          </tr>
+          <tr>
+            <td>Avatar URL</td>
+            <td>
+              <input type="text" v-model="group.properties.avatar_src">
+            </td>
+          </tr>
+          <tr>
+            <td>Restricted</td>
+            <td>
+              <input
+                type="checkbox"
+                v-model="group.properties.restricted">
+            </td>
+          </tr>
+          <tr v-if="current_user_is_admin">
+            <td>Official</td>
+            <td>
+              <input
+                type="checkbox"
+                v-model="group.properties.official">
+            </td>
+          </tr>
+          <tr>
+            <td>Save modifications</td>
+            <td>
+              <button
+                type="button"
+                v-on:click="patch_group()">
+                <font-awesome-icon icon="save"/>
+                <span>Save</span>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Delete group</td>
+            <td>
+              <button
+                type="button"
+                v-on:click="delete_group()">
+                <font-awesome-icon icon="trash"/>
+                <span>Delete</span>
+              </button>
+            </td>
+          </tr>
 
-          </table>
+        </table>
 
-        </div>
 
 
 
@@ -250,15 +232,13 @@
           @selection="add_user_to_group($event)"/>
 
         <h3 class="">Add groups to {{group.properties.name}}</h3>
-        <div class="user_picker">
-          <GroupPicker
-            :usersWithNoGroup="false"
-            class="group_picker"
-            :apiUrl="picker_api_url"
-            @selection="add_group_to_group($event)"/>
-        </div>
+        <GroupPicker
+          :usersWithNoGroup="false"
+          class="group_picker"
+          :apiUrl="picker_api_url"
+          @selection="add_group_to_group($event)"/>
 
-      </div>
+      </template>
 
 
 

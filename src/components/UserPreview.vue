@@ -2,7 +2,6 @@
 
   <div
     class="user_preview"
-    :class="{self: user.identity.low === $store.state.current_user.identity.low}"
     @click="user_clicked()">
 
     <!-- Avatar -->
@@ -17,6 +16,12 @@
         || user.properties.name_kanji
         || user.properties.name}}
     </div>
+
+    <span
+      class="its_you"
+      v-if="user.identity.low === $store.state.current_user.identity.low">
+      (It's you!)
+    </span>
 
     <div class="growing_spacer" />
 
@@ -81,9 +86,12 @@ export default {
   border-bottom: 1px solid #dddddd;
 }
 
-.user_preview.self {
-  border: 1px solid #c00000;
-  //background-color: #ffdddddd;
+.user_preview > *:not(:last-child) {
+  margin-right: 0.5em;
+}
+
+.its_you {
+  color: #c00000;
 }
 
 
