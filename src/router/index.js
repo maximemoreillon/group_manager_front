@@ -12,6 +12,11 @@ const routes = [
     component: () => import('../views/GroupBrowser.vue')
   },
   {
+    path: '/groups/create',
+    name: 'create_group',
+    component: () => import('../views/CreateGroup.vue')
+  },
+  {
     path: '/users/:user_id/groups',
     name: 'groups_of_user',
     component: Groups,

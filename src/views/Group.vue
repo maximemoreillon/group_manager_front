@@ -795,5 +795,9 @@ button:not(:last-child){
   border-bottom: 1px solid #dddddd;
 }
 
+.group_properties_table input[type="text"] {
+  width: 100%;
+}
+
 
 </style>

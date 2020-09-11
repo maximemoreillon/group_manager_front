@@ -7,19 +7,6 @@
     <h1 v-else>Groups</h1>
 
     <h2 class="">As member ({{groups.length}})</h2>
-    <!-- P not vey nice -->
-    <!--
-    <p v-if="user_is_current_user">
-      <button
-        type="button"
-        class="bordered"
-        v-on:click="group_modal_open = true" >
-        <font-awesome-icon icon="sign-in-alt" />
-        <span>Join a group</span>
-      </button>
-    </p>
-    -->
-
     <template v-if="!groups.loading">
       <template v-if="groups.length > 0">
 
@@ -65,18 +52,6 @@
     <Loader v-if="groups_administrated_by_user.loading" message="Loading"/>
     <div class="error" v-if="groups_administrated_by_user.error">{{error}}</div>
 
-
-    <!-- Options to create or join a group -->
-    <template v-if="user_is_current_user">
-
-      <!-- Creating a group -->
-      <h2 class="">Create a new group</h2>
-      <form class="" v-on:submit.prevent="create_group()">
-        <input type="text" ref="new_group_name" placeholder="Group name">
-        <input type="submit">
-      </form>
-    </template>
-
     <Modal
       :open="group_modal_open"
       @close="group_modal_open=false">
@@ -100,34 +75,7 @@ import Modal from '@moreillon/vue_modal'
 import GroupPicker from '@moreillon/vue_group_picker'
 import GroupPreview from '@/components/GroupPreview.vue'
 
-// Icons
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import {
-  faPlus,
-  faUserPlus,
-  faEdit,
-  faSave,
-  faSignInAlt,
-  faSignOutAlt,
-  faUserTie,
-  faUserSlash,
-  faTrash,
 
-} from '@fortawesome/free-solid-svg-icons'
-
-library.add(
-  faPlus,
-  faUserPlus,
-  faEdit,
-  faSave,
-  faSignInAlt,
-  faSignOutAlt,
-  faUserTie,
-  faUserSlash,
-  faTrash,
-
-)
 
 export default {
   name: 'Group',
@@ -137,7 +85,6 @@ export default {
     GroupPicker,
     GroupPreview,
 
-    FontAwesomeIcon,
   },
   data(){
     return {
@@ -239,17 +186,6 @@ export default {
       })
       .catch( () => {this.$set(this.groups,'error','Error loading groups')})
       .finally( () => {this.$set(this.groups_administrated_by_user,'loading',false)})
-    },
-
-    create_group(){
-      this.loading = true;
-      this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups`, {
-        name: this.$refs.new_group_name.value,
-      })
-      .then( (response) => {
-        this.$router.push({name: 'group', params: {group_id: response.data.identity.low}})
-      })
-      .catch( () => {this.error = 'Error loading groups'})
     },
 
     join_group(group){
