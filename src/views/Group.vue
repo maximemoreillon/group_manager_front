@@ -44,6 +44,17 @@
       <Loader v-else-if="members.loading">Loading members</Loader>
       <template v-else>
 
+        <!-- P not vey nice -->
+        <p v-if="current_user_is_admin_of_group || current_user_is_admin">
+          <button
+            type="button"
+            v-on:click="member_modal_open = true" >
+            <font-awesome-icon icon="user-plus" />
+            <span>Add member</span>
+          </button>
+        </p>
+
+
         <div class="members_container" v-if="members.length > 0">
           <UserPreview
             v-bind:user="member"
@@ -66,6 +77,7 @@
 
               <!-- Make user an administrator -->
               <button
+                v-if="!current_user_is_admin_of_group"
                 type="button"
                 v-on:click.stop="make_user_administrator_of_group(member)" >
                 <font-awesome-icon icon="user-tie"/>
@@ -94,6 +106,17 @@
       <div class="" v-if="administrators.error">{{administrators.error}}</div>
       <Loader v-else-if="administrators.loading">Loading administrators</Loader>
       <template v-else>
+
+        <!-- P not vey nice -->
+        <p v-if="current_user_is_admin_of_group || current_user_is_admin">
+          <button
+            type="button"
+            v-on:click="administrator_modal_open = true" >
+            <font-awesome-icon icon="user-plus" />
+            <span>Add administrator</span>
+          </button>
+        </p>
+
         <div class="members_container" v-if="administrators.length > 0">
           <UserPreview
             v-bind:user="administrator"
@@ -122,22 +145,32 @@
 
       <!-- Groups -->
       <h2 class="">Child groups</h2>
-      <div class="" v-if="groups.error">{{groups.error}}</div>
-      <Loader v-else-if="groups.loading">Loading groups</Loader>
+      <div class="" v-if="child_groups.error">{{child_groups.error}}</div>
+      <Loader v-else-if="child_groups.loading">Loading groups</Loader>
       <template v-else>
-        <div class="members_container" v-if="groups.length > 0">
+        <!-- P not vey nice -->
+        <p v-if="current_user_is_admin_of_group || current_user_is_admin">
+          <button
+            type="button"
+            v-on:click="child_group_modal_open = true" >
+            <font-awesome-icon icon="plus" />
+            <span>Add child group</span>
+          </button>
+        </p>
+
+        <div class="members_container" v-if="child_groups.length > 0">
 
           <GroupPreview
-            :group="group"
-            v-for="group in groups"
-            v-bind:key="group.identity.low">
+            :group="child_group"
+            v-for="child_group in child_groups"
+            v-bind:key="child_group.identity.low">
 
             <!-- Admin controls on group-->
             <template v-if="current_user_is_admin_of_group">
-              <!-- Button to remove member from group -->
+              <!-- Button to remove group from group -->
               <button
                 type="button"
-                v-on:click.stop="remove_group_from_group(group)" >
+                v-on:click.stop="remove_child_group_from_parent_group(child_group, group)" >
                 <font-awesome-icon icon="sign-out-alt"/>
                 <span>Remove</span>
               </button>
@@ -154,11 +187,34 @@
       <div class="" v-if="parent_groups.error">{{parent_groups.error}}</div>
       <Loader v-else-if="parent_groups.loading">Loading parent groups</Loader>
       <template v-else>
+
+        <p v-if="current_user_is_admin_of_group || current_user_is_admin">
+          <button
+            type="button"
+            v-on:click="parent_group_modal_open = true" >
+            <font-awesome-icon icon="plus" />
+            <span>Add parent group</span>
+          </button>
+        </p>
+
         <div class="members_container" v-if="parent_groups.length > 0">
           <GroupPreview
-          :group="group"
-          v-for="group in parent_groups"
-          v-bind:key="`parent_${group.identity.low}`"/>
+            v-for="parent_group in parent_groups"
+            :group="parent_group"
+            v-bind:key="`parent_${parent_group.identity.low}`">
+
+            <!-- Admin controls on group-->
+            <template v-if="current_user_is_admin_of_group">
+              <!-- Button to remove group from group -->
+              <button
+                type="button"
+                v-on:click.stop="remove_child_group_from_parent_group(group, parent_group)" >
+                <font-awesome-icon icon="sign-out-alt"/>
+                <span>Remove</span>
+              </button>
+            </template>
+
+          </GroupPreview>
         </div>
         <div class="" v-else>No parent groups</div>
       </template>
@@ -231,23 +287,6 @@
 
         </table>
 
-
-
-
-        <!-- User picker to add people to the group -->
-        <h3 class="">Add members to {{group.properties.name}}</h3>
-        <UserPicker
-          class="user_picker"
-          :apiUrl="picker_api_url"
-          @selection="add_user_to_group($event)"/>
-
-        <h3 class="">Add groups to {{group.properties.name}}</h3>
-        <GroupPicker
-          :usersWithNoGroup="false"
-          class="group_picker"
-          :apiUrl="picker_api_url"
-          @selection="add_group_to_group($event)"/>
-
       </template>
 
 
@@ -257,6 +296,57 @@
     <div class="loader_wrapper" v-if="loading">
       <Loader message="Loading group..."/>
     </div>
+
+
+    <Modal
+      :open="member_modal_open"
+      @close="member_modal_open=false">
+      <h2>Add member to group</h2>
+      <div class="modal_picker_wrapper">
+        <UserPicker
+          class="modal_picker"
+          :apiUrl="picker_api_url"
+          @selection="add_user_to_group($event)"/>
+      </div>
+    </Modal>
+
+    <Modal
+      :open="administrator_modal_open"
+      @close="administrator_modal_open=false">
+      <h2>Add administrator to group</h2>
+      <div class="modal_picker_wrapper">
+        <UserPicker
+          class="modal_picker"
+          :apiUrl="picker_api_url"
+          @selection="make_user_administrator_of_group($event)"/>
+      </div>
+    </Modal>
+
+    <Modal
+      :open="child_group_modal_open"
+      @close="child_group_modal_open=false">
+      <h2>Add child group to current group</h2>
+      <div class="modal_picker_wrapper">
+        <GroupPicker
+          :usersWithNoGroup="false"
+          class="modal_picker"
+          :apiUrl="picker_api_url"
+          @selection="add_child_group_to_parent_group($event, group)"/>
+      </div>
+    </Modal>
+
+    <Modal
+      :open="parent_group_modal_open"
+      @close="parent_group_modal_open=false">
+      <h2>Add current group to parent group</h2>
+      <div class="modal_picker_wrapper">
+        <GroupPicker
+          :usersWithNoGroup="false"
+          class="modal_picker"
+          :apiUrl="picker_api_url"
+          @selection="add_child_group_to_parent_group(group, $event)"/>
+      </div>
+    </Modal>
 
 
 
@@ -270,6 +360,7 @@
 <script>
 
 import Loader from '@moreillon/vue_loader'
+import Modal from '@moreillon/vue_modal'
 
 
 import UserPicker from '@moreillon/vue_user_picker'
@@ -284,6 +375,8 @@ import GroupPreview from '@/components/GroupPreview.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
+  faPlus,
+  faUserPlus,
   faEdit,
   faSave,
   faSignInAlt,
@@ -295,6 +388,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
+  faPlus,
+  faUserPlus,
   faEdit,
   faSave,
   faSignInAlt,
@@ -309,6 +404,7 @@ export default {
   name: 'Group',
   components: {
     Loader,
+    Modal,
     UserPicker,
     GroupPicker,
 
@@ -328,8 +424,13 @@ export default {
 
       members: [],
       administrators: [],
-      groups: [],
+      child_groups: [],
       parent_groups: [],
+
+      member_modal_open: false,
+      administrator_modal_open: false,
+      child_group_modal_open: false,
+      parent_group_modal_open: false,
     }
   },
   watch: {
@@ -352,10 +453,12 @@ export default {
         this.group = response.data
         this.get_members_of_group()
         this.get_administrators_of_group()
-        this.get_groups_of_group()
+        this.get_child_groups_of_group()
         this.get_parent_groups_of_group()
       })
       .catch(error => {
+        // Todo: display proper error
+        alert(`Error getting group`)
         if(error.response) console.log(error.response.data)
         else console.log(error)
       })
@@ -374,22 +477,22 @@ export default {
        .catch( () => this.$set(this.members,'error','Error'))
        .finally(() => this.$set(this.members,'loading',false))
     },
-    get_groups_of_group(){
-      this.$set(this.groups,'loading',true)
+    get_child_groups_of_group(){
+      this.$set(this.child_groups,'loading',true)
       this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/groups`, {
         params: { id: this.group_id }
       })
       .then(response => {
-        this.groups = []
+        this.child_groups = []
         response.data.forEach((record) => {
-          this.groups.push(record._fields[record._fieldLookup['group']])
+          this.child_groups.push(record._fields[record._fieldLookup['group']])
         })
        })
        .catch( (error) => {
          console.log(error)
-         this.$set(this.groups,'error','Error')
+         this.$set(this.child_groups,'error','Error')
        })
-       .finally(() => this.$set(this.groups,'loading',false))
+       .finally(() => this.$set(this.child_groups,'loading',false))
     },
     get_parent_groups_of_group(){
       this.$set(this.parent_groups,'loading',true)
@@ -462,6 +565,7 @@ export default {
         .then( () => {
           alert(`Success`)
           this.get_members_of_group()
+          this.member_modal_open=false
         })
         .catch(error => {
           alert(`System error`)
@@ -498,6 +602,7 @@ export default {
         .then( () => {
           alert(`Success`)
           this.get_administrators_of_group()
+          this.administrator_modal_open=false
         })
         .catch(error => {
           alert(`System error`)
@@ -524,40 +629,42 @@ export default {
       }
 
     },
-    add_group_to_group(group){
-      if(confirm(`Add ${group.properties.name} to ${this.group.properties.name}?`)){
+    add_child_group_to_parent_group(child_group, parent_group){
+      if(confirm(`Add ${child_group.properties.name} to ${parent_group.properties.name}?`)){
 
-        let parent_group_id = this.group.identity.low
-        let child_group_id = group.identity.low
+        let parent_group_id = parent_group.identity.low
+        let child_group_id = child_group.identity.low
+
         let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${parent_group_id}/groups/${child_group_id}`
 
         this.axios.post(url)
         .then( () => {
-          alert(`Success`)
-          this.get_groups_of_group()
+          this.child_group_modal_open=false
+          this.parent_group_modal_open=false
+          this.get_group()
         })
         .catch(error => {
-          alert(`System error`)
+          alert(`Invalid operation`)
           console.error(error)
         })
       }
     },
-    remove_group_from_group(group){
-      if(confirm(`Remove ${group.properties.name} from ${this.group.properties.name}?`)) {
-        let parent_group_id = this.group.identity.low
-        let child_group_id = group.identity.low
+    remove_child_group_from_parent_group(child_group, parent_group){
+      if(confirm(`Remove ${child_group.properties.name} from ${parent_group.properties.name}?`)) {
+
+        let parent_group_id = parent_group.identity.low
+        let child_group_id = child_group.identity.low
+
         let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${parent_group_id}/groups/${child_group_id}`
         this.axios.delete(url)
         .then( () => {
-          alert(`Success`)
-          this.get_groups_of_group()
+          this.get_group()
         })
         .catch(error => {
-          alert(`System error`)
+          alert(`Invalid operation`)
           console.error(error)
         })
       }
-
     },
     patch_group(){
       let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}`
@@ -701,5 +808,14 @@ button > *:not(:last-child){
 
 .group_properties_table tr:not(:last-child) {
   border-bottom: 1px solid #dddddd;
+}
+
+.modal_picker_wrapper {
+  height: 50vh;
+  width: 75vw;
+}
+
+.modal_picker {
+  height: 100%;
 }
 </style>

@@ -78,4 +78,9 @@ button.bordered:hover {
 button.bordered:disabled {
   border-color: #dddddd;
 }
+
+.modal_close_button {
+  top: 10px !important;
+  right: 15px !important;
+}
 </style>
