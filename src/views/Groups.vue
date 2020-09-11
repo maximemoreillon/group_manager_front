@@ -7,6 +7,17 @@
     <h1 v-else>Groups</h1>
 
     <h2 class="">As member ({{groups.length}})</h2>
+    <!-- P not vey nice -->
+    <p v-if="user_is_current_user">
+      <button
+        type="button"
+        class="bordered"
+        v-on:click="group_modal_open = true" >
+        <font-awesome-icon icon="sign-in-alt" />
+        <span>Join a group</span>
+      </button>
+    </p>
+
     <template v-if="!groups.loading">
       <template v-if="groups.length > 0">
 
@@ -56,17 +67,6 @@
     <!-- Options to create or join a group -->
     <template v-if="user_is_current_user">
 
-      <!-- Join a group -->
-      <h2 class="">Join an existing group</h2>
-      <GroupPicker
-        class="group_picker"
-        :usersWithNoGroup="false"
-        v-bind:apiUrl="group_manager_api_url"
-        @selection="join_group($event)"
-        :userPageUrl="user_page_url"
-        groupPageUrl="/group"/>
-
-
       <!-- Creating a group -->
       <h2 class="">Create a new group</h2>
       <form class="" v-on:submit.prevent="create_group()">
@@ -75,21 +75,67 @@
       </form>
     </template>
 
+    <Modal
+      :open="group_modal_open"
+      @close="group_modal_open=false">
+      <h2>Join a group</h2>
+      <div class="modal_picker_wrapper">
+        <GroupPicker
+          :usersWithNoGroup="false"
+          class="modal_picker"
+          @selection="join_group($event)"/>
+      </div>
+    </Modal>
+
 
   </div>
 </template>
 
 <script>
 import Loader from '@moreillon/vue_loader'
+import Modal from '@moreillon/vue_modal'
+
 import GroupPicker from '@moreillon/vue_group_picker'
 import GroupPreview from '@/components/GroupPreview.vue'
+
+// Icons
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import {
+  faPlus,
+  faUserPlus,
+  faEdit,
+  faSave,
+  faSignInAlt,
+  faSignOutAlt,
+  faUserTie,
+  faUserSlash,
+  faTrash,
+
+} from '@fortawesome/free-solid-svg-icons'
+
+library.add(
+  faPlus,
+  faUserPlus,
+  faEdit,
+  faSave,
+  faSignInAlt,
+  faSignOutAlt,
+  faUserTie,
+  faUserSlash,
+  faTrash,
+
+)
 
 export default {
   name: 'Group',
   components: {
     Loader,
+    Modal,
     GroupPicker,
     GroupPreview,
+
+    FontAwesomeIcon,
   },
   data(){
     return {
@@ -100,7 +146,9 @@ export default {
       groups_administrated_by_user: [],
 
       group_manager_api_url : process.env.VUE_APP_GROUP_MANAGER_API_URL,
-      user_page_url : process.env.VUE_APP_EMPLOYEE_MANAGER_FRONT_URL
+      user_page_url : process.env.VUE_APP_EMPLOYEE_MANAGER_FRONT_URL,
+
+      group_modal_open: false,
     }
   },
 
@@ -208,7 +256,10 @@ export default {
       this.loading = true;
       let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group.identity.low}/join`
       this.axios.post(url)
-      .then( () => { this.get_groups_of_user() })
+      .then( () => {
+        this.group_modal_open = false
+        this.get_groups_of_user()
+      })
       .catch( () => {this.error = 'Error loading groups'})
 
 

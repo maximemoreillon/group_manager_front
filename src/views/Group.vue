@@ -766,26 +766,11 @@ h1 {
   overflow-y: auto;
 }
 
-button {
-  border: 1px solid #666666;
-  border-radius: 5px;
-  outline: none;
-  background-color: transparent;
-  padding: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  color: #c00000;
-  border-color: #c00000;
-}
 
 button:not(:last-child){
   margin-right: 5px;
 }
-button > *:not(:last-child){
-  margin-right: 5px;
-}
+
 
 .loader_wrapper {
   display: flex;
@@ -810,12 +795,5 @@ button > *:not(:last-child){
   border-bottom: 1px solid #dddddd;
 }
 
-.modal_picker_wrapper {
-  height: 50vh;
-  width: 75vw;
-}
 
-.modal_picker {
-  height: 100%;
-}
 </style>

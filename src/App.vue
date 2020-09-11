@@ -50,14 +50,20 @@ button {
   align-items: center;
   text-align: center;
   transition: color 0.25s, border-color 0.25s;
+
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 0.25em 0.5em;
 }
 
 button:hover{
   color: #c00000;
+  border-color: #c00000;
 }
 
 button:disabled {
   color: #dddddd;
+  border-color: #dddddd;
   cursor: not-allowed;
 }
 
@@ -65,22 +71,19 @@ button > *:not(:last-child) {
   margin-right: 0.25em;
 }
 
-button.bordered {
-  border: 1px solid black;
-  border-radius: 5px;
-  padding: 0.25em 0.5em;
-}
 
-button.bordered:hover {
-  border-color: #c00000;
-}
-
-button.bordered:disabled {
-  border-color: #dddddd;
-}
 
 .modal_close_button {
   top: 10px !important;
   right: 15px !important;
+}
+
+.modal_picker_wrapper {
+  height: 50vh;
+  width: 75vw;
+}
+
+.modal_picker {
+  height: 100% !important;
 }
 </style>
