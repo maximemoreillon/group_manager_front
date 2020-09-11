@@ -8,6 +8,7 @@
 
     <h2 class="">As member ({{groups.length}})</h2>
     <!-- P not vey nice -->
+    <!--
     <p v-if="user_is_current_user">
       <button
         type="button"
@@ -17,6 +18,7 @@
         <span>Join a group</span>
       </button>
     </p>
+    -->
 
     <template v-if="!groups.loading">
       <template v-if="groups.length > 0">
