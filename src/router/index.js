@@ -6,13 +6,11 @@ import Group from '../views/Group.vue'
 Vue.use(VueRouter)
 
 const routes = [
-  /*
   {
-    path: '/',
-    name: 'groups',
-    component: Groups
+    path: '/groups/browse',
+    name: 'group_browser',
+    component: () => import('../views/GroupBrowser.vue')
   },
-  */
   {
     path: '/users/:user_id/groups',
     name: 'groups_of_user',

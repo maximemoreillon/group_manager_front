@@ -5,8 +5,12 @@
       applicationName="グループマネージャー">
       <template v-slot:navigation>
 
-        <router-link :to="{ name: 'groups_of_user'}">
+        <router-link :to="{ name: 'groups_of_user', params: {user_id: 'self'}}">
           <span>My groups</span>
+        </router-link>
+
+        <router-link :to="{ name: 'group_browser'}">
+          <span>Group browser</span>
         </router-link>
 
         <router-link :to="{ name: 'about'}">

@@ -18,7 +18,7 @@ export default {
   },
   data(){
     return {
-      api_url: process.env.VUE_APP_GROUP_MANAGER_URL,
+      api_url: process.env.VUE_APP_GROUP_MANAGER_API_URL,
       version: pjson.version
     }
   },

@@ -1,6 +1,5 @@
 <template>
   <div class="group">
-
     <template v-if="group && !loading">
 
 
@@ -50,8 +49,13 @@
             v-bind:user="member"
             v-for="member in members"
             v-bind:key="`member_${member.identity.low}`">
-            <!-- Admin controls on member-->
-            <template v-if="!user_is_current_user(member) && current_user_is_admin_of_group">
+
+            <!-- Admin controls on members -->
+            <template
+              v-if="(!user_is_current_user(member)
+              && current_user_is_admin_of_group)
+              || current_user_is_admin">
+
               <!-- Button to remove member from group -->
               <button
                 type="button"
@@ -97,7 +101,10 @@
             v-bind:key="`administrator_${administrator.identity.low}`">
 
             <!-- Cannot remove oneself from admins -->
-            <template v-if="!user_is_current_user(administrator) && current_user_is_admin_of_group">
+            <template
+              v-if="(!user_is_current_user(administrator)
+                && current_user_is_admin_of_group)
+                || current_user_is_admin">
               <!-- Button to remove member from administrators -->
               <button
                 type="button"
@@ -106,6 +113,7 @@
                 <span>Remove from admins</span>
               </button>
             </template>
+
           </UserPreview>
         </div>
         <div class="" v-else>No Administrator</div>
@@ -113,7 +121,7 @@
 
 
       <!-- Groups -->
-      <h2 class="">Groups</h2>
+      <h2 class="">Child groups</h2>
       <div class="" v-if="groups.error">{{groups.error}}</div>
       <Loader v-else-if="groups.loading">Loading groups</Loader>
       <template v-else>
@@ -160,7 +168,8 @@
 
 
       <!-- Admin controls of the group -->
-      <template v-if="current_user_is_admin_of_group">
+      <template
+        v-if="current_user_is_admin_of_group || current_user_is_admin">
 
         <h2>Admin area</h2>
 
@@ -188,6 +197,7 @@
                 v-model="group.properties.restricted">
             </td>
           </tr>
+          <!-- Only super admins can make a group official -->
           <tr v-if="current_user_is_admin">
             <td>Official</td>
             <td>
@@ -313,7 +323,6 @@ export default {
       // Won't be needed anymore
       picker_api_url: process.env.VUE_APP_GROUP_MANAGER_API_URL,
 
-      current_user: null,
       group: null,
       loading: false,
 
@@ -325,22 +334,14 @@ export default {
   },
   watch: {
     group_id(){
-      this.get_current_user()
       this.get_group()
     }
   },
   mounted(){
-    this.get_current_user()
     this.get_group()
   },
   methods: {
-    get_current_user(){
-      this.axios.get(`${process.env.VUE_APP_AUTHENTICATION_MANAGER_URL}/whoami`)
-      .then(response => {
-        this.current_user = response.data
-      })
-      .catch(error => console.log(error))
-    },
+
     get_group(){
 
       let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}`
@@ -408,8 +409,11 @@ export default {
       if(confirm(`Delete ${this.group.properties.name}?`)){
         let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}`
         this.axios.delete(url)
-        .then( () => { this.$router.push({name: 'groups'}) })
-        .catch(error => console.log(error))
+        .then( () => { this.$router.push({name: 'groups_of_user', params: {user_id: 'self'}}) })
+        .catch(error => {
+          alert(`System error`)
+          console.error(error)
+        })
       }
 
     },
@@ -422,7 +426,10 @@ export default {
         });
 
        })
-      .catch(error => console.log(error))
+       .catch(error => {
+         alert(`System error`)
+         console.error(error)
+       })
     },
     leave_group(){
       if(confirm(`Leave ${this.group.properties.name}?`)){
@@ -438,7 +445,10 @@ export default {
         let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}/join`
         this.axios.post(url)
         .then( () => { this.get_members_of_group() })
-        .catch(error => console.log(error))
+        .catch(error => {
+          alert(`System error`)
+          console.error(error)
+        })
       }
     },
     add_user_to_group(user){
@@ -449,8 +459,14 @@ export default {
         let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
 
         this.axios.post(url)
-        .then( () => { this.get_members_of_group() })
-        .catch(error => console.log(error))
+        .then( () => {
+          alert(`Success`)
+          this.get_members_of_group()
+        })
+        .catch(error => {
+          alert(`System error`)
+          console.error(error)
+        })
       }
     },
     remove_user_from_group(user){
@@ -461,8 +477,14 @@ export default {
         let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
 
         this.axios.delete(url)
-        .then( () => { this.get_members_of_group() })
-        .catch(error => console.log(error))
+        .then( () => {
+          alert(`Success`)
+          this.get_members_of_group()
+        })
+        .catch(error => {
+          alert(`System error`)
+          console.error(error)
+        })
       }
     },
     make_user_administrator_of_group(user){
@@ -473,8 +495,14 @@ export default {
         let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
 
         this.axios.post(url)
-        .then( () => { this.get_administrators_of_group() })
-        .catch(error => console.log(error))
+        .then( () => {
+          alert(`Success`)
+          this.get_administrators_of_group()
+        })
+        .catch(error => {
+          alert(`System error`)
+          console.error(error)
+        })
       }
 
     },
@@ -485,8 +513,14 @@ export default {
         let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
 
         this.axios.delete(url)
-        .then( () => { this.get_administrators_of_group() })
-        .catch(error => console.log(error))
+        .then( () => {
+          alert(`Success`)
+          this.get_administrators_of_group()
+        })
+        .catch(error => {
+          alert(`System error`)
+          console.error(error)
+        })
       }
 
     },
@@ -499,9 +533,13 @@ export default {
 
         this.axios.post(url)
         .then( () => {
+          alert(`Success`)
           this.get_groups_of_group()
         })
-        .catch(error => console.log(error))
+        .catch(error => {
+          alert(`System error`)
+          console.error(error)
+        })
       }
     },
     remove_group_from_group(group){
@@ -510,8 +548,14 @@ export default {
         let child_group_id = group.identity.low
         let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${parent_group_id}/groups/${child_group_id}`
         this.axios.delete(url)
-        .then( () => { this.get_groups_of_group() })
-        .catch(error => console.log(error))
+        .then( () => {
+          alert(`Success`)
+          this.get_groups_of_group()
+        })
+        .catch(error => {
+          alert(`System error`)
+          console.error(error)
+        })
       }
 
     },
@@ -521,17 +565,21 @@ export default {
         this.group.properties
       )
       .then( () => {
+        alert(`Success`)
         this.get_group()
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        alert(`System error`)
+        console.error(error)
+      })
     },
 
     view_profile_of_user(user){
       this.$router.push({name: 'profile', query: {id: user.identity.low}})
     },
     user_is_current_user(user){
-      if(!this.current_user) return false
-      return user.identity.low === this.current_user.identity.low
+      if(!this.$store.state.current_user) return false
+      return user.identity.low === this.$store.state.current_user.identity.low
     },
 
 
@@ -545,24 +593,24 @@ export default {
         || this.$route.params.group_id
     },
     current_user_is_member_of_group(){
-      if(!this.current_user) return false
+      if(!this.$store.state.current_user) return false
       if(this.members.length < 1) return false
       let found = this.members.find( member => {
-        return member.identity.low === this.current_user.identity.low
+        return member.identity.low === this.$store.state.current_user.identity.low
       })
       return !!found
     },
     current_user_is_admin_of_group(){
-      if(!this.current_user) return false
+      if(!this.$store.state.current_user) return false
       if(this.administrators.length < 1) return false
       let found = this.administrators.find( administrator => {
-        return administrator.identity.low === this.current_user.identity.low
+        return administrator.identity.low === this.$store.state.current_user.identity.low
       })
       return !!found
     },
     current_user_is_admin(){
-      if(!this.current_user) return false
-      return this.current_user.properties.isAdmin
+      if(!this.$store.state.current_user) return false
+      return this.$store.state.current_user.properties.isAdmin
     },
     group_avatar_src(){
       if(this.group.properties.avatar_src) return this.group.properties.avatar_src
