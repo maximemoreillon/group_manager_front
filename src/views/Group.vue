@@ -84,9 +84,9 @@
                 <span>Make admin</span>
               </button>
             </template>
-
+            
+            <!-- button to leave group -->
             <template v-if="user_is_current_user(member)" >
-              <!-- button to leave group -->
               <button
                 type="button"
                 v-on:click.stop="leave_group()"
@@ -123,12 +123,12 @@
             v-for="administrator in administrators"
             v-bind:key="`administrator_${administrator.identity.low}`">
 
+            <!-- Button to remove member from administrators -->
             <!-- Cannot remove oneself from admins -->
             <template
               v-if="(!user_is_current_user(administrator)
                 && current_user_is_admin_of_group)
                 || current_user_is_admin">
-              <!-- Button to remove member from administrators -->
               <button
                 type="button"
                 v-on:click.stop="remove_user_from_administrators(administrator)">
@@ -165,9 +165,9 @@
             v-for="child_group in child_groups"
             v-bind:key="child_group.identity.low">
 
-            <!-- Admin controls on group-->
-            <template v-if="current_user_is_admin_of_group">
-              <!-- Button to remove group from group -->
+            <!-- Button to remove group from group -->
+            <template
+              v-if="current_user_is_admin_of_group || current_user_is_admin">
               <button
                 type="button"
                 v-on:click.stop="remove_child_group_from_parent_group(child_group, group)" >
@@ -204,7 +204,8 @@
             v-bind:key="`parent_${parent_group.identity.low}`">
 
             <!-- Admin controls on group-->
-            <template v-if="current_user_is_admin_of_group">
+            <template
+              v-if="current_user_is_admin_of_group || current_user_is_admin">
               <!-- Button to remove group from group -->
               <button
                 type="button"
