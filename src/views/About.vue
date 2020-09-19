@@ -1,9 +1,10 @@
 <template>
   <div class="about">
-    <h1>About</h1>
-    <p>Group Manager, Maxime MOREILLON</p>
+    <h1>Group Manager</h1>
     <p>Version: v{{version}}</p>
-    <p>API URL: {{api_url}}</p>
+    <p>Developped by <a href="https://maximemoreillon.com">Maxime MOREILLON</a></p>
+    <p>Group manager API URL: {{group_manager_api_url}}</p>
+    <p>Authentication API URL: {{authentication_api_url}}</p>
 
   </div>
 </template>
@@ -18,7 +19,8 @@ export default {
   },
   data(){
     return {
-      api_url: process.env.VUE_APP_GROUP_MANAGER_API_URL,
+      group_manager_api_url: process.env.VUE_APP_GROUP_MANAGER_API_URL,
+      authentication_api_url: process.env.VUE_APP_AUTHENTICATION_API_URL,
       version: pjson.version
     }
   },
@@ -29,5 +31,13 @@ export default {
 
 <style scoped>
 
+a {
+  color: currentColor;
+  transition: 0.25s;
+}
+
+a:hover {
+  color: #c00000;
+}
 
 </style>

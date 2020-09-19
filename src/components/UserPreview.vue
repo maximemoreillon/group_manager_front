@@ -34,15 +34,11 @@
 
 <script>
 
-
-
-
 export default {
   name: 'UserPreview',
   props: {
     user: Object,
     currentUser: Object,
-    profileUrl: String,
 
   },
   components: {

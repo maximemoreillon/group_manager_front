@@ -1,10 +1,19 @@
 <template>
   <div class="groups">
 
-    <h1 v-if="user">
-      Groups of {{user.properties.display_name}}
-    </h1>
+    <template v-if="user">
+      <h1 v-if="user">
+        Groups of {{user.properties.display_name}}
+      </h1>
+      <p v-if="user_profile_url">
+        <a :href="user_profile_url">
+          Go to {{user.properties.display_name}}'s profile
+        </a>
+      </p>
+    </template>
     <h1 v-else>Groups</h1>
+
+
 
     <h2 class="">As member ({{groups.length}})</h2>
     <template v-if="!groups.loading">
@@ -52,27 +61,12 @@
     <Loader v-if="groups_administrated_by_user.loading" message="Loading"/>
     <div class="error" v-if="groups_administrated_by_user.error">{{error}}</div>
 
-    <Modal
-      :open="group_modal_open"
-      @close="group_modal_open=false">
-      <h2>Join a group</h2>
-      <div class="modal_picker_wrapper">
-        <GroupPicker
-          :usersWithNoGroup="false"
-          class="modal_picker"
-          @selection="join_group($event)"/>
-      </div>
-    </Modal>
-
-
   </div>
 </template>
 
 <script>
 import Loader from '@moreillon/vue_loader'
-import Modal from '@moreillon/vue_modal'
 
-import GroupPicker from '@moreillon/vue_group_picker'
 import GroupPreview from '@/components/GroupPreview.vue'
 
 
@@ -81,8 +75,6 @@ export default {
   name: 'Group',
   components: {
     Loader,
-    Modal,
-    GroupPicker,
     GroupPreview,
 
   },
@@ -96,8 +88,6 @@ export default {
 
       group_manager_api_url : process.env.VUE_APP_GROUP_MANAGER_API_URL,
       user_page_url : process.env.VUE_APP_EMPLOYEE_MANAGER_FRONT_URL,
-
-      group_modal_open: false,
     }
   },
 
@@ -112,12 +102,9 @@ export default {
   },
 
   mounted(){
-
-
     this.get_user()
     this.get_groups_of_user()
     this.get_groups_administrated_by_user()
-
   },
   methods: {
 
@@ -187,21 +174,6 @@ export default {
       .catch( () => {this.$set(this.groups,'error','Error loading groups')})
       .finally( () => {this.$set(this.groups_administrated_by_user,'loading',false)})
     },
-
-    join_group(group){
-      if(!confirm(`Join ${group.properties.name}?`)) return
-
-      this.loading = true;
-      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group.identity.low}/join`
-      this.axios.post(url)
-      .then( () => {
-        this.group_modal_open = false
-        this.get_groups_of_user()
-      })
-      .catch( () => {this.error = 'Error loading groups'})
-
-
-    },
     official_groups(groups){
       return groups.filter((group) => {
         return group.properties.official
@@ -216,12 +188,29 @@ export default {
   },
   computed: {
     user_is_current_user(){
+      let user_id = this.$route.params.user_id
       // If ID not specified in query, then user is automatically current user
-      if(!this.$route.query.id) return true
+      if(!user_id || user_id === 'self') return true
       // If an ID is specified but current user cannot be identified, then user might not be current user
       if(!this.$store.state.current_user) return false
-      return this.$store.state.current_user.identity.low === this.$route.query.id
+      return this.$store.state.current_user.identity.low === user_id
     },
+    user_profile_url(){
+      if(!process.env.VUE_APP_USER_MANAGER_FRONT_URL) return null
+
+      let user_manager_front_url = process.env.VUE_APP_USER_MANAGER_FRONT_URL
+      let user_id = this.$route.params.user_id
+
+      if(process.env.VUE_APP_USER_PROFILE_ROUTE){
+        let route = process.env.VUE_APP_USER_PROFILE_ROUTE.replace(':user_id',user_id)
+        return `${user_manager_front_url}${route}`
+      }
+      else {
+        return `${user_manager_front_url}/users/${user_id}`
+      }
+
+
+    }
 
   }
 }
@@ -245,6 +234,12 @@ export default {
   //border-color: #c00000;
 }
 
+a {
+  color: currentColor;
+}
 
+a:hover {
+  color: #c00000;
+}
 
 </style>
