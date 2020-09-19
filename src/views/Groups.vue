@@ -201,11 +201,9 @@ export default {
       let user_manager_front_url = process.env.VUE_APP_USER_MANAGER_FRONT_URL
       let user_id = this.$route.params.user_id
 
-      if(process.env.VUE_APP_USER_PROFILE_ROUTE){
-        console.log(process.env.VUE_APP_USER_PROFILE_ROUTE)
-        console.log(process.env.VUE_APP_USER_PROFILE_ROUTE === '')
-        console.log(typeof process.env.VUE_APP_USER_PROFILE_ROUTE)
+      console.log(process.env.VUE_APP_USER_PROFILE_ROUTE.length)
 
+      if(process.env.VUE_APP_USER_PROFILE_ROUTE){
         let route = process.env.VUE_APP_USER_PROFILE_ROUTE.replace(':user_id',user_id)
         return `${user_manager_front_url}${route}`
       }
