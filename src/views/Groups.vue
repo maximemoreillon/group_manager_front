@@ -202,6 +202,7 @@ export default {
       let user_id = this.$route.params.user_id
 
       if(process.env.VUE_APP_USER_PROFILE_ROUTE){
+        console.log('HERE')
         let route = process.env.VUE_APP_USER_PROFILE_ROUTE.replace(':user_id',user_id)
         return `${user_manager_front_url}${route}`
       }
