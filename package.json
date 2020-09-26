@@ -11,7 +11,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
     "@fortawesome/vue-fontawesome": "^0.1.10",
-    "@moreillon/vue_application_template_flex": "^1.1.11",
+    "@moreillon/vue_application_template_flex": "^1.1.13",
     "@moreillon/vue_group_picker": "^0.1.21",
     "@moreillon/vue_loader": "^0.1.1",
     "@moreillon/vue_modal": "0.0.4",
@@ -22,7 +22,7 @@
     "vue-axios": "^2.1.5",
     "vue-cookies": "^1.7.4",
     "vue-material-design-icons": "^4.9.0",
-    "vue-router": "^3.4.3",
+    "vue-router": "^3.4.4",
     "vuex": "^3.5.1"
   },
   "devDependencies": {

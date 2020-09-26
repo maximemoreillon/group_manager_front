@@ -24,6 +24,10 @@ do
   sed -i 's|VUE_APP_USER_MANAGER_FRONT_URL_PLACEHOLDER|'${VUE_APP_USER_MANAGER_FRONT_URL}'|g' $file
   sed -i 's|VUE_APP_USER_PROFILE_ROUTE_PLACEHOLDER|'${VUE_APP_USER_PROFILE_ROUTE}'|g' $file
 
+  # Homepage for application list
+  sed -i 's|VUE_APP_HOMEPAGE_URL_PLACEHOLDER|'${VUE_APP_HOMEPAGE_URL}'|g' $file
+
+
 
 done
 
