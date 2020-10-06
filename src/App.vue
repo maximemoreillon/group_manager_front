@@ -96,6 +96,18 @@ button > *:not(:last-child) {
 
 
 
+@media only screen and (max-width: 600px) {
+  button > *:not(:first-child) {
+    display: none;
+  }
+
+  button > *:first-child {
+    margin-right: 0;
+  }
+}
+
+
+
 .modal_close_button {
   top: 10px !important;
   right: 15px !important;

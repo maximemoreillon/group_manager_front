@@ -61,6 +61,15 @@
             v-for="member in members"
             v-bind:key="`member_${member.identity.low}`">
 
+            <!-- button to leave group -->
+            <button
+              type="button"
+              v-on:click.stop="leave_group()"
+              v-if="current_user_is_member_of_group && user_is_current_user(member)">
+              <font-awesome-icon icon="sign-out-alt"/>
+              <span>Leave</span>
+            </button>
+
             <!-- Admin controls on members -->
             <template
               v-if="(!user_is_current_user(member)
@@ -70,6 +79,7 @@
               <!-- Button to remove member from group -->
               <button
                 type="button"
+                v-if="!user_is_current_user(member)"
                 v-on:click.stop="remove_user_from_group(member)" >
                 <font-awesome-icon icon="sign-out-alt" />
                 <span>Remove</span>
@@ -77,24 +87,14 @@
 
               <!-- Make user an administrator -->
               <button
-                v-if="!current_user_is_admin_of_group"
                 type="button"
                 v-on:click.stop="make_user_administrator_of_group(member)" >
                 <font-awesome-icon icon="user-tie"/>
                 <span>Make admin</span>
               </button>
             </template>
-            
-            <!-- button to leave group -->
-            <template v-if="user_is_current_user(member)" >
-              <button
-                type="button"
-                v-on:click.stop="leave_group()"
-                v-if="current_user_is_member_of_group">
-                <font-awesome-icon icon="sign-out-alt"/>
-                <span>Leave</span>
-              </button>
-            </template>
+
+
           </UserPreview>
         </div>
         <div class="" v-else>No member</div>
