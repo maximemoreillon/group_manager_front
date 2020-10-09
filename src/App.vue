@@ -2,7 +2,7 @@
   <div id="app">
     <AppTemplate
       authenticate
-      applicationName="グループマネージャー">
+      applicationName="Group manager">
 
       <template v-slot:navigation>
 
