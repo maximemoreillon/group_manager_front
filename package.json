@@ -16,7 +16,7 @@
     "@moreillon/vue_loader": "^0.1.1",
     "@moreillon/vue_modal": "0.0.4",
     "@moreillon/vue_user_picker": "^1.0.6",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "vue": "^2.6.12",
     "vue-axios": "^2.1.5",
