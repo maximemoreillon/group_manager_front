@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Groups from '../views/Groups.vue'
 import Group from '../views/Group.vue'
 
 Vue.use(VueRouter)
@@ -19,7 +18,7 @@ const routes = [
   {
     path: '/users/:user_id/groups',
     name: 'groups_of_user',
-    component: Groups,
+    component: () => import('../views/GroupsOfUser.vue'),
     alias: '/members/:member:id/groups'
   },
   {

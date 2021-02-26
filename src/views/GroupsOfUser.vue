@@ -21,14 +21,14 @@
 
         <h3>Official groups ({{official_groups(groups).length}})</h3>
         <GroupPreview
-          v-for="group in official_groups(groups)"
-          v-bind:key="group.identity.low"
+          v-for="(group, index) in official_groups(groups)"
+          v-bind:key="`official_${index}`"
           v-bind:group="group"/>
 
         <h3>Non-official groups ({{non_official_groups(groups).length}})</h3>
         <GroupPreview
-          v-for="group in non_official_groups(groups)"
-          v-bind:key="group.identity.low"
+          v-for="(group, index) in non_official_groups(groups)"
+          v-bind:key="`nonofficial_${index}`"
           v-bind:group="group"/>
 
       </template>
@@ -45,14 +45,14 @@
 
         <h3>Official groups ({{official_groups(groups_administrated_by_user).length}})</h3>
         <GroupPreview
-          v-for="group in official_groups(groups_administrated_by_user)"
-          v-bind:key="`administrated_${group.identity.low}`"
+          v-for="(group, index) in official_groups(groups_administrated_by_user)"
+          v-bind:key="`administrated_official_${index}`"
           v-bind:group="group"/>
 
         <h3>User-created groups ({{non_official_groups(groups_administrated_by_user).length}})</h3>
         <GroupPreview
-          v-for="group in non_official_groups(groups_administrated_by_user)"
-          v-bind:key="`administrated_${group.identity.low}`"
+          v-for="(group, index) in non_official_groups(groups_administrated_by_user)"
+          v-bind:key="`administrated_nonofficial_${index}`"
           v-bind:group="group"/>
 
       </template>
@@ -187,13 +187,17 @@ export default {
 
   },
   computed: {
+    current_user_id(){
+      return this.$store.state.current_user.identity.low
+        || this.$store.state.current_user.identity
+    },
     user_is_current_user(){
       let user_id = this.$route.params.user_id
       // If ID not specified in query, then user is automatically current user
       if(!user_id || user_id === 'self') return true
       // If an ID is specified but current user cannot be identified, then user might not be current user
       if(!this.$store.state.current_user) return false
-      return this.$store.state.current_user.identity.low === user_id
+      return this.current_user_id === user_id
     },
     user_profile_url(){
       if(!process.env.VUE_APP_USER_MANAGER_FRONT_URL) return null

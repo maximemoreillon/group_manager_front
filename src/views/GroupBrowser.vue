@@ -6,7 +6,6 @@
     <GroupPicker
       class="group_picker"
       :usersWithNoGroup="false"
-      v-bind:apiUrl="group_manager_api_url"
       @selection="see_group($event)"/>
 
 
@@ -23,12 +22,12 @@ export default {
   },
   data(){
     return {
-      group_manager_api_url : process.env.VUE_APP_GROUP_MANAGER_API_URL,
     }
   },
   methods: {
     see_group(event) {
-      this.$router.push({name: 'group', params: {group_id: event.identity.low}})
+      const group_id = event.identity.low || event.identity
+      this.$router.push({name: 'group', params: {group_id }})
     }
   }
 }

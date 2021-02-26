@@ -26,7 +26,7 @@
       </div>
 
       <div class="group_id">
-        ID: {{group.identity.low}}
+        ID: {{group.identity.low || group.identity}}
       </div>
 
       <div class="avatar_wrapper">
@@ -58,8 +58,8 @@
         <div class="members_container" v-if="members.length > 0">
           <UserPreview
             v-bind:user="member"
-            v-for="member in members"
-            v-bind:key="`member_${member.identity.low}`">
+            v-for="(member, index) in members"
+            v-bind:key="`member_${index}`">
 
             <!-- button to leave group -->
             <button
@@ -120,8 +120,8 @@
         <div class="members_container" v-if="administrators.length > 0">
           <UserPreview
             v-bind:user="administrator"
-            v-for="administrator in administrators"
-            v-bind:key="`administrator_${administrator.identity.low}`">
+            v-for="(administrator, index) in administrators"
+            v-bind:key="`administrator_${index}`">
 
             <!-- Button to remove member from administrators -->
             <!-- Cannot remove oneself from admins -->
@@ -162,8 +162,8 @@
 
           <GroupPreview
             :group="child_group"
-            v-for="child_group in child_groups"
-            v-bind:key="child_group.identity.low">
+            v-for="(child_group, index) in child_groups"
+            v-bind:key="`child_group_${index}`">
 
             <!-- Button to remove group from group -->
             <template
@@ -199,9 +199,9 @@
 
         <div class="members_container" v-if="parent_groups.length > 0">
           <GroupPreview
-            v-for="parent_group in parent_groups"
+            v-for="(parent_group, index) in parent_groups"
             :group="parent_group"
-            v-bind:key="`parent_${parent_group.identity.low}`">
+            v-bind:key="`parent_group_${index}`">
 
             <!-- Admin controls on group-->
             <template
@@ -291,6 +291,55 @@
       </template>
 
 
+      <Modal
+        :open="member_modal_open"
+        @close="member_modal_open=false">
+        <h2>Add member to group</h2>
+        <div class="modal_picker_wrapper">
+          <UserPicker
+            class="modal_picker"
+            :apiUrl="picker_api_url"
+            @selection="add_user_to_group($event)"/>
+        </div>
+      </Modal>
+
+      <Modal
+        :open="administrator_modal_open"
+        @close="administrator_modal_open=false">
+        <h2>Add administrator to group</h2>
+        <div class="modal_picker_wrapper">
+          <UserPicker
+            class="modal_picker"
+            :apiUrl="picker_api_url"
+            @selection="make_user_administrator_of_group($event)"/>
+        </div>
+      </Modal>
+
+      <Modal
+        :open="child_group_modal_open"
+        @close="child_group_modal_open=false">
+        <h2>Add child group to current group</h2>
+        <div class="modal_picker_wrapper">
+          <GroupPicker
+            :usersWithNoGroup="false"
+            class="modal_picker"
+            :apiUrl="picker_api_url"
+            @selection="add_child_group_to_parent_group($event, group)"/>
+        </div>
+      </Modal>
+
+      <Modal
+        :open="parent_group_modal_open"
+        @close="parent_group_modal_open=false">
+        <h2>Add current group to parent group</h2>
+        <div class="modal_picker_wrapper">
+          <GroupPicker
+            :usersWithNoGroup="false"
+            class="modal_picker"
+            :apiUrl="picker_api_url"
+            @selection="add_child_group_to_parent_group(group, $event)"/>
+        </div>
+      </Modal>
 
     </template>
 
@@ -299,55 +348,7 @@
     </div>
 
 
-    <Modal
-      :open="member_modal_open"
-      @close="member_modal_open=false">
-      <h2>Add member to group</h2>
-      <div class="modal_picker_wrapper">
-        <UserPicker
-          class="modal_picker"
-          :apiUrl="picker_api_url"
-          @selection="add_user_to_group($event)"/>
-      </div>
-    </Modal>
 
-    <Modal
-      :open="administrator_modal_open"
-      @close="administrator_modal_open=false">
-      <h2>Add administrator to group</h2>
-      <div class="modal_picker_wrapper">
-        <UserPicker
-          class="modal_picker"
-          :apiUrl="picker_api_url"
-          @selection="make_user_administrator_of_group($event)"/>
-      </div>
-    </Modal>
-
-    <Modal
-      :open="child_group_modal_open"
-      @close="child_group_modal_open=false">
-      <h2>Add child group to current group</h2>
-      <div class="modal_picker_wrapper">
-        <GroupPicker
-          :usersWithNoGroup="false"
-          class="modal_picker"
-          :apiUrl="picker_api_url"
-          @selection="add_child_group_to_parent_group($event, group)"/>
-      </div>
-    </Modal>
-
-    <Modal
-      :open="parent_group_modal_open"
-      @close="parent_group_modal_open=false">
-      <h2>Add current group to parent group</h2>
-      <div class="modal_picker_wrapper">
-        <GroupPicker
-          :usersWithNoGroup="false"
-          class="modal_picker"
-          :apiUrl="picker_api_url"
-          @selection="add_child_group_to_parent_group(group, $event)"/>
-      </div>
-    </Modal>
 
 
 
@@ -446,7 +447,7 @@ export default {
 
     get_group(){
 
-      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}`
 
       this.loading = true;
       this.axios.get(url)
@@ -467,7 +468,7 @@ export default {
     },
     get_members_of_group(){
       this.$set(this.members,'loading',true)
-      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/members`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/members`
       this.axios.get(url)
       .then(response => {
         this.members = []
@@ -480,9 +481,11 @@ export default {
     },
     get_child_groups_of_group(){
       this.$set(this.child_groups,'loading',true)
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/groups`, {
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/groups`
+      const options = {
         params: { id: this.group_id }
-      })
+      }
+      this.axios.get(url,options )
       .then(response => {
         this.child_groups = []
         response.data.forEach((record) => {
@@ -497,7 +500,7 @@ export default {
     },
     get_parent_groups_of_group(){
       this.$set(this.parent_groups,'loading',true)
-      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/parent_groups`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/parent_groups`
       this.axios.get(url)
       .then(response => {
         this.parent_groups = []
@@ -510,19 +513,20 @@ export default {
       .finally(() => this.$set(this.parent_groups,'loading',false))
     },
     delete_group(){
-      if(confirm(`Delete ${this.group.properties.name}?`)){
-        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}`
-        this.axios.delete(url)
-        .then( () => { this.$router.push({name: 'groups_of_user', params: {user_id: 'self'}}) })
-        .catch(error => {
-          alert(`System error`)
-          console.error(error)
-        })
-      }
+      if(!confirm(`Delete ${this.group.properties.name}?`)) return
+      const group_id = this.group.identity.low || this.group.identity
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}`
+      this.axios.delete(url)
+      .then( () => { this.$router.push({name: 'groups_of_user', params: {user_id: 'self'}}) })
+      .catch(error => {
+        alert(`System error`)
+        console.error(error)
+      })
+
 
     },
     get_administrators_of_group(){
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}/administrators`)
+      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/administrators`)
       .then(response => {
         this.administrators.splice(0,this.administrators.length)
         response.data.forEach((record) => {
@@ -536,139 +540,134 @@ export default {
        })
     },
     leave_group(){
-      if(confirm(`Leave ${this.group.properties.name}?`)){
-        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}/leave`
-        this.axios.post(url)
-        .then( () => { this.get_members_of_group() })
-        .catch(error => console.log(error))
-      }
+      if(!confirm(`Leave group ${this.group.properties.name}?`)) return
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/leave`
+      this.axios.post(url)
+      .then( () => { this.get_members_of_group() })
+      .catch(error => console.log(error))
 
     },
     join_group(){
-      if(confirm(`Join ${this.group.properties.name}?`)){
-        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}/join`
-        this.axios.post(url)
-        .then( () => { this.get_members_of_group() })
-        .catch(error => {
-          alert(`System error`)
-          console.error(error)
-        })
-      }
+      if(!confirm(`Join group ${this.group.properties.name}?`)) return
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/join`
+      this.axios.post(url)
+      .then( () => { this.get_members_of_group() })
+      .catch(error => {
+        alert(`System error`)
+        console.error(error)
+      })
     },
     add_user_to_group(user){
-      if(confirm(`Add ${user.properties.name_kanji} to ${this.group.properties.name}?`)){
+      if(!confirm(`Add user ${user.properties.display_name} to group ${this.group.properties.name}?`)) return
 
-        let group_id = this.group.identity.low
-        let user_id = user.identity.low
-        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
+      const group_id = this.group.identity.low || this.group.identity.low
+      const user_id = user.identity.low || user.identity.low
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
 
-        this.axios.post(url)
-        .then( () => {
-          alert(`Success`)
-          this.get_members_of_group()
-          this.member_modal_open=false
-        })
-        .catch(error => {
-          alert(`System error`)
-          console.error(error)
-        })
-      }
+      this.axios.post(url)
+      .then( () => {
+        alert(`Success`)
+        this.get_members_of_group()
+        this.member_modal_open=false
+      })
+      .catch(error => {
+        alert(`System error`)
+        console.error(error)
+      })
     },
     remove_user_from_group(user){
-      if(confirm(`Remove ${user.properties.name_kanji} from ${this.group.properties.name}?`)){
+      if(!confirm(`Remove user ${user.properties.display_name} from group ${this.group.properties.name}?`)) return
 
-        let group_id = this.group.identity.low
-        let user_id = user.identity.low
-        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
+      const group_id = this.group.identity.low || this.group.identity.low
+      const user_id = user.identity.low || user.identity.low
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
 
-        this.axios.delete(url)
-        .then( () => {
-          alert(`Success`)
-          this.get_members_of_group()
-        })
-        .catch(error => {
-          alert(`System error`)
-          console.error(error)
-        })
-      }
+      this.axios.delete(url)
+      .then( () => {
+        alert(`Success`)
+        this.get_members_of_group()
+      })
+      .catch(error => {
+        alert(`System error`)
+        console.error(error)
+      })
     },
     make_user_administrator_of_group(user){
-      if(confirm(`Make ${user.properties.name_kanji} admin of ${this.group.properties.name}?`)){
+      if(!confirm(`Make user ${user.properties.display_name} admin of group ${this.group.properties.name}?`)) return
 
-        let group_id = this.group.identity.low
-        let user_id = user.identity.low
-        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
+      const group_id = this.group.identity.low || this.group.identity.low
+      const user_id = user.identity.low || user.identity.low
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
 
-        this.axios.post(url)
-        .then( () => {
-          alert(`Success`)
-          this.get_administrators_of_group()
-          this.administrator_modal_open=false
-        })
-        .catch(error => {
-          alert(`System error`)
-          console.error(error)
-        })
-      }
+      this.axios.post(url)
+      .then( () => {
+        alert(`Success`)
+        this.get_administrators_of_group()
+        this.administrator_modal_open=false
+      })
+      .catch(error => {
+        alert(`System error`)
+        console.error(error)
+      })
+
 
     },
     remove_user_from_administrators(user){
-      if(confirm(`Remove ${user.properties.name_kanji} from administrators of ${this.group.properties.name}?`)){
-        let group_id = this.group.identity.low
-        let user_id = user.identity.low
-        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
+      if(!confirm(`Remove ${user.properties.display_name} from administrators of ${this.group.properties.name}?`)) return
 
-        this.axios.delete(url)
-        .then( () => {
-          alert(`Success`)
-          this.get_administrators_of_group()
-        })
-        .catch(error => {
-          alert(`System error`)
-          console.error(error)
-        })
-      }
+      const group_id = this.group.identity.low || this.group.identity.low
+      const user_id = user.identity.low || user.identity.low
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
+
+      this.axios.delete(url)
+      .then( () => {
+        alert(`Success`)
+        this.get_administrators_of_group()
+      })
+      .catch(error => {
+        alert(`System error`)
+        console.error(error)
+      })
+
 
     },
     add_child_group_to_parent_group(child_group, parent_group){
-      if(confirm(`Add ${child_group.properties.name} to ${parent_group.properties.name}?`)){
+      if(!confirm(`Add ${child_group.properties.name} to ${parent_group.properties.name}?`)) return
 
-        let parent_group_id = parent_group.identity.low
-        let child_group_id = child_group.identity.low
+      const parent_group_id = parent_group.identity.low || parent_group.identity
+      const child_group_id = child_group.identity.low || child_group.identity
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${parent_group_id}/groups/${child_group_id}`
 
-        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${parent_group_id}/groups/${child_group_id}`
-
-        this.axios.post(url)
-        .then( () => {
-          this.child_group_modal_open=false
-          this.parent_group_modal_open=false
-          this.get_group()
-        })
-        .catch(error => {
-          alert(`Invalid operation`)
-          console.error(error)
-        })
-      }
+      this.axios.post(url)
+      .then( () => {
+        this.child_group_modal_open=false
+        this.parent_group_modal_open=false
+        this.get_group()
+      })
+      .catch(error => {
+        alert(`Invalid operation`)
+        console.error(error)
+      })
     },
     remove_child_group_from_parent_group(child_group, parent_group){
-      if(confirm(`Remove ${child_group.properties.name} from ${parent_group.properties.name}?`)) {
+      if(!confirm(`Remove ${child_group.properties.name} from ${parent_group.properties.name}?`)) return
 
-        let parent_group_id = parent_group.identity.low
-        let child_group_id = child_group.identity.low
+      const parent_group_id = parent_group.identity.low || parent_group.identity
+      const child_group_id = child_group.identity.low || child_group.identity
 
-        let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${parent_group_id}/groups/${child_group_id}`
-        this.axios.delete(url)
-        .then( () => {
-          this.get_group()
-        })
-        .catch(error => {
-          alert(`Invalid operation`)
-          console.error(error)
-        })
-      }
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${parent_group_id}/groups/${child_group_id}`
+      this.axios.delete(url)
+      .then( () => {
+        this.get_group()
+      })
+      .catch(error => {
+        alert(`Invalid operation`)
+        console.error(error)
+      })
     },
     patch_group(){
-      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.identity.low}`
+      const group_id = this.group.identity.low || this.group.identity
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}`
       this.axios.patch(url,
         this.group.properties
       )
@@ -683,11 +682,13 @@ export default {
     },
 
     view_profile_of_user(user){
-      this.$router.push({name: 'profile', query: {id: user.identity.low}})
+      const id = user.identity.low || user.identity
+      this.$router.push({name: 'profile', query: {id}})
     },
     user_is_current_user(user){
       if(!this.$store.state.current_user) return false
-      return user.identity.low === this.$store.state.current_user.identity.low
+      const user_id = user.identity.low || user.identity
+      return user_id === this.current_user_id
     },
 
 
@@ -704,7 +705,8 @@ export default {
       if(!this.$store.state.current_user) return false
       if(this.members.length < 1) return false
       let found = this.members.find( member => {
-        return member.identity.low === this.$store.state.current_user.identity.low
+        const member_id = member.identity.low || member.identity
+        return member_id === this.current_user_id
       })
       return !!found
     },
@@ -712,13 +714,18 @@ export default {
       if(!this.$store.state.current_user) return false
       if(this.administrators.length < 1) return false
       let found = this.administrators.find( administrator => {
-        return administrator.identity.low === this.$store.state.current_user.identity.low
+        const administrator_id = administrator.identity.low || administrator.identity
+        return administrator_id === this.current_user_id
       })
       return !!found
     },
     current_user_is_admin(){
       if(!this.$store.state.current_user) return false
       return this.$store.state.current_user.properties.isAdmin
+    },
+    current_user_id() {
+      return this.$store.state.current_user.identity.low
+        || this.$store.state.current_user.identity
     },
     group_avatar_src(){
       if(this.group.properties.avatar_src) return this.group.properties.avatar_src

@@ -37,13 +37,17 @@ export default {
 
   methods: {
     group_clicked(){
-      this.$router.push({name: 'group', params: {group_id: this.group.identity.low}})
+      this.$router.push({name: 'group', params: {group_id: this.group_id}})
     }
   },
   computed: {
     avatar_src(){
       if(this.group.properties.avatar_src) return this.group.properties.avatar_src
       else return require('@/assets/account-multiple.svg')
+    },
+    group_id(){
+      return this.group.identity.low
+        || this.group.identity
     }
   }
 

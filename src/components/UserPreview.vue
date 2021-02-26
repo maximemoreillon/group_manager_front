@@ -19,7 +19,7 @@
 
     <span
       class="its_you"
-      v-if="user.identity.low === $store.state.current_user.identity.low">
+      v-if="user_is_current_user">
       (It's you!)
     </span>
 
@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     user_clicked(){
-      this.$router.push({ name: 'groups_of_user', params: {user_id: this.user.identity.low} })
+      this.$router.push({ name: 'groups_of_user', params: {user_id: this.user_id} })
     }
   },
   computed: {
@@ -54,6 +54,16 @@ export default {
       if(this.user.properties.avatar_src) return this.user.properties.avatar_src
       else return require('@/assets/account.svg')
     },
+    user_id(){
+      return this.user.identity.low
+        || this.user.identity
+    },
+    user_is_current_user(){
+      const current_user_id = this.$store.state.current_user.identity.low
+        || this.$store.state.current_user.identity
+
+      return current_user_id === this.user_id
+    }
   }
 
 }
