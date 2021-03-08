@@ -20,16 +20,37 @@
       <template v-if="groups.length > 0">
 
         <h3>Official groups ({{official_groups(groups).length}})</h3>
+
         <GroupPreview
           v-for="(group, index) in official_groups(groups)"
           v-bind:key="`official_${index}`"
-          v-bind:group="group"/>
+          v-bind:group="group">
+
+          <button
+            type="button"
+            v-if="current_user_is_admin"
+            v-on:click.stop="remove_user_from_group(group)" >
+            <font-awesome-icon icon="sign-out-alt" />
+            <span>Remove</span>
+          </button>
+
+        </GroupPreview>
 
         <h3>Non-official groups ({{non_official_groups(groups).length}})</h3>
         <GroupPreview
           v-for="(group, index) in non_official_groups(groups)"
           v-bind:key="`nonofficial_${index}`"
-          v-bind:group="group"/>
+          v-bind:group="group">
+
+          <button
+            type="button"
+            v-if="current_user_is_admin"
+            v-on:click.stop="remove_user_from_group(group)" >
+            <font-awesome-icon icon="sign-out-alt" />
+            <span>Remove</span>
+          </button>
+
+        </GroupPreview>
 
       </template>
       <div class="" v-else>No groups</div>
@@ -47,13 +68,29 @@
         <GroupPreview
           v-for="(group, index) in official_groups(groups_administrated_by_user)"
           v-bind:key="`administrated_official_${index}`"
-          v-bind:group="group"/>
+          v-bind:group="group">
+          <button
+            type="button"
+            v-if="current_user_is_admin"
+            v-on:click.stop="remove_user_from_administrators(group)">
+            <font-awesome-icon icon="sign-out-alt"/>
+            <span>Remove from admins</span>
+          </button>
+        </GroupPreview>
 
         <h3>User-created groups ({{non_official_groups(groups_administrated_by_user).length}})</h3>
         <GroupPreview
           v-for="(group, index) in non_official_groups(groups_administrated_by_user)"
           v-bind:key="`administrated_nonofficial_${index}`"
-          v-bind:group="group"/>
+          v-bind:group="group">
+          <button
+            type="button"
+            v-if="current_user_is_admin"
+            v-on:click.stop="remove_user_from_administrators(group)">
+            <font-awesome-icon icon="sign-out-alt"/>
+            <span>Remove</span>
+          </button>
+        </GroupPreview>
 
       </template>
       <div class="" v-else>No groups</div>
@@ -69,11 +106,38 @@ import Loader from '@moreillon/vue_loader'
 
 import GroupPreview from '@/components/GroupPreview.vue'
 
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import {
+  faPlus,
+  faUserPlus,
+  faEdit,
+  faSave,
+  faSignInAlt,
+  faSignOutAlt,
+  faUserTie,
+  faUserSlash,
+  faTrash,
 
+} from '@fortawesome/free-solid-svg-icons'
+
+library.add(
+  faPlus,
+  faUserPlus,
+  faEdit,
+  faSave,
+  faSignInAlt,
+  faSignOutAlt,
+  faUserTie,
+  faUserSlash,
+  faTrash,
+
+)
 
 export default {
   name: 'Group',
   components: {
+    FontAwesomeIcon,
     Loader,
     GroupPreview,
 
@@ -110,12 +174,12 @@ export default {
 
     get_user(){
       // simply used to show the user's name on the page title
-      let user_id = this.$route.params.member_id
+      const user_id = this.$route.params.member_id
         || this.$route.params.user_id
         || this.$route.query.id
         || 'self'
 
-      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/members/${user_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/members/${user_id}`
       this.axios.get(url)
       .then(response => {
         let record = response.data[0]
@@ -183,13 +247,51 @@ export default {
       return groups.filter((group) => {
         return !group.properties.official
       })
-    }
+    },
+    remove_user_from_group(group){
+      if(!confirm(`Remove user ${this.user.properties.display_name} from group ${group.properties.name}?`)) return
+
+      const group_id = group.identity.low || group.identity
+      const user_id = this.user.identity.low || this.user.identity
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
+
+      this.axios.delete(url)
+      .then( () => {
+        this.get_groups_of_user()
+      })
+      .catch(error => {
+        alert(`System error`)
+        console.error(error)
+      })
+    },
+    remove_user_from_administrators(group){
+      if(!confirm(`Remove ${this.user.properties.display_name} from administrators of ${group.properties.name}?`)) return
+
+      const group_id = group.identity.low || group.identity
+      const user_id = this.user.identity.low || this.user.identity
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
+
+      this.axios.delete(url)
+      .then( () => {
+        this.get_groups_administrated_by_user()
+      })
+      .catch(error => {
+        alert(`System error`)
+        console.error(error)
+      })
+
+
+    },
 
   },
   computed: {
     current_user_id(){
       return this.$store.state.current_user.identity.low
         || this.$store.state.current_user.identity
+    },
+    current_user_is_admin(){
+      if(!this.$store.state.current_user) return false
+      return this.$store.state.current_user.properties.isAdmin
     },
     user_is_current_user(){
       let user_id = this.$route.params.user_id

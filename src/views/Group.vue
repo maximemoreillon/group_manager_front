@@ -560,8 +560,8 @@ export default {
     add_user_to_group(user){
       if(!confirm(`Add user ${user.properties.display_name} to group ${this.group.properties.name}?`)) return
 
-      const group_id = this.group.identity.low || this.group.identity.low
-      const user_id = user.identity.low || user.identity.low
+      const group_id = this.group.identity.low || this.group.identity
+      const user_id = user.identity.low || user.identity
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
 
       this.axios.post(url)
@@ -578,8 +578,8 @@ export default {
     remove_user_from_group(user){
       if(!confirm(`Remove user ${user.properties.display_name} from group ${this.group.properties.name}?`)) return
 
-      const group_id = this.group.identity.low || this.group.identity.low
-      const user_id = user.identity.low || user.identity.low
+      const group_id = this.group.identity.low || this.group.identity
+      const user_id = user.identity.low || user.identity
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
 
       this.axios.delete(url)
@@ -595,8 +595,8 @@ export default {
     make_user_administrator_of_group(user){
       if(!confirm(`Make user ${user.properties.display_name} admin of group ${this.group.properties.name}?`)) return
 
-      const group_id = this.group.identity.low || this.group.identity.low
-      const user_id = user.identity.low || user.identity.low
+      const group_id = this.group.identity.low || this.group.identity
+      const user_id = user.identity.low || user.identity
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
 
       this.axios.post(url)
@@ -615,8 +615,8 @@ export default {
     remove_user_from_administrators(user){
       if(!confirm(`Remove ${user.properties.display_name} from administrators of ${this.group.properties.name}?`)) return
 
-      const group_id = this.group.identity.low || this.group.identity.low
-      const user_id = user.identity.low || user.identity.low
+      const group_id = this.group.identity.low || this.group.identity
+      const user_id = user.identity.low || user.identity
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
 
       this.axios.delete(url)
