@@ -45,13 +45,24 @@
       <template v-else>
 
         <!-- P not vey nice -->
-        <p v-if="current_user_is_admin_of_group || current_user_is_admin">
+        <p>
+
           <button
             type="button"
-            v-on:click="member_modal_open = true" >
-            <font-awesome-icon icon="user-plus" />
-            <span>Add member</span>
+            v-on:click="excel_export(members)" >
+            <font-awesome-icon icon="file-export" />
+            <span>Export</span>
           </button>
+
+          <template v-if="current_user_is_admin_of_group || current_user_is_admin">
+            <button
+              type="button"
+              v-on:click="member_modal_open = true" >
+              <font-awesome-icon icon="user-plus" />
+              <span>Add member</span>
+            </button>
+          </template>
+
         </p>
 
 
@@ -363,7 +374,7 @@
 
 import Loader from '@moreillon/vue_loader'
 import Modal from '@moreillon/vue_modal'
-
+import XLSX from 'xlsx'
 
 import UserPicker from '@moreillon/vue_user_picker'
 import GroupPicker from '@moreillon/vue_group_picker'
@@ -386,6 +397,7 @@ import {
   faUserTie,
   faUserSlash,
   faTrash,
+  faFileExport,
 
 } from '@fortawesome/free-solid-svg-icons'
 
@@ -399,6 +411,7 @@ library.add(
   faUserTie,
   faUserSlash,
   faTrash,
+  faFileExport,
 
 )
 
@@ -690,6 +703,14 @@ export default {
       const user_id = user.identity.low || user.identity
       return user_id === this.current_user_id
     },
+    excel_export(list){
+      const formatted_list = list.map(i => i.properties)
+      console.log(formatted_list)
+      const workbook = XLSX.utils.book_new()
+      const ws1 = XLSX.utils.json_to_sheet(formatted_list)
+      XLSX.utils.book_append_sheet(workbook, ws1, 'Sheet1')
+      XLSX.writeFile(workbook, 'export.xlsx')
+    }
 
 
 
