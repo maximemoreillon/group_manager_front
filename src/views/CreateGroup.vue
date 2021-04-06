@@ -77,8 +77,9 @@ export default {
       this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups`, {
         name: this.$refs.new_group_name.value,
       })
-      .then( (response) => {
-        this.$router.push({name: 'group', params: {group_id: response.data.identity.low}})
+      .then( ({data}) => {
+        const group_id = data.identity.low || data.identity
+        this.$router.push({name: 'group', params: {group_id}})
       })
       .catch( (error) => {
         console.error(error)
