@@ -150,8 +150,7 @@ export default {
 
       groups_administrated_by_user: [],
 
-      group_manager_api_url : process.env.VUE_APP_GROUP_MANAGER_API_URL,
-      user_page_url : process.env.VUE_APP_EMPLOYEE_MANAGER_FRONT_URL,
+
     }
   },
 
@@ -285,6 +284,9 @@ export default {
 
   },
   computed: {
+    user_id(){
+      return this.$route.params.user_id
+    },
     current_user_id(){
       return this.$store.state.current_user.identity.low
         || this.$store.state.current_user.identity
@@ -294,32 +296,18 @@ export default {
       return this.$store.state.current_user.properties.isAdmin
     },
     user_is_current_user(){
-      let user_id = this.$route.params.user_id
       // If ID not specified in query, then user is automatically current user
-      if(!user_id || user_id === 'self') return true
+      if(!this.user_id || this.user_id === 'self') return true
       // If an ID is specified but current user cannot be identified, then user might not be current user
       if(!this.$store.state.current_user) return false
-      return this.current_user_id === user_id
+      return this.current_user_id === this.user_id
     },
     user_profile_url(){
-      if(!process.env.VUE_APP_USER_MANAGER_FRONT_URL) return null
+      if(!process.env.VUE_APP_USER_PROFILE_URL) return null
 
-      let user_manager_front_url = process.env.VUE_APP_USER_MANAGER_FRONT_URL
-      let user_id = this.$route.params.user_id
+      return process.env.VUE_APP_USER_PROFILE_URL.replace(':user_id',this.user_id)
 
-
-      if(process.env.VUE_APP_USER_PROFILE_ROUTE){
-        if(process.env.VUE_APP_USER_PROFILE_ROUTE.length > 0){
-          let route = process.env.VUE_APP_USER_PROFILE_ROUTE.replace(':user_id',user_id)
-          return `${user_manager_front_url}${route}`
-        }
-      }
-
-      return `${user_manager_front_url}/users/${user_id}`
-
-
-
-    }
+    },
 
   }
 }
