@@ -14,7 +14,8 @@
       class="user_name">
       {{user.properties.display_name
         || user.properties.name_kanji
-        || user.properties.name}}
+        || user.properties.name
+        || user.properties.username}}
     </div>
 
     <span
