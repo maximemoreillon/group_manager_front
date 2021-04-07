@@ -308,6 +308,7 @@
         <h2>Add member to group</h2>
         <div class="modal_picker_wrapper">
           <UserPicker
+            v-if="member_modal_open"
             class="modal_picker"
             :apiUrl="picker_api_url"
             @selection="add_user_to_group($event)"/>
@@ -320,6 +321,7 @@
         <h2>Add administrator to group</h2>
         <div class="modal_picker_wrapper">
           <UserPicker
+            v-if="administrator_modal_open"
             class="modal_picker"
             :apiUrl="picker_api_url"
             @selection="make_user_administrator_of_group($event)"/>
@@ -332,6 +334,7 @@
         <h2>Add child group to current group</h2>
         <div class="modal_picker_wrapper">
           <GroupPicker
+            v-if="child_group_modal_open"
             :usersWithNoGroup="false"
             class="modal_picker"
             :apiUrl="picker_api_url"
@@ -345,6 +348,7 @@
         <h2>Add current group to parent group</h2>
         <div class="modal_picker_wrapper">
           <GroupPicker
+            v-if="parent_group_modal_open"
             :usersWithNoGroup="false"
             class="modal_picker"
             :apiUrl="picker_api_url"
