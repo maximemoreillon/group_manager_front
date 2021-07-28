@@ -24,10 +24,11 @@ deployment:
   tags:
     - moreillon
   script:
+    - echo 'Nothing'
     # create/update the deployment
     #- envsubst < kubernetes/deployment.yml | kubectl apply -f -
     # Pull latest image of deployment
-    - kubectl rollout restart deployment/${APPLICATION_NAME}
+    # - kubectl rollout restart deployment/${APPLICATION_NAME}
     # If a nodeport is specified, serve app through a nodeport service
     #- >
     #  if [ -z ${SERVICE_PORT} ];

@@ -1,48 +1,50 @@
 <template>
-  <AppTemplate
-    :options="options"
-    @user="get_user($event)">
+  <div id="app">
+    <AppTemplate
+      authenticate
+      applicationName="Group manager">
 
-    <template v-slot:nav>
+      <template v-slot:navigation>
 
-      <router-link :to="{ name: 'groups_of_user', params: {user_id: 'self'}}">
-        <AccountGroupIcon />
-        <span>My groups</span>
-      </router-link>
+        <router-link :to="{ name: 'groups_of_user', params: {user_id: 'self'}}">
+          <AccountGroupIcon />
+          <span>My groups</span>
+        </router-link>
 
 
 
-      <router-link :to="{ name: 'group_browser'}">
-        <MagnifyIcon />
-        <span>Group browser</span>
-      </router-link>
+        <router-link :to="{ name: 'group_browser'}">
+          <MagnifyIcon />
+          <span>Group browser</span>
+        </router-link>
 
-      <router-link :to="{ name: 'create_group'}">
-        <PlusIcon />
-        <span>Create group</span>
-      </router-link>
+        <router-link :to="{ name: 'create_group'}">
+          <PlusIcon />
+          <span>Create group</span>
+        </router-link>
 
-      <router-link :to="{ name: 'about'}">
-        <InformationOutlineIcon />
-        <span>About</span>
-      </router-link>
+        <router-link :to="{ name: 'about'}">
+          <InformationOutlineIcon />
+          <span>About</span>
+        </router-link>
 
-    </template>
+      </template>
 
-  </AppTemplate>
+    </AppTemplate>
+  </div>
 </template>
 
 <script>
-
-import AppTemplate from '@moreillon/vue_application_template'
+import AppTemplate from '@moreillon/vue_application_template_flex'
 
 import AccountGroupIcon from 'vue-material-design-icons/AccountGroup.vue'
 import PlusIcon from 'vue-material-design-icons/Plus.vue'
 import MagnifyIcon from 'vue-material-design-icons/Magnify.vue'
 import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
 
+
 export default {
-  name: 'App',
+  name: 'app',
   components: {
     AppTemplate,
     AccountGroupIcon,
@@ -52,18 +54,8 @@ export default {
 
   },
   data(){
-    return {
-      options: {
-        authenticate: true,
-        title: 'Group manager',
-        login_url: `${process.env.VUE_APP_AUTHENTICATION_API_URL}/login`,
-        identification_url: `${process.env.VUE_APP_AUTHENTICATION_API_URL}/whoami`
-      }
-    }
-  },
-  methods: {
-    get_user(user){
-      this.$store.commit('set_current_user',user)
+    return{
+
     }
   }
 }

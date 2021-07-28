@@ -178,12 +178,9 @@ export default {
         || this.$route.query.id
         || 'self'
 
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/members/${user_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/members/${user_id}`
       this.axios.get(url)
-      .then(response => {
-        let record = response.data[0]
-        this.user = record._fields[record._fieldLookup['user']]
-      })
+      .then(({data}) => { this.user = data })
       .catch(error => alert(error))
 
     },
@@ -195,17 +192,12 @@ export default {
         || this.$route.params.user_id
         || 'self'
 
-      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/members/${user_id}/groups`
+      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/members/${user_id}/groups`
 
       this.$set(this.groups,'loading',true)
 
       this.axios.get(url)
-      .then(response => {
-        this.groups = []
-        response.data.forEach((record) => {
-          this.groups.push(record._fields[record._fieldLookup['group']])
-        });
-      })
+      .then( ({data}) => { this.groups = data })
       .catch( (error) => {
 
         if(error.response) console.log(error.response.data)
@@ -223,17 +215,12 @@ export default {
         || this.$route.params.user_id
         || 'self'
 
-      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/administrators/${user_id}/groups`
+      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/administrators/${user_id}/groups`
 
       this.$set(this.groups_administrated_by_user,'loading',true)
 
       this.axios.get(url)
-      .then(response => {
-        this.groups_administrated_by_user = []
-        response.data.forEach((record) => {
-          this.groups_administrated_by_user.push(record._fields[record._fieldLookup['group']])
-        });
-      })
+      .then( ({data}) => { this.groups_administrated_by_user = data })
       .catch( () => {this.$set(this.groups,'error','Error loading groups')})
       .finally( () => {this.$set(this.groups_administrated_by_user,'loading',false)})
     },
@@ -255,9 +242,7 @@ export default {
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
 
       this.axios.delete(url)
-      .then( () => {
-        this.get_groups_of_user()
-      })
+      .then( () => { this.get_groups_of_user() })
       .catch(error => {
         alert(`System error`)
         console.error(error)
@@ -271,9 +256,7 @@ export default {
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
 
       this.axios.delete(url)
-      .then( () => {
-        this.get_groups_administrated_by_user()
-      })
+      .then( () => { this.get_groups_administrated_by_user() })
       .catch(error => {
         alert(`System error`)
         console.error(error)

@@ -74,7 +74,7 @@ export default {
 
     create_group(){
       this.loading = true;
-      this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups`, {
+      this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups`, {
         name: this.$refs.new_group_name.value,
       })
       .then( ({data}) => {

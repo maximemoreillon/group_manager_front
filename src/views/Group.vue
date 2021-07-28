@@ -26,7 +26,7 @@
       </div>
 
       <div class="group_id">
-        ID: {{group.identity.low || group.identity}}
+        ID: {{group.identity}}
       </div>
 
       <div class="avatar_wrapper">
@@ -463,13 +463,11 @@ export default {
   methods: {
 
     get_group(){
-
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}`
-
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}`
       this.loading = true;
       this.axios.get(url)
-      .then(response => {
-        this.group = response.data
+      .then(({data}) => {
+        this.group = data
         this.get_members_of_group()
         this.get_administrators_of_group()
         this.get_child_groups_of_group()
@@ -485,54 +483,34 @@ export default {
     },
     get_members_of_group(){
       this.$set(this.members,'loading',true)
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/members`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/members`
       this.axios.get(url)
-      .then(response => {
-        this.members = []
-        response.data.forEach((record) => {
-          this.members.push(record._fields[record._fieldLookup['user']])
-        });
-       })
+      .then(({data}) => { this.members = data })
        .catch( () => this.$set(this.members,'error','Error'))
        .finally(() => this.$set(this.members,'loading',false))
     },
     get_child_groups_of_group(){
       this.$set(this.child_groups,'loading',true)
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/groups`
-      const options = {
-        params: { id: this.group_id }
-      }
-      this.axios.get(url,options )
-      .then(response => {
-        this.child_groups = []
-        response.data.forEach((record) => {
-          this.child_groups.push(record._fields[record._fieldLookup['group']])
-        })
-       })
-       .catch( (error) => {
-         console.log(error)
-         this.$set(this.child_groups,'error','Error')
-       })
-       .finally(() => this.$set(this.child_groups,'loading',false))
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/groups`
+      this.axios.get(url )
+      .then( ({data}) => { this.child_groups = data })
+      .catch( (error) => {
+        console.log(error)
+        this.$set(this.child_groups,'error','Error')
+      })
+      .finally(() => this.$set(this.child_groups,'loading',false))
     },
     get_parent_groups_of_group(){
       this.$set(this.parent_groups,'loading',true)
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/parent_groups`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/parent_groups`
       this.axios.get(url)
-      .then(response => {
-        this.parent_groups = []
-        response.data.forEach((record) => {
-          this.parent_groups.push(record._fields[record._fieldLookup['group']])
-        });
-
-       })
+      .then( ({data}) => {  this.parent_groups = data })
       .catch( () => this.$set(this.parent_groups,'error','Error'))
       .finally(() => this.$set(this.parent_groups,'loading',false))
     },
     delete_group(){
       if(!confirm(`Delete ${this.group.properties.name}?`)) return
-      const group_id = this.group.identity.low || this.group.identity
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}`
       this.axios.delete(url)
       .then( () => { this.$router.push({name: 'groups_of_user', params: {user_id: 'self'}}) })
       .catch(error => {
@@ -543,14 +521,8 @@ export default {
 
     },
     get_administrators_of_group(){
-      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/administrators`)
-      .then(response => {
-        this.administrators.splice(0,this.administrators.length)
-        response.data.forEach((record) => {
-          this.administrators.push(record._fields[record._fieldLookup['user']])
-        });
-
-       })
+      this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/administrators`)
+      .then( ({data}) => { this.administrators = data })
        .catch(error => {
          alert(`System error`)
          console.error(error)
@@ -558,7 +530,7 @@ export default {
     },
     leave_group(){
       if(!confirm(`Leave group ${this.group.properties.name}?`)) return
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/leave`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/leave`
       this.axios.post(url)
       .then( () => { this.get_members_of_group() })
       .catch(error => console.log(error))
@@ -566,7 +538,7 @@ export default {
     },
     join_group(){
       if(!confirm(`Join group ${this.group.properties.name}?`)) return
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/join`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/join`
       this.axios.post(url)
       .then( () => { this.get_members_of_group() })
       .catch(error => {
@@ -576,10 +548,8 @@ export default {
     },
     add_user_to_group(user){
       if(!confirm(`Add user ${user.properties.display_name} to group ${this.group.properties.name}?`)) return
-
-      const group_id = this.group.identity.low || this.group.identity
       const user_id = user.identity.low || user.identity
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/members/${user_id}`
 
       this.axios.post(url)
       .then( () => {
@@ -595,9 +565,8 @@ export default {
     remove_user_from_group(user){
       if(!confirm(`Remove user ${user.properties.display_name} from group ${this.group.properties.name}?`)) return
 
-      const group_id = this.group.identity.low || this.group.identity
       const user_id = user.identity.low || user.identity
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/members/${user_id}`
 
       this.axios.delete(url)
       .then( () => {
@@ -612,9 +581,8 @@ export default {
     make_user_administrator_of_group(user){
       if(!confirm(`Make user ${user.properties.display_name} admin of group ${this.group.properties.name}?`)) return
 
-      const group_id = this.group.identity.low || this.group.identity
       const user_id = user.identity.low || user.identity
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/administrators/${user_id}`
 
       this.axios.post(url)
       .then( () => {
@@ -632,9 +600,8 @@ export default {
     remove_user_from_administrators(user){
       if(!confirm(`Remove ${user.properties.display_name} from administrators of ${this.group.properties.name}?`)) return
 
-      const group_id = this.group.identity.low || this.group.identity
       const user_id = user.identity.low || user.identity
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/administrators/${user_id}`
 
       this.axios.delete(url)
       .then( () => {
@@ -653,7 +620,7 @@ export default {
 
       const parent_group_id = parent_group.identity.low || parent_group.identity
       const child_group_id = child_group.identity.low || child_group.identity
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${parent_group_id}/groups/${child_group_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${parent_group_id}/groups/${child_group_id}`
 
       this.axios.post(url)
       .then( () => {
@@ -672,7 +639,7 @@ export default {
       const parent_group_id = parent_group.identity.low || parent_group.identity
       const child_group_id = child_group.identity.low || child_group.identity
 
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${parent_group_id}/groups/${child_group_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${parent_group_id}/groups/${child_group_id}`
       this.axios.delete(url)
       .then( () => {
         this.get_group()
@@ -684,10 +651,8 @@ export default {
     },
     patch_group(){
       const group_id = this.group.identity.low || this.group.identity
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}`
-      this.axios.patch(url,
-        this.group.properties
-      )
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${group_id}`
+      this.axios.patch(url, this.group.properties )
       .then( () => {
         alert(`Success`)
         this.get_group()
@@ -698,22 +663,26 @@ export default {
       })
     },
 
-    view_profile_of_user(user){
-      const id = user.identity.low || user.identity
-      this.$router.push({name: 'profile', query: {id}})
-    },
     user_is_current_user(user){
       if(!this.$store.state.current_user) return false
       const user_id = user.identity.low || user.identity
       return user_id === this.current_user_id
     },
     excel_export(list){
-      const formatted_list = list.map(i => i.properties)
-      console.log(formatted_list)
+      const formatted_list = list.map(i => {
+        const formatted_entry = i.properties
+        delete formatted_entry.password_hashed
+        delete formatted_entry.password_changed
+        delete formatted_entry.last_login
+        delete formatted_entry.avatar_src
+        delete formatted_entry.locked
+        return formatted_entry
+      })
+
       const workbook = XLSX.utils.book_new()
       const ws1 = XLSX.utils.json_to_sheet(formatted_list)
       XLSX.utils.book_append_sheet(workbook, ws1, 'Sheet1')
-      XLSX.writeFile(workbook, 'export.xlsx')
+      XLSX.writeFile(workbook, `group_manager_${this.group.properties.name}_export.xlsx`)
     }
 
 
@@ -806,6 +775,7 @@ button:not(:last-child){
 
 
 .loader_wrapper {
+  margin-top: 3em;
   display: flex;
   justify-content: center;
   font-size: 150%;
