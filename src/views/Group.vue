@@ -44,9 +44,9 @@
       <Loader v-else-if="members.loading">Loading members</Loader>
       <template v-else>
 
-        <!-- P not vey nice -->
-        <p>
-
+        <div class="toolbar">
+          <span class="member_count">{{members.length}} member(s)</span>
+          <div class="spacer"/>
           <button
             type="button"
             v-on:click="excel_export(members)" >
@@ -62,8 +62,9 @@
               <span>Add member</span>
             </button>
           </template>
+        </div>
 
-        </p>
+
 
 
         <div class="members_container" v-if="members.length > 0">
@@ -119,14 +120,18 @@
       <template v-else>
 
         <!-- P not vey nice -->
-        <p v-if="current_user_is_admin_of_group || current_user_is_admin">
-          <button
-            type="button"
-            v-on:click="administrator_modal_open = true" >
-            <font-awesome-icon icon="user-plus" />
-            <span>Add administrator</span>
-          </button>
-        </p>
+        <div class="toolbar">
+          <span class="member_count">{{administrators.length}} administrator(s)</span>
+          <div class="spacer"/>
+          <template v-if="current_user_is_admin_of_group || current_user_is_admin">
+            <button
+              type="button"
+              v-on:click="administrator_modal_open = true" >
+              <font-awesome-icon icon="user-plus" />
+              <span>Add administrator</span>
+            </button>
+          </template>
+        </div>
 
         <div class="members_container" v-if="administrators.length > 0">
           <UserPreview
@@ -800,6 +805,18 @@ button:not(:last-child){
 
 .group_properties_table input[type="text"] {
   width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  margin: 1em 0;
+  padding: 0.5em;
+  border-bottom: 2px solid #dddddd;
+}
+
+.spacer {
+  flex-grow: 1;
 }
 
 
