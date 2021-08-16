@@ -18,6 +18,17 @@
         || user.properties.username}}
     </div>
 
+    <div class="role" v-if="user.properties.role">
+      {{user.properties.role}}
+    </div>
+
+
+    <div class="employee_number" v-if="user.properties.employee_number">
+      {{user.properties.employee_number}}
+    </div>
+
+
+
     <span
       class="its_you"
       v-if="user_is_current_user">
@@ -76,6 +87,7 @@ export default {
 .user_preview {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   text-decoration: none;
   color: currentColor;
@@ -106,6 +118,21 @@ export default {
   background-color: #eeeeee;
 }
 
+.user_name {
+  width: 150px;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+.role {
+  width: 75px;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+
 
 
 .avatar {
@@ -123,6 +150,6 @@ export default {
 }
 
 .growing_spacer {
-  flex-grow: 1
+  flex-grow: 1;
 }
 </style>
