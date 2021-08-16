@@ -24,11 +24,9 @@ deployment:
   tags:
     - moreillon
   script:
-    - echo 'Nothing'
     # create/update the deployment
     #- envsubst < kubernetes/deployment.yml | kubectl apply -f -
-    # Pull latest image of deployment
-    # - kubectl rollout restart deployment/${APPLICATION_NAME}
+
     # If a nodeport is specified, serve app through a nodeport service
     #- >
     #  if [ -z ${SERVICE_PORT} ];
@@ -41,6 +39,8 @@ deployment:
     #  then echo "CERTIFICATE_DOMAIN not set, skipping creation of ingress";
     #  else envsubst < kubernetes/ingress.yml | kubectl apply -f -;
     #  fi
+    # Pull latest image of deployment
+    - kubectl rollout restart deployment/${APPLICATION_NAME}
   environment:
     name: production
     kubernetes:
