@@ -126,7 +126,7 @@ export default {
 }
 
 .role {
-  width: 75px;
+  width: 100px;
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
