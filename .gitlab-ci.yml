@@ -25,7 +25,7 @@ deployment:
     - moreillon
   script:
     # create/update the deployment
-    #- envsubst < kubernetes/deployment.yml | kubectl apply -f -
+    - envsubst < kubernetes/deployment.yml | kubectl apply -f -
 
     # If a nodeport is specified, serve app through a nodeport service
     #- >
