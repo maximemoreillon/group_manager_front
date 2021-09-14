@@ -5,14 +5,25 @@
     <Loader v-else-if="parent_groups.loading">Loading parent groups</Loader>
     <template v-else>
 
-      <p v-if="current_user_is_admin_of_group || current_user_is_admin">
-        <button
-          type="button"
-          v-on:click="parent_group_modal_open = true" >
-          <font-awesome-icon icon="plus" />
-          <span>Add parent group</span>
-        </button>
-      </p>
+      <div class="toolbar">
+        <input
+          type="checkbox"
+          v-model="direct_parents_only"
+          @change="get_parent_groups_of_group()">
+        <label>Show only direct parents</label>
+
+        <div class="spacer"/>
+        <template v-if="current_user_is_admin_of_group || current_user_is_admin">
+          <button
+            type="button"
+            v-on:click="parent_group_modal_open = true" >
+            <font-awesome-icon icon="plus" />
+            <span>Add parent group</span>
+          </button>
+        </template>
+
+      </div>
+
 
       <div class="members_container" v-if="parent_groups.length > 0">
         <GroupPreview
@@ -96,6 +107,7 @@ export default {
   },
   data(){
     return {
+      direct_parents_only: true,
       parent_groups: [],
       parent_group_modal_open: false,
     }
@@ -115,7 +127,8 @@ export default {
     get_parent_groups_of_group(){
       this.$set(this.parent_groups,'loading',true)
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/parent_groups`
-      this.axios.get(url)
+      const params = {direct: this.direct_parents_only}
+      this.axios.get(url, {params})
       .then( ({data}) => {  this.parent_groups = data })
       .catch( () => this.$set(this.parent_groups,'error','Error'))
       .finally(() => this.$set(this.parent_groups,'loading',false))
