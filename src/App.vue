@@ -70,6 +70,8 @@ export default {
 </script>
 
 <style>
+/* Those styles are app-wide */
+
 button {
   border: none;
   background-color: transparent;
@@ -129,4 +131,27 @@ button > *:not(:last-child) {
 .modal_picker {
   height: 100% !important;
 }
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  margin: 1em 0;
+  padding: 0.5em 0;
+  border-bottom: 2px solid #dddddd;
+}
+
+.spacer {
+  flex-grow: 1;
+}
+
+button:not(:last-child){
+  margin-right: 5px;
+}
+
+.members_container{
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+
 </style>
