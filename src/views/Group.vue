@@ -42,8 +42,7 @@
 
       <Administrators
         :group="group"
-        :current_user_is_admin_of_group="current_user_is_admin_of_group"
-        @user_is_admin="current_user_is_admin_of_group=true"/>
+        @user_is_admin_of_group="current_user_is_admin_of_group=true"/>
 
       <SubGroups
         :group="group"

@@ -100,7 +100,6 @@ export default {
   name: 'Administrators',
   props: {
     group: Object,
-    current_user_is_admin_of_group: Boolean,
   },
   data(){
     return {
@@ -124,7 +123,7 @@ export default {
       this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/administrators`)
       .then( ({data}) => {
         this.administrators = data
-        if(this.current_user_is_admin) this.$emit('user_is_admin')
+        if(this.current_user_is_admin_of_group) this.$emit('user_is_admin_of_group')
       })
        .catch(error => {
          alert(`System error`)
@@ -163,8 +162,16 @@ export default {
         this.get_administrators_of_group()
       })
       .catch(error => {
-        alert(`System error`)
-        console.error(error)
+        if(error.response) {
+          const error_message = error.response.data
+          alert(error_message)
+          console.error(error_message)
+        }
+        else {
+          alert(`System error`)
+          console.error(error)
+        }
+
       })
 
 
@@ -194,6 +201,14 @@ export default {
     current_user_is_admin(){
       if(!this.$store.state.current_user) return false
       return this.$store.state.current_user.properties.isAdmin
+    },
+    current_user_is_admin_of_group(){
+      if(!this.$store.state.current_user) return false
+      return this.administrators.find(a => {
+        const current_user = this.$store.state.current_user
+        const current_user_id = current_user.identity.low || current_user.identity
+        return a.identity === current_user_id
+      })
     },
     current_user_id() {
       return this.$store.state.current_user.identity.low
