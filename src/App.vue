@@ -43,7 +43,7 @@ export default {
       identification_url:process.env.VUE_APP_IDENTIFICATION_URL,
     },
     nav: [
-      {title: 'Home', to: {name: 'Home'}, icon: 'mdi-home'},
+      {title: 'Groups', to: {name: 'Group'}, icon: 'mdi-account-group'},
       {title: 'About', to: {name: 'About'}, icon: 'mdi-information-outline'},
     ]
   }),
