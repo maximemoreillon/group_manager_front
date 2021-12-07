@@ -56,8 +56,8 @@ export default {
       options: {
         authenticate: true,
         title: 'Group manager',
-        login_url: `${process.env.VUE_APP_AUTHENTICATION_API_URL}/login`,
-        identification_url: `${process.env.VUE_APP_AUTHENTICATION_API_URL}/whoami`
+        login_url: `${process.env.VUE_APP_AUTHENTICATION_API_URL}/auth/login`,
+        identification_url: `${process.env.VUE_APP_AUTHENTICATION_API_URL}/users/self`
       }
     }
   },

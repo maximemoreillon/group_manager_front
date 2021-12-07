@@ -172,7 +172,6 @@ export default {
 
       this.axios.post(url)
       .then( () => {
-        alert(`Success`)
         this.get_members_of_group()
         this.member_modal_open=false
       })
@@ -189,7 +188,6 @@ export default {
 
       this.axios.delete(url)
       .then( () => {
-        alert(`Success`)
         this.get_members_of_group()
       })
       .catch(error => {
@@ -201,6 +199,17 @@ export default {
       if(!this.$store.state.current_user) return false
       const user_id = user.identity.low || user.identity
       return user_id === this.current_user_id
+    },
+    leave_group(){
+      if(!confirm(`Leave group ${this.group.properties.name}?`)) return
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/leave`
+      this.axios.post(url)
+      .then( () => {
+        this.get_members_of_group()
+        this.$emit('groupLeft')
+      })
+      .catch(error => console.log(error))
+
     },
     excel_export(list){
       const formatted_list = list.map(i => {

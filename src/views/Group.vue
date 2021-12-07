@@ -38,7 +38,8 @@
       <Members
         :group="group"
         :current_user_is_admin_of_group="current_user_is_admin_of_group"
-        @user_is_member="current_user_is_member_of_group=true"/>
+        @user_is_member="current_user_is_member_of_group=true"
+        @groupLeft="current_user_is_member_of_group=false"/>
 
       <Administrators
         :group="group"
