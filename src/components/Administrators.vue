@@ -65,6 +65,9 @@ import Modal from '@moreillon/vue_modal'
 import UserPicker from '@moreillon/vue_user_picker'
 import UserPreview from '@/components/UserPreview.vue'
 
+import IdUtils from '@/mixins/IdUtils.js'
+import authUtils from '@/mixins/authUtils.js'
+
 // Icons
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -101,6 +104,10 @@ export default {
   props: {
     group: Object,
   },
+  mixins: [
+    IdUtils,
+    authUtils
+  ],
   data(){
     return {
       administrators: [],
@@ -123,7 +130,7 @@ export default {
       this.axios.get(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/administrators`)
       .then( ({data}) => {
         this.administrators = data
-        if(this.current_user_is_admin_of_group) this.$emit('user_is_admin_of_group')
+        this.$emit('userMembership', this.current_user_is_admin_of_group)
       })
        .catch(error => {
          alert(`System error`)
@@ -134,12 +141,10 @@ export default {
     make_user_administrator_of_group(user){
       if(!confirm(`Make user ${user.properties.display_name} admin of group ${this.group.properties.name}?`)) return
 
-      const user_id = user.identity.low || user.identity
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/administrators/${user_id}`
-
-      this.axios.post(url)
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/administrators`
+      const user_id = this.get_id_of_item(user)
+      this.axios.post(url, {user_id})
       .then( () => {
-        alert(`Success`)
         this.get_administrators_of_group()
         this.administrator_modal_open=false
       })
@@ -153,7 +158,7 @@ export default {
     remove_user_from_administrators(user){
       if(!confirm(`Remove ${user.properties.display_name} from administrators of ${this.group.properties.name}?`)) return
 
-      const user_id = user.identity.low || user.identity
+      const user_id = this.get_id_of_item(user)
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/administrators/${user_id}`
 
       this.axios.delete(url)
@@ -179,7 +184,7 @@ export default {
 
     user_is_current_user(user){
       if(!this.$store.state.current_user) return false
-      const user_id = user.identity.low || user.identity
+      const user_id = this.get_id_of_item(user)
       return user_id === this.current_user_id
     },
   },
@@ -191,29 +196,17 @@ export default {
     },
     current_user_is_member_of_group(){
       if(!this.$store.state.current_user) return false
-      if(this.members.length < 1) return false
+      if(!this.members.length) return false
       let found = this.members.find( member => {
-        const member_id = member.identity.low || member.identity
+        const member_id = this.get_id_of_item(member)
         return member_id === this.current_user_id
       })
       return !!found
     },
-    current_user_is_admin(){
-      if(!this.$store.state.current_user) return false
-      return this.$store.state.current_user.properties.isAdmin
-    },
     current_user_is_admin_of_group(){
-      if(!this.$store.state.current_user) return false
-      return this.administrators.find(a => {
-        const current_user = this.$store.state.current_user
-        const current_user_id = current_user.identity.low || current_user.identity
-        return a.identity === current_user_id
-      })
+      return this.administrators.find(a => this.get_id_of_item(a) === this.current_user_id)
     },
-    current_user_id() {
-      return this.$store.state.current_user.identity.low
-        || this.$store.state.current_user.identity
-    },
+
     group_avatar_src(){
       if(this.group.properties.avatar_src) return this.group.properties.avatar_src
       else return require("@/assets/account-multiple.svg")

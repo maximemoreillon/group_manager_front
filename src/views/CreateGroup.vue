@@ -28,7 +28,8 @@
 </template>
 
 <script>
-// Icons
+import IdUtils from '@/mixins/IdUtils.js'
+
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
@@ -62,6 +63,8 @@ export default {
   components: {
     FontAwesomeIcon,
   },
+  mixins: [ IdUtils ],
+
   data(){
     return {
 
@@ -78,7 +81,7 @@ export default {
         name: this.$refs.new_group_name.value,
       })
       .then( ({data}) => {
-        const group_id = data.identity.low || data.identity
+        const group_id = this.get_id_of_item(data)
         this.$router.push({name: 'group', params: {group_id}})
       })
       .catch( (error) => {

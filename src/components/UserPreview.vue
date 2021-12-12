@@ -45,6 +45,7 @@
 </template>
 
 <script>
+import IdUtils from '@/mixins/IdUtils.js'
 
 export default {
   name: 'UserPreview',
@@ -53,6 +54,8 @@ export default {
     currentUser: Object,
 
   },
+  mixins: [ IdUtils ],
+
   components: {
 
   },
@@ -67,14 +70,10 @@ export default {
       else return require('@/assets/account.svg')
     },
     user_id(){
-      return this.user.identity.low
-        || this.user.identity
+      return this.get_id_of_item(this.user)
     },
     user_is_current_user(){
-      const current_user_id = this.$store.state.current_user.identity.low
-        || this.$store.state.current_user.identity
-
-      return current_user_id === this.user_id
+      return this.current_user_id === this.user_id
     }
   }
 

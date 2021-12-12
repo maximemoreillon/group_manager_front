@@ -97,6 +97,9 @@ import XLSX from 'xlsx'
 import UserPicker from '@moreillon/vue_user_picker'
 import UserPreview from '@/components/UserPreview.vue'
 
+import IdUtils from '@/mixins/IdUtils.js'
+import authUtils from '@/mixins/authUtils.js'
+
 // Icons
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -134,6 +137,10 @@ export default {
     group: Object,
     current_user_is_admin_of_group: Boolean,
   },
+  mixins: [
+    IdUtils,
+    authUtils
+  ],
   data(){
     return {
       members: [],
@@ -159,7 +166,7 @@ export default {
       this.axios.get(url)
       .then(({data}) => {
         this.members = data
-        if(this.current_user_is_member_of_group) this.$emit('user_is_member')
+        this.$emit('userMembership',this.current_user_is_member_of_group )
       })
        .catch( () => this.$set(this.members,'error','Error'))
        .finally(() => this.$set(this.members,'loading',false))
@@ -167,10 +174,9 @@ export default {
 
     add_user_to_group(user){
       if(!confirm(`Add user ${user.properties.display_name} to group ${this.group.properties.name}?`)) return
-      const user_id = user.identity.low || user.identity
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/members/${user_id}`
-
-      this.axios.post(url)
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/members`
+      const user_id = this.get_id_of_item(user)
+      this.axios.post(url, {user_id})
       .then( () => {
         this.get_members_of_group()
         this.member_modal_open=false
@@ -183,7 +189,7 @@ export default {
     remove_user_from_group(user){
       if(!confirm(`Remove user ${user.properties.display_name} from group ${this.group.properties.name}?`)) return
 
-      const user_id = user.identity.low || user.identity
+      const user_id = this.get_id_of_item(user)
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/members/${user_id}`
 
       this.axios.delete(url)
@@ -197,7 +203,7 @@ export default {
     },
     user_is_current_user(user){
       if(!this.$store.state.current_user) return false
-      const user_id = user.identity.low || user.identity
+      const user_id = this.get_id_of_item(user)
       return user_id === this.current_user_id
     },
     leave_group(){
@@ -206,7 +212,6 @@ export default {
       this.axios.post(url)
       .then( () => {
         this.get_members_of_group()
-        this.$emit('groupLeft')
       })
       .catch(error => console.log(error))
 
@@ -236,22 +241,15 @@ export default {
     },
     current_user_is_member_of_group(){
       if(!this.$store.state.current_user) return false
-      if(this.members.length < 1) return false
-      let found = this.members.find( member => {
-        const member_id = member.identity.low || member.identity
+      if(!this.members.length) return false
+      const found = this.members.find( member => {
+        const member_id = this.get_id_of_item(member)
+
         return member_id === this.current_user_id
       })
       return !!found
     },
 
-    current_user_is_admin(){
-      if(!this.$store.state.current_user) return false
-      return this.$store.state.current_user.properties.isAdmin
-    },
-    current_user_id() {
-      return this.$store.state.current_user.identity.low
-        || this.$store.state.current_user.identity
-    },
 
     group_avatar_src(){
       if(this.group.properties.avatar_src) return this.group.properties.avatar_src

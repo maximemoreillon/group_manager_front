@@ -14,6 +14,7 @@
 
 <script>
 import GroupPicker from '@moreillon/vue_group_picker'
+import IdUtils from '@/mixins/IdUtils.js'
 
 export default {
   name: 'Group',
@@ -24,9 +25,10 @@ export default {
     return {
     }
   },
+  mixins: [ IdUtils ],
   methods: {
-    see_group(event) {
-      const group_id = event.identity.low || event.identity
+    see_group(group) {
+      const group_id = this.get_id_of_item(group)
       this.$router.push({name: 'group', params: {group_id }})
     }
   }

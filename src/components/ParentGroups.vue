@@ -68,6 +68,9 @@ import GroupPreview from '@/components/GroupPreview.vue'
 import Loader from '@moreillon/vue_loader'
 import Modal from '@moreillon/vue_modal'
 import GroupPicker from '@moreillon/vue_group_picker'
+
+import IdUtils from '@/mixins/IdUtils.js'
+
 // Icons
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -105,8 +108,12 @@ export default {
     group: Object,
     current_user_is_admin_of_group: Boolean,
   },
+  mixins: [ IdUtils ],
+
   data(){
     return {
+      loading: false,
+      error: null,
       direct_parents_only: true,
       parent_groups: [],
       parent_group_modal_open: false,
@@ -129,18 +136,19 @@ export default {
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/parent_groups`
       const params = {direct: this.direct_parents_only}
       this.axios.get(url, {params})
-      .then( ({data}) => {  this.parent_groups = data })
+      .then( ({data}) => { this.parent_groups = data })
       .catch( () => this.$set(this.parent_groups,'error','Error'))
       .finally(() => this.$set(this.parent_groups,'loading',false))
     },
     add_child_group_to_parent_group(child_group, parent_group){
       if(!confirm(`Add ${child_group.properties.name} to ${parent_group.properties.name}?`)) return
 
-      const parent_group_id = parent_group.identity.low || parent_group.identity
-      const child_group_id = child_group.identity.low || child_group.identity
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${parent_group_id}/groups/${child_group_id}`
+      const parent_group_id = this.get_id_of_item(parent_group)
+      const child_group_id = this.get_id_of_item(child_group)
 
-      this.axios.post(url)
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${parent_group_id}/groups`
+      const body = {group_id: child_group_id}
+      this.axios.post(url, body)
       .then( () => {
         this.parent_group_modal_open=false
         this.get_parent_groups_of_group()
@@ -153,8 +161,8 @@ export default {
     remove_child_group_from_parent_group(child_group, parent_group){
       if(!confirm(`Remove ${child_group.properties.name} from ${parent_group.properties.name}?`)) return
 
-      const parent_group_id = parent_group.identity.low || parent_group.identity
-      const child_group_id = child_group.identity.low || child_group.identity
+      const parent_group_id = this.get_id_of_item(parent_group)
+      const child_group_id = this.get_id_of_item(child_group)
 
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${parent_group_id}/groups/${child_group_id}`
       this.axios.delete(url)
@@ -169,17 +177,11 @@ export default {
   },
   computed: {
     group_id(){
-      return this.$route.query.id
-        || this.$route.query.group_id
-        || this.$route.params.group_id
+      return this.$route.params.group_id
     },
     current_user_is_admin(){
       if(!this.$store.state.current_user) return false
       return this.$store.state.current_user.properties.isAdmin
-    },
-    current_user_id() {
-      return this.$store.state.current_user.identity.low
-        || this.$store.state.current_user.identity
     },
     group_avatar_src(){
       if(this.group.properties.avatar_src) return this.group.properties.avatar_src

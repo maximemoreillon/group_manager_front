@@ -105,6 +105,7 @@
 import Loader from '@moreillon/vue_loader'
 
 import GroupPreview from '@/components/GroupPreview.vue'
+import IdUtils from '@/mixins/IdUtils.js'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -142,6 +143,8 @@ export default {
     GroupPreview,
 
   },
+  mixins: [ IdUtils ],
+
   data(){
     return {
       user: null,
@@ -173,12 +176,7 @@ export default {
 
     get_user(){
       // simply used to show the user's name on the page title
-      const user_id = this.$route.params.member_id
-        || this.$route.params.user_id
-        || this.$route.query.id
-        || 'self'
-
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/members/${user_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/members/${this.user_id}`
       this.axios.get(url)
       .then(({data}) => { this.user = data })
       .catch(error => alert(error))
@@ -187,12 +185,7 @@ export default {
 
     get_groups_of_user(){
 
-      let user_id = this.$route.query.id
-        || this.$route.query.user_id
-        || this.$route.params.user_id
-        || 'self'
-
-      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/members/${user_id}/groups`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/members/${this.user_id}/groups`
 
       this.$set(this.groups,'loading',true)
 
@@ -210,12 +203,7 @@ export default {
 
     get_groups_administrated_by_user(){
 
-      let user_id = this.$route.query.id
-        || this.$route.query.user_id
-        || this.$route.params.user_id
-        || 'self'
-
-      let url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/administrators/${user_id}/groups`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/administrators/${this.user_id}/groups`
 
       this.$set(this.groups_administrated_by_user,'loading',true)
 
@@ -237,9 +225,8 @@ export default {
     remove_user_from_group(group){
       if(!confirm(`Remove user ${this.user.properties.display_name} from group ${group.properties.name}?`)) return
 
-      const group_id = group.identity.low || group.identity
-      const user_id = this.user.identity.low || this.user.identity
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${user_id}`
+      const group_id = this.get_id_of_item(group)
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/members/${this.user_id}`
 
       this.axios.delete(url)
       .then( () => { this.get_groups_of_user() })
@@ -251,9 +238,8 @@ export default {
     remove_user_from_administrators(group){
       if(!confirm(`Remove ${this.user.properties.display_name} from administrators of ${group.properties.name}?`)) return
 
-      const group_id = group.identity.low || group.identity
-      const user_id = this.user.identity.low || this.user.identity
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${user_id}`
+      const group_id = this.get_id_of_item(group)
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${group_id}/administrators/${this.user_id}`
 
       this.axios.delete(url)
       .then( () => { this.get_groups_administrated_by_user() })
@@ -270,10 +256,7 @@ export default {
     user_id(){
       return this.$route.params.user_id
     },
-    current_user_id(){
-      return this.$store.state.current_user.identity.low
-        || this.$store.state.current_user.identity
-    },
+
     current_user_is_admin(){
       if(!this.$store.state.current_user) return false
       return this.$store.state.current_user.properties.isAdmin

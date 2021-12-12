@@ -24,16 +24,14 @@
 </template>
 
 <script>
-
-
-
+import IdUtils from '@/mixins/IdUtils.js'
 
 export default {
   name: 'GroupPreview',
   props: {
     group: Object,
   },
-
+  mixins: [ IdUtils ],
 
   methods: {
     group_clicked(){
@@ -46,8 +44,7 @@ export default {
       else return require('@/assets/account-multiple.svg')
     },
     group_id(){
-      return this.group.identity.low
-        || this.group.identity
+      return this.get_id_of_item(this.group)
     }
   }
 

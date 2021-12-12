@@ -24,7 +24,7 @@
       </div>
 
       <div class="group_id">
-        ID: {{group.identity}}
+        ID: {{get_id_of_item(group)}}
       </div>
 
       <div class="avatar_wrapper">
@@ -34,16 +34,14 @@
           v-bind:src="group_avatar_src">
       </div>
 
-
       <Members
         :group="group"
         :current_user_is_admin_of_group="current_user_is_admin_of_group"
-        @user_is_member="current_user_is_member_of_group=true"
-        @groupLeft="current_user_is_member_of_group=false"/>
+        @userMembership="current_user_is_member_of_group=$event"/>
 
       <Administrators
         :group="group"
-        @user_is_admin_of_group="current_user_is_admin_of_group=true"/>
+        @userMembership="current_user_is_member_of_group=$event"/>
 
       <SubGroups
         :group="group"
@@ -52,13 +50,6 @@
       <ParentGroups
         :group="group"
         :current_user_is_admin_of_group="current_user_is_admin_of_group"/>
-
-      <!-- Parent Groups -->
-
-
-
-
-
 
       <!-- Admin controls of the group -->
       <template
@@ -139,6 +130,10 @@ import Administrators from '@/components/Administrators.vue'
 import SubGroups from '@/components/SubGroups.vue'
 import ParentGroups from '@/components/ParentGroups.vue'
 
+import IdUtils from '@/mixins/IdUtils.js'
+import authUtils from '@/mixins/authUtils.js'
+
+
 import Loader from '@moreillon/vue_loader'
 
 // Icons
@@ -184,6 +179,10 @@ export default {
     SubGroups,
     ParentGroups,
   },
+  mixins: [
+    IdUtils,
+    authUtils
+  ],
   data(){
     return {
       group: null,
@@ -205,7 +204,8 @@ export default {
 
     get_group(){
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}`
-      this.loading = true;
+      this.loading = true
+      this.group = null
       this.axios.get(url)
       .then(({data}) => { this.group = data })
       .catch(error => {
@@ -230,11 +230,10 @@ export default {
     },
 
     patch_group(){
-      const group_id = this.group.identity.low || this.group.identity
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${group_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}`
       this.axios.patch(url, this.group.properties )
       .then( () => {
-        alert(`Success`)
+        alert(`Group updated`)
         this.get_group()
       })
       .catch(error => {
@@ -247,15 +246,18 @@ export default {
       if(!confirm(`Leave group ${this.group.properties.name}?`)) return
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/leave`
       this.axios.post(url)
-      .then( () => { this.get_members_of_group() })
-      .catch(error => console.log(error))
+      .then( () => { this.get_group() })
+      .catch(error => {
+        alert(`System error`)
+        console.error(error)
+      })
 
     },
     join_group(){
       if(!confirm(`Join group ${this.group.properties.name}?`)) return
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups/${this.group_id}/join`
       this.axios.post(url)
-      .then( () => { this.get_members_of_group() })
+      .then( () => { this.get_group() })
       .catch(error => {
         alert(`System error`)
         console.error(error)
@@ -265,19 +267,9 @@ export default {
   },
   computed: {
     group_id(){
-      return this.$route.query.id
-        || this.$route.query.group_id
-        || this.$route.params.group_id
+      return this.$route.params.group_id
     },
 
-    current_user_is_admin(){
-      if(!this.$store.state.current_user) return false
-      return this.$store.state.current_user.properties.isAdmin
-    },
-    current_user_id() {
-      return this.$store.state.current_user.identity.low
-        || this.$store.state.current_user.identity
-    },
     group_avatar_src(){
       if(this.group.properties.avatar_src) return this.group.properties.avatar_src
       else return require("@/assets/account-multiple.svg")
@@ -298,6 +290,7 @@ h1 {
   margin-bottom: 0.2em;
 }
 .avatar_wrapper {
+  margin-top: 2em;
   display: flex;
   flex-direction: column;
   align-items: center;
