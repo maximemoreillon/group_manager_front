@@ -35,6 +35,7 @@
 <script>
 
 import AppTemplate from '@moreillon/vue_application_template'
+import {version} from '@/../package.json'
 
 import AccountGroupIcon from 'vue-material-design-icons/AccountGroup.vue'
 import PlusIcon from 'vue-material-design-icons/Plus.vue'
@@ -55,9 +56,9 @@ export default {
     return {
       options: {
         authenticate: true,
-        title: 'Group manager',
-        login_url: `${process.env.VUE_APP_USER_MANAGER_API_URL}/auth/login`,
-        identification_url: `${process.env.VUE_APP_USER_MANAGER_API_URL}/users/self`
+        title: `Group manager v${version}`,
+        login_url: process.env.VUE_APP_LOGIN_URL,
+        identification_url: process.env.VUE_APP_IDENTIFICATION_URL,
       }
     }
   },
