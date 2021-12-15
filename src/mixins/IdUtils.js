@@ -7,7 +7,7 @@ export default {
         || item.properties._id
 
       if(!id) {
-        console.warning(`Item does not have an _id`)
+        console.warn(`Item does not have an _id`)
         id = item.identity.low
         || item.identity
       }
