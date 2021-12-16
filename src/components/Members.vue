@@ -79,7 +79,7 @@ export default {
       .finally( () => { this.loading = false})
     },
     add_user(user){
-      const user_id = user._id || user.properties._id
+      const user_id = user._id || user.properties._id // for old picker
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/members`
       const body = {user_id}
       this.axios.post(url, body)
@@ -92,7 +92,7 @@ export default {
     },
     remove_user(user){
       if(!confirm(`Remove user ${user.username}?`)) return
-      const user_id = user._id || user.properties._id
+      const user_id = user._id
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/members/${user_id}`
       this.axios.delete(url)
       .then( () => {
