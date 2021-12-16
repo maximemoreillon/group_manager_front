@@ -83,17 +83,24 @@
 
       <v-card-text>
         <Members
+          user_type="members"
           @usersChanged="get_group()"/>
+      </v-card-text>
 
-
-
+      <v-card-text>
+        <Members
+          user_type="administrators"
+          @usersChanged="get_group()"/>
       </v-card-text>
 
       <v-card-text>
         <SubGroups
           @groupsChanged="get_group()"/>
+      </v-card-text>
 
-
+      <v-card-text>
+        <ParentGroups
+          @groupsChanged="get_group()"/>
       </v-card-text>
 
 
@@ -105,12 +112,14 @@
 <script>
 // @ is an alias to /src
 import SubGroups from '@/components/SubGroups.vue'
+import ParentGroups from '@/components/ParentGroups.vue'
 import Members from '@/components/Members.vue'
 
 export default {
   name: 'Group',
   components: {
     SubGroups,
+    ParentGroups,
     Members,
   },
   data(){

@@ -85,7 +85,7 @@ export default {
       })
     },
     remove_subgroup(group){
-      if(!confirm(`Remove user ${group.name}?`)) return
+      if(!confirm(`Remove group ${group.name}?`)) return
       const group_id = group._id
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/groups/${group_id}`
       this.axios.delete(url)
