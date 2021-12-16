@@ -1,7 +1,9 @@
 <template>
-  <v-card>
+  <v-card
+    max-width="500"
+    class="mx-auto">
     <v-toolbar flat>
-      <v-toolbar-title>Groups</v-toolbar-title>
+      <v-toolbar-title>Group browser</v-toolbar-title>
       <v-spacer/>
       <v-btn
         exact
@@ -12,15 +14,26 @@
     <v-divider/>
 
     <v-card-text>
-      Groups come here
+      <GroupPicker
+        @selection="group_selected($event)"/>
     </v-card-text>
 
   </v-card>
 </template>
 
 <script>
+import GroupPicker from '@moreillon/vue_group_picker'
 
-  export default {
-    name: 'Home',
+export default {
+  name: 'Groups',
+  components: {
+    GroupPicker
+  },
+  methods: {
+    group_selected(group){
+      const group_id = group._id || group.properties._id
+      this.$router.push({name: 'Group', params: {group_id}})
+    }
   }
+}
 </script>

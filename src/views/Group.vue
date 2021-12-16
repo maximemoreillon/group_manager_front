@@ -117,26 +117,8 @@
       </v-card-text>
 
       <v-card-text>
+        <SubGroups />
 
-        <v-data-table
-          :items="group.subgroups"
-          :headers="subgroups_table_headers"
-          @click:row="$router.push({name: 'group', params: {group_id: $event._id}})">
-          <template v-slot:top>
-            <v-toolbar flat>
-              <v-toolbar-title>Subgroups</v-toolbar-title>
-              <v-spacer/>
-              <v-btn
-                class="mx-2"
-                :to="{name: 'create_group', query: {parent: group_id}}"
-                dark>
-                <v-icon>mdi-account-multiple-plus</v-icon>
-                <span class="ml-2">Create subgroup</span>
-              </v-btn>
-            </v-toolbar>
-            <v-divider/>
-          </template>
-        </v-data-table>
 
       </v-card-text>
 
@@ -149,10 +131,13 @@
 <script>
 // @ is an alias to /src
 import AddUserDialog from '@/components/AddUserDialog.vue'
+import SubGroups from '@/components/SubGroups.vue'
+
 export default {
   name: 'Home',
   components: {
-    AddUserDialog
+    AddUserDialog,
+    SubGroups
   },
   data(){
     return {
@@ -180,13 +165,12 @@ export default {
     get_group(){
       this.group = null
       this.loading = true
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}`
       this.axios.get(url)
       .then( ({data}) => {
         this.group = data
-        this.get_subgroups()
-        this.get_members_info()
-        this.get_parent()
+        // this.get_members_info()
+        // this.get_parent()
       })
       .catch( error => {
         console.error(error)
@@ -197,7 +181,7 @@ export default {
     },
     get_members_info(){
       // This is definitely not the nicest way to go
-      const url = `${process.env.VUE_APP_USER_MANAGER_API_URL}/users/`
+      const url = `${process.env.VUE_APP_USER_MANAGER_API_URL}/v2/users/`
       const ids = this.group.members.map(m => m.user_id)
       const params = {ids}
       this.axios.get(url,{params})
@@ -219,16 +203,7 @@ export default {
         console.error(error)
       })
     },
-    get_subgroups(){
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/subgroups`
-      this.axios.get(url)
-      .then( ({data}) => {
-        this.$set(this.group,'subgroups',data)
-      })
-      .catch( error => {
-        console.error(error)
-      })
-    },
+
     get_parent(){
       if(!this.group.parent) return
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.parent}`

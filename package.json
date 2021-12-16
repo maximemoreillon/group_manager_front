@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@moreillon/vue_application_template_vuetify": "^1.1.4",
+    "@moreillon/vue_group_picker": "^3.0.3",
+    "@moreillon/vue_user_picker": "^3.0.2",
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
     "i": "^0.3.7",
