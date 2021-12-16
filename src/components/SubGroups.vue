@@ -9,15 +9,8 @@
       <v-toolbar flat>
         <v-toolbar-title>Subgroups</v-toolbar-title>
         <v-spacer/>
-
-        <!-- <v-btn
-          class="mx-2"
-          :to="{name: 'create_group', query: {parent: group_id}}"
-          dark>
-          <v-icon>mdi-account-multiple-plus</v-icon>
-          <span class="ml-2">Create subgroup</span>
-        </v-btn> -->
-
+        <AddGroupDialog
+          @groupAdd="$emit('groupAdd',$event)"/>
       </v-toolbar>
       <v-divider/>
     </template>
@@ -26,8 +19,13 @@
 </template>
 
 <script>
+import AddGroupDialog from '@/components/AddGroupDialog.vue'
+
 export default {
   name: 'SubGroups',
+  components: {
+    AddGroupDialog
+  },
   data(){
     return {
       loading: false,

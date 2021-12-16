@@ -83,14 +83,15 @@
 
       <v-card-text>
         <Members
-          @userAdd="add_user($event)"/>
+          @usersChanged="get_group()"/>
 
 
 
       </v-card-text>
 
       <v-card-text>
-        <SubGroups />
+        <SubGroups
+          @groupsChanged="get_group()"/>
 
 
       </v-card-text>
@@ -211,27 +212,7 @@ export default {
         console.error(error)
       })
     },
-    add_user({_id}){
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/members`
-      const body = {user_id: _id}
-      this.axios.post(url, body)
-      .then( () => {
-        this.get_group()
-      })
-      .catch( error => {
-        console.error(error)
-      })
-    },
-    remove_user({_id}){
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/members/${_id}`
-      this.axios.delete(url)
-      .then( () => {
-        this.get_group()
-      })
-      .catch( error => {
-        console.error(error)
-      })
-    }
+
   },
   computed: {
     group_id(){

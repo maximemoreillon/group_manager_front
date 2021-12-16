@@ -1,8 +1,8 @@
 <template>
   <v-dialog
       v-model="dialog"
-      width="500"
-    >
+      width="500">
+      
       <template v-slot:activator="{ on, attrs }">
         <v-btn
           color="black"
@@ -10,7 +10,7 @@
           v-bind="attrs"
           v-on="on" >
           <v-icon>mdi-account-plus</v-icon>
-          <span class="ml-2">Add user</span>
+          <span class="ml-2">Add Group</span>
         </v-btn>
       </template>
 
@@ -20,12 +20,9 @@
         </v-card-title>
 
         <v-card-text>
-          <UserPicker
-            @selection="user_selected($event)"/>
-
-
+          <GroupPicker
+            @selection="group_selected($event)"/>
         </v-card-text>
-
 
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -42,12 +39,12 @@
 </template>
 
 <script>
-import UserPicker from '@moreillon/vue_user_picker'
+import GroupPicker from '@moreillon/vue_group_picker'
 
 export default {
-  name: 'AddUserDialog',
+  name: 'AddGroupDialog',
   components: {
-    UserPicker
+    GroupPicker
   },
   data(){
     return {
@@ -56,10 +53,9 @@ export default {
   },
 
   methods: {
-
-    user_selected(user){
-      const _id = user._id || user.properties._id
-      this.$emit('userAdd', {_id})
+    group_selected(group){
+      const _id = group._id || group.properties._id
+      this.$emit('groupAdd', {_id})
       this.dialog = false
     },
   }
