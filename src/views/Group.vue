@@ -82,37 +82,10 @@
       </v-card-text>
 
       <v-card-text>
+        <Members
+          @userAdd="add_user($event)"/>
 
-        <v-data-table
-          :items="group.members"
-          :headers="members_table_headers">
-          <template v-slot:top>
-            <v-toolbar flat>
-              <v-toolbar-title>members</v-toolbar-title>
-              <v-spacer/>
-              <AddUserDialog
-                @userAdd="add_user($event)"/>
-            </v-toolbar>
-            <v-divider/>
-          </template>
 
-          <template v-slot:item.admin="{ item }">
-            <v-checkbox
-              v-model="item.admin">
-            </v-checkbox>
-          </template>
-
-          <template v-slot:item.delete="{ item }">
-            <v-btn
-              icon
-              @click="remove_user(item)"
-              color="#c00000"
-              dark>
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-          </template>
-
-        </v-data-table>
 
       </v-card-text>
 
@@ -130,14 +103,14 @@
 
 <script>
 // @ is an alias to /src
-import AddUserDialog from '@/components/AddUserDialog.vue'
 import SubGroups from '@/components/SubGroups.vue'
+import Members from '@/components/Members.vue'
 
 export default {
-  name: 'Home',
+  name: 'Group',
   components: {
-    AddUserDialog,
-    SubGroups
+    SubGroups,
+    Members,
   },
   data(){
     return {
@@ -206,7 +179,7 @@ export default {
 
     get_parent(){
       if(!this.group.parent) return
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group.parent}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group.parent}`
       this.axios.get(url)
       .then( ({data}) => {
         this.$set(this.group,'parent',data)
@@ -215,9 +188,10 @@ export default {
         console.error(error)
       })
     },
+
     delete_group(){
       if(!confirm(`Delete group ${this.group.name}?`)) return
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}`
       this.axios.delete(url)
       .then( () => {
         this.$router.push({name: 'groups'})
@@ -227,7 +201,7 @@ export default {
       })
     },
     update_group(){
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}`
       const body = this.group // dangerous!
       this.axios.patch(url, body)
       .then( () => {
@@ -238,7 +212,7 @@ export default {
       })
     },
     add_user({_id}){
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/members`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/members`
       const body = {user_id: _id}
       this.axios.post(url, body)
       .then( () => {
@@ -249,7 +223,7 @@ export default {
       })
     },
     remove_user({_id}){
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/groups/${this.group_id}/members/${_id}`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/members/${_id}`
       this.axios.delete(url)
       .then( () => {
         this.get_group()

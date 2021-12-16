@@ -20,11 +20,10 @@
         </v-card-title>
 
         <v-card-text>
-          <v-data-table
-            :items="users"
-            :headers="headers"
-            @click:row="add_user($event)">
-          </v-data-table>
+          <UserPicker
+            @selection="user_selected($event)"/>
+
+
         </v-card-text>
 
 
@@ -43,8 +42,13 @@
 </template>
 
 <script>
+import UserPicker from '@moreillon/vue_user_picker'
+
 export default {
   name: 'AddUserDialog',
+  components: {
+    UserPicker
+  },
   data(){
     return {
       dialog: false,
@@ -69,7 +73,8 @@ export default {
         console.error(error)
       })
     },
-    add_user({_id}){
+    user_selected(user){
+      const _id = user._id || user.properties._id
       this.$emit('userAdd', {_id})
       this.dialog = false
     },
