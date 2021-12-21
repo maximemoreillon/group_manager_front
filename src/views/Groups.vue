@@ -8,7 +8,8 @@
       <v-btn
         exact
         :to="{name: 'CreateGroup'}">
-        Create group
+        <v-icon>mdi-account-multiple-plus</v-icon>
+        <span class="ml-2">Create group</span>
       </v-btn>
     </v-toolbar>
     <v-divider/>
