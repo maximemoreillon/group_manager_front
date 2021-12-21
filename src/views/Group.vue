@@ -228,7 +228,7 @@ export default {
       // Simply used to check if user is member
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/members`
       this.axios.get(url)
-      .then( ({data}) => { this.members = data })
+      .then( ({data}) => { this.members = data.items })
       .catch( error => {
         console.error(error)
       })
@@ -239,7 +239,7 @@ export default {
       // Simply used to check if user is administrator
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/administrators`
       this.axios.get(url)
-      .then( ({data}) => { this.administrators = data })
+      .then( ({data}) => { this.administrators = data.items })
       .catch( error => {
         console.error(error)
       })

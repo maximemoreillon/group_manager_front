@@ -128,7 +128,7 @@ export default {
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/users/${this.user_id}/groups`
       this.axios.get(url)
       .then( ({data}) => {
-        this.groups = data
+        this.groups = data.items
       })
       .catch( error => {
         console.error(error)
@@ -140,7 +140,7 @@ export default {
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/administrators/${this.user_id}/groups`
       this.axios.get(url)
       .then( ({data}) => {
-        this.administrated_groups = data
+        this.administrated_groups = data.items
       })
       .catch( error => {
         console.error(error)
