@@ -34,7 +34,7 @@ export default {
       version: pjson.version,
       services: [
         {
-          name: 'Employee manager GUI',
+          name: 'Group manager GUI',
           url: window.location.origin,
           version: pjson.version
         },
@@ -44,9 +44,14 @@ export default {
           version: null
         },
         {
-          name: 'Authentication API',
-          url: process.env.VUE_APP_AUTHENTICATION_API_URL,
-          version: null
+          name: 'Login URL',
+          url: process.env.VUE_APP_IDENTIFICATION_URL,
+          version: 'N/A',
+        },
+        {
+          name: 'Identification URL',
+          url: process.env.VUE_APP_LOGIN_URL,
+          version: 'N/A',
         },
 
       ],
