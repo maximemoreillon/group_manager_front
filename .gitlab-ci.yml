@@ -1,6 +1,6 @@
 stages:
-  - containerization
-  - deployment
+  - build
+  - deploy
 
 variables:
   APPLICATION_NAME: group-manager-front
@@ -8,10 +8,16 @@ variables:
   CONTAINER_IMAGE_LATEST: ${CONTAINER_IMAGE}:latest
   CONTAINER_IMAGE_TAGGED: ${CONTAINER_IMAGE}:${CI_COMMIT_SHORT_SHA}
 
-containerization:
-  stage: containerization
+image: moreillon/ci-dind
+services:
+  - name: docker:19.03.12-dind
+
+build:
+  stage: build
   tags:
-    - moreillon
+    - dind
+  only:
+    - master
   script:
     # Docker hub login
     - echo "${DOCKER_HUB_PASSWORD}" | docker login --username ${DOCKER_HUB_USERNAME} --password-stdin
@@ -27,29 +33,15 @@ containerization:
     - docker image rm ${CONTAINER_IMAGE_TAGGED}
     - docker image rm ${CONTAINER_IMAGE_LATEST}
 
-deployment:
-  stage: deployment
+deploy:
+  stage: deploy
   tags:
-    - moreillon
+    - dind
+  only:
+    - master
   script:
-    # create/update the deployment
     - envsubst < kubernetes/deployment.yml | kubectl apply -f -
-
-    # If a nodeport is specified, serve app through a nodeport service
-    #- >
-    #  if [ -z ${SERVICE_PORT} ];
-    #  then echo "SERVICE_PORT not set, skipping creation of NodePort service";
-    #  else envsubst < kubernetes/nodeport_service.yml | kubectl apply -f -;
-    #  fi
-    # if a domain name is specified, serve app through an ingress
-    #- >
-    #  if [ -z ${CERTIFICATE_DOMAIN} ];
-    #  then echo "CERTIFICATE_DOMAIN not set, skipping creation of ingress";
-    #  else envsubst < kubernetes/ingress.yml | kubectl apply -f -;
-    #  fi
-    # Pull latest image of deployment
-    - kubectl rollout restart deployment/${APPLICATION_NAME}
   environment:
     name: production
     kubernetes:
-      namespace: ${KUBERNETES_NAMESPACE} # Obtained from GitLab
+      namespace: ${KUBERNETES_NAMESPACE}
