@@ -1,11 +1,13 @@
 # Group Manager GUI
 
-Front end for the Group Manager API
+Front end for the Group Manager API.
+
+More information available on the project page: https://articles.maximemoreillon.com/articles/398
 
 ## Environment variables
 
 | Variable | Description |
 | --- | --- |
 | VUE_APP_GROUP_MANAGER_API_URL | The URL of group manager API |
-| VUE_APP_AUTHENTICATION_API_URL | The URL of the authentication API |
-| VUE_APP_COOKIE_DOMAIN | Cookie domain (Optional) |
+| VUE_APP_LOGIN_URL | URL of the API endpoint used for login |
+| VUE_APP_IDENTIFICATION_URL | URL of the API endpoint used to identity the user |
