@@ -6,6 +6,7 @@
 
       <div class="group_header">
         <h1 class="">{{group.properties.name}}</h1>
+        {{current_user_is_admin_of_group}}
         <button
           type="button"
           v-on:click="leave_group()"
@@ -41,7 +42,7 @@
 
       <Administrators
         :group="group"
-        @userMembership="current_user_is_member_of_group=$event"/>
+        @userMembership="current_user_is_admin_of_group=$event"/>
 
       <SubGroups
         :group="group"

@@ -204,7 +204,7 @@ export default {
       return !!found
     },
     current_user_is_admin_of_group(){
-      return this.administrators.find(a => this.get_id_of_item(a) === this.current_user_id)
+      return this.administrators.some(a => this.get_id_of_item(a) === this.current_user_id)
     },
 
     group_avatar_src(){
