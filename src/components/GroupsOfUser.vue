@@ -8,6 +8,13 @@
     disable-sort
     disable-filtering>
 
+    <template v-slot:top>
+      <div class="text-h6" >
+        <span v-if="official">Official groups</span>
+        <span v-if="nonofficial">Non-official groups</span>
+      </div>
+    </template>
+
     <template v-slot:item.name="{ item }">
       <router-link :to="{name: 'Group', params: {group_id: item._id}}">
         {{item.name}}
@@ -34,6 +41,8 @@ export default {
   props: {
     as: {type: String, default: () => 'member'},
     shallow: Boolean,
+    official: Boolean,
+    nonofficial: Boolean,
   },
   data(){
     return {
@@ -43,7 +52,7 @@ export default {
       options: {},
       headers: [
         {value: 'name', text: 'Name'},
-        {value: 'official', text: 'Official'},
+        // {value: 'official', text: 'Official'},
         {value: 'restricted', text: 'Restricted'},
       ]
     }
@@ -73,6 +82,8 @@ export default {
         batch_size: itemsPerPage,
         start_index: (page-1) * itemsPerPage,
         shallow: this.shallow ? true : undefined, // do not send if not true
+        official: this.official ? true : undefined, // do not send if not true
+        nonofficial: this.nonofficial ? true : undefined, // do not send if not true
       }
 
       this.axios.get(url, {params})

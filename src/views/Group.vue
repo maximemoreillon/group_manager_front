@@ -157,16 +157,12 @@
           <v-divider/>
           <v-card-text>
             <v-tabs-items v-model="members_tab">
-              <v-tab-item>
+              <v-tab-item
+                v-for="user_type in ['members', 'administrators']"
+                :key="`user_type_${user_type}`">
                 <UsersOfGroup
                   :currentUserHasAdminRights="current_user_has_admin_rights"
-                  user_type="members"
-                  @usersChanged="get_group()"/>
-              </v-tab-item>
-              <v-tab-item>
-                <UsersOfGroup
-                  :currentUserHasAdminRights="current_user_has_admin_rights"
-                  user_type="administrators"
+                  :user_type="user_type"
                   @usersChanged="get_group()"/>
               </v-tab-item>
             </v-tabs-items>
@@ -192,15 +188,11 @@
           <v-divider/>
           <v-card-text>
             <v-tabs-items v-model="groups_tab">
-              <v-tab-item>
+              <v-tab-item
+                v-for="group_type in ['child', 'parent']"
+                :key="`group_type_${group_type}`">
                 <GroupsOfGroups
-                  group_type="child"
-                  :currentUserHasAdminRights="current_user_has_admin_rights"
-                  @groupsChanged="get_group()"/>
-              </v-tab-item>
-              <v-tab-item>
-                <GroupsOfGroups
-                  group_type="parent"
+                  :group_type="group_type"
                   :currentUserHasAdminRights="current_user_has_admin_rights"
                   @groupsChanged="get_group()"/>
               </v-tab-item>
@@ -242,6 +234,7 @@ export default {
 
       members_tab: null,
       groups_tab: null,
+      groups_officiality_tab: null,
 
       // Used to check if user is member of admin
       // NOT IDEAL

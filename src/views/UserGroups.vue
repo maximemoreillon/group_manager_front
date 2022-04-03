@@ -29,7 +29,7 @@
 
       <template v-slot:extension>
         <v-tabs
-          v-model="tab">
+          v-model="relation_tab">
           <v-tab>As member</v-tab>
           <v-tab>As administrator</v-tab>
         </v-tabs>
@@ -43,17 +43,39 @@
     <v-divider/>
 
     <v-card-text>
-      <v-tabs-items v-model="tab">
-        <v-tab-item>
-          <GroupsOfUser
-            :shallow="shallow"
-            as="member" />
+      <v-tabs-items v-model="relation_tab">
+
+        <v-tab-item
+          v-for="relationship in ['member', 'administrator']"
+          :key="`as_${relationship}`">
+
+          <v-card outlined>
+            <v-toolbar flat>
+              <v-tabs
+                v-model="officiality_tab">
+                <v-tab>Official</v-tab>
+                <v-tab>Non-official</v-tab>
+              </v-tabs>
+            </v-toolbar>
+            <v-divider />
+            <v-card-text>
+              <v-tabs-items v-model="officiality_tab">
+                <v-tab-item
+                  v-for="officiality in ['official', 'nonofficial']"
+                  :key="`as_${relationship}_${officiality}`">
+                  <GroupsOfUser
+                    :official="officiality === 'official'"
+                    :nonofficial="officiality === 'nonofficial'"
+                    :shallow="shallow"
+                    :as="relationship" />
+                </v-tab-item>
+              </v-tabs-items>
+
+            </v-card-text>
+          </v-card>
+
         </v-tab-item>
-        <v-tab-item>
-          <GroupsOfUser
-            :shallow="shallow"
-            as="administrator" />
-        </v-tab-item>
+
       </v-tabs-items>
     </v-card-text>
 
@@ -77,7 +99,8 @@ export default {
     return {
       user: null,
       user_loading: false,
-      tab: null,
+      relation_tab: null,
+      officiality_tab: null,
       shallow: true,
 
     }
