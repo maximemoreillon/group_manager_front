@@ -224,6 +224,7 @@
     </template>
 
     <v-card-text class="text-center pa-5" v-if="loading">Loading group...</v-card-text>
+    <v-card-text class="text-center pa-5 error--text" v-if="error">{{error}}</v-card-text>
 
   </v-card>
 </template>
@@ -259,6 +260,8 @@ export default {
       joining: false,
       leaving: false,
 
+      error: null,
+
 
     }
   },
@@ -286,6 +289,7 @@ export default {
       })
       .catch( error => {
         console.error(error)
+        this.error = error
       })
       .finally(() => {
         this.loading = false
