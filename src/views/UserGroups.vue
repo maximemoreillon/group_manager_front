@@ -22,20 +22,8 @@
     <v-card-text>
       <v-card outlined>
         <v-card-text>
-          <v-data-table
-            :items="groups"
-            :headers="headers"
-            :loading="groups_loading"
-            @click:row="$router.push({name: 'Group', params: {group_id: $event._id}})">
+          <GroupsOfUser as="member" />
 
-            <template v-slot:top>
-
-              <v-toolbar flat>
-                <v-toolbar-title>As member</v-toolbar-title>
-              </v-toolbar>
-
-            </template>
-          </v-data-table>
         </v-card-text>
       </v-card>
 
@@ -44,20 +32,7 @@
     <v-card-text>
       <v-card outlined>
         <v-card-text>
-          <v-data-table
-            :items="administrated_groups"
-            :headers="headers"
-            :loading="administrated_groups_loading"
-            @click:row="$router.push({name: 'Group', params: {group_id: $event._id}})">
-
-            <template v-slot:top>
-              <v-toolbar flat>
-                <v-toolbar-title>As administrator</v-toolbar-title>
-              </v-toolbar>
-
-            </template>
-          </v-data-table>
-
+          <GroupsOfUser as="administrator" />
         </v-card-text>
       </v-card>
 
@@ -68,12 +43,17 @@
 </template>
 
 <script>
+import GroupsOfUser from '@/components/GroupsOfUser.vue'
+
 export default {
   name: 'UserGroups',
   watch:{
     user_id(){
       this.get_groups()
     }
+  },
+  components: {
+    GroupsOfUser
   },
   data(){
     return {

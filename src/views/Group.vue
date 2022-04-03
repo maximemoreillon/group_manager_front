@@ -2,40 +2,68 @@
   <v-card
     :loading="loading">
 
-    <v-toolbar flat>
-      <v-btn
-        exact
-        icon
-        :to="{name: 'Groups'}" >
-        <v-icon>mdi-arrow-left</v-icon>
-      </v-btn>
-      <v-toolbar-title>
-        <span v-if="group">{{group.name}}</span>
-        <span v-else>Group</span>
-      </v-toolbar-title>
-      <v-spacer />
+    <v-toolbar flat v-if="group">
+      <v-row align="center">
+        <v-col cols="auto">
+          <v-btn
+            exact
+            icon
+            :to="{name: 'Groups'}" >
+            <v-icon>mdi-arrow-left</v-icon>
+          </v-btn>
+        </v-col>
+        <v-col cols="auto">
+          <v-toolbar-title>{{group.name}}</v-toolbar-title>
+        </v-col>
+        <v-spacer />
+        <v-col cols="auto">
+          <v-btn
+            :loading="leaving"
+            v-if="current_user_is_member_of_group"
+            @click="leave_group()">
+            <v-icon>mdi-account-multiple-minus</v-icon>
+            <span class="ml-2">Leave</span>
+          </v-btn>
+          <v-btn
+            v-else
+            :loading="joining"
+            :disabled="group.restricted"
+            @click="join_group()">
+            <v-icon>mdi-account-multiple-plus</v-icon>
+            <span class="ml-2">Join</span>
+          </v-btn>
+        </v-col>
+        <template
+          v-if="current_user_is_administrator_of_group || current_user.isAdmin">
+          <v-col cols="auto">
+            <v-btn
+              :disabled="!group_has_modifications"
+              :loading="updating"
+              @click="update_group()">
+              <v-icon>mdi-content-save</v-icon>
+              <span class="ml-2">Save</span>
+            </v-btn>
+          </v-col>
+          <v-col cols="auto">
+            <v-btn
+              :loading="deleting"
+              @click="delete_group()"
+              color="#c00000"
+              dark>
+              <v-icon>mdi-delete</v-icon>
+              <span class="ml-2">Delete</span>
+            </v-btn>
+          </v-col>
 
-      <template
-        v-if="current_user_is_administrator_of_group || current_user.isAdmin">
-        <v-btn
-          :disabled="!group_has_modifications"
-          class="mx-2"
-          :loading="updating"
-          @click="update_group()">
-          <v-icon>mdi-content-save</v-icon>
-          <span>Save</span>
-        </v-btn>
 
-        <v-btn
-          class="mx-2"
-          :loading="deleting"
-          @click="delete_group()"
-          color="#c00000"
-          dark>
-          <v-icon>mdi-delete</v-icon>
-          <span>Delete</span>
-        </v-btn>
-      </template>
+
+        </template>
+      </v-row>
+
+
+
+
+
 
 
 
@@ -109,7 +137,7 @@
         <v-card outlined>
           <v-card-text>
             <!-- <v-card-title>Members</v-card-title> -->
-            <Members
+            <UsersOfGroup
               :currentUserHasAdminRights="current_user_has_admin_rights"
               user_type="members"
               @usersChanged="get_group()"/>
@@ -121,7 +149,7 @@
         <v-card outlined>
           <!-- <v-card-title>Administrators</v-card-title> -->
           <v-card-text>
-            <Members
+            <UsersOfGroup
               :currentUserHasAdminRights="current_user_has_admin_rights"
               user_type="administrators"
               @usersChanged="get_group()"/>
@@ -162,36 +190,32 @@
 // @ is an alias to /src
 import SubGroups from '@/components/SubGroups.vue'
 import ParentGroups from '@/components/ParentGroups.vue'
-import Members from '@/components/Members.vue'
+import UsersOfGroup from '@/components/UsersOfGroup.vue'
 
 export default {
   name: 'Group',
   components: {
     SubGroups,
     ParentGroups,
-    Members,
+    UsersOfGroup,
   },
   data(){
     return {
       group: null,
+      unmodified_group_copy: null,
+
+      // Used to check if user is member of admin
+      // NOT IDEAL
+      members: [],
+      administrators: [],
+
+      // Used for loaders
       loading: false,
       updating: false,
       deleting: false,
-      members_table_headers: [
-        {text: 'ID', value: 'user_id'},
-        {text: 'Username', value: 'username'},
-        {text: 'Admin', value: 'admin'},
-        {text: 'Delete', value: 'delete'},
-      ],
-      subgroups_table_headers: [
-        {text: 'ID', value: '_id'},
-      ],
+      joining: false,
+      leaving: false,
 
-      // here or in dedicated component?
-      administrators: [],
-      members: [],
-
-      unmodified_group_copy: null,
 
     }
   },
@@ -225,20 +249,11 @@ export default {
       })
     },
 
-    get_parent(){
-      if(!this.group.parent) return
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group.parent}`
-      this.axios.get(url)
-      .then( ({data}) => {
-        this.$set(this.group,'parent',data)
-      })
-      .catch( error => {
-        console.error(error)
-      })
-    },
+
 
     delete_group(){
       if(!confirm(`Delete group ${this.group.name}?`)) return
+      this.deleting = true
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}`
       this.axios.delete(url)
       .then( () => {
@@ -247,10 +262,14 @@ export default {
       .catch( error => {
         console.error(error)
       })
+      .finally(() => {
+        this.deleting = false
+      })
     },
 
 
     update_group(){
+      this.updating = true
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}`
       const body = this.modified_properties
       this.axios.patch(url, body)
@@ -259,6 +278,39 @@ export default {
       })
       .catch( error => {
         console.error(error)
+      })
+      .finally(() => {
+        this.updating = false
+      })
+    },
+
+    join_group(){
+      this.joining = true
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/join`
+      this.axios.post(url)
+      .then( () => {
+        this.get_group()
+      })
+      .catch( error => {
+        console.error(error)
+      })
+      .finally(() => {
+        this.joining = false
+      })
+    },
+
+    leave_group(){
+      this.leaving = true
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/leave`
+      this.axios.post(url)
+      .then( () => {
+        this.get_group()
+      })
+      .catch( error => {
+        console.error(error)
+      })
+      .finally(() => {
+        this.leaving = false
       })
     },
 

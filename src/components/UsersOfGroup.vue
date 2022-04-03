@@ -45,7 +45,7 @@
 import AddUserDialog from '@/components/AddUserDialog.vue'
 
 export default {
-  name: 'Members',
+  name: 'UsersOfGroup',
   components: {
     AddUserDialog,
   },
