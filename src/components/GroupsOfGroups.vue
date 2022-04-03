@@ -113,7 +113,7 @@ export default {
       const params = {
         batch_size: itemsPerPage,
         start_index: (page-1) * itemsPerPage,
-        shallow
+        shallow: shallow ? true : undefined, // do not send if not true
       }
 
       this.axios.get(url, {params})
