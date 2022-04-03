@@ -9,7 +9,6 @@
     <template v-slot:top>
       <v-row align="center">
         <v-spacer />
-        <!-- Shallow flag not working in API at the moment -->
         <v-col cols="auto">
           <v-switch
             v-model="options.shallow"
@@ -63,9 +62,7 @@ export default {
   },
   props: {
     currentUserHasAdminRights: Boolean,
-
     group_type: String, // 'child' or 'parent'
-
   },
   data(){
     return {
@@ -92,6 +89,7 @@ export default {
   watch: {
     options: {
       handler () {
+        // WARNING: DOUBLE QUERY WHEN CHANGING SHALLOW
         this.get_groups()
       },
       deep: true,

@@ -8,11 +8,19 @@
 
     <template v-slot:top>
       <v-toolbar flat>
-        <v-spacer/>
-        <AddUserDialog
-          :as="user_type"
-          v-if="currentUserHasAdminRights"
-          @userAdd="add_user($event)"/>
+        <v-row align="center">
+          <v-spacer/>
+          <v-col cols="auto">
+            <MembersExcelExport
+              :user_type="user_type"/>
+          </v-col>
+          <v-col cols="auto">
+            <AddUserDialog
+              :as="user_type"
+              v-if="currentUserHasAdminRights"
+              @userAdd="add_user($event)"/>
+          </v-col>
+        </v-row>
       </v-toolbar>
     </template>
 
@@ -46,11 +54,14 @@
 
 <script>
 import AddUserDialog from '@/components/AddUserDialog.vue'
+import MembersExcelExport from '@/components/MembersExcelExport.vue'
+
 
 export default {
   name: 'UsersOfGroup',
   components: {
     AddUserDialog,
+    MembersExcelExport,
   },
   props: {
     user_type: String,
@@ -133,8 +144,10 @@ export default {
       return this.$route.params.group_id
     },
     headers(){
-      if(this.currentUserHasAdminRights) return [...this.base_headers, ...this.admin_headers]
-      else return this.base_headers
+      let headers = this.base_headers
+      if(this.members.length && this.members[0].role) headers = [...headers, {value: 'role', text: 'Role'}]
+      if(this.currentUserHasAdminRights) headers = [...headers, ...this.admin_headers]
+      return headers
     }
   }
 }

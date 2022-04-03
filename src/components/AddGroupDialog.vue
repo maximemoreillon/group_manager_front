@@ -10,12 +10,12 @@
           v-bind="attrs"
           v-on="on" >
           <v-icon>mdi-account-multiple-plus</v-icon>
-          <span class="ml-2">Add {{as || 'group'}}</span>
+          <span class="ml-2">Add {{as || 'group'}} group</span>
         </v-btn>
       </template>
 
       <v-card>
-        <v-card-title>Add {{as || 'group'}}</v-card-title>
+        <v-card-title>Add {{as || 'group'}} group</v-card-title>
 
         <v-card-text>
           <GroupPicker
