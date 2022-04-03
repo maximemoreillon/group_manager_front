@@ -5,6 +5,8 @@
     :loading="loading"
     :options.sync="options"
     :server-items-length="total"
+    :items-per-page="50"
+    :footer-props="footerProps"
     disable-sort
     disable-filtering>
 
@@ -64,6 +66,7 @@ export default {
       groups: [],
       total: 0,
       options: {},
+      footerProps: {'items-per-page-options': [50, 100, 500, -1]},
       headers: [
         {value: 'image', text: 'Avatar'},
         {value: 'name', text: 'Name'},

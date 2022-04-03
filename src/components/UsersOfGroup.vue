@@ -5,8 +5,11 @@
     :headers="headers"
     :options.sync="options"
     :server-items-length="total"
+    :items-per-page="50"
+    :footer-props="footerProps"
     disable-sort
-    disable-filtering>
+    disable-filtering
+    >
 
     <template v-slot:top>
       <v-toolbar flat>
@@ -89,6 +92,7 @@ export default {
       members: [],
       total: 0,
       options: {},
+      footerProps: {'items-per-page-options': [50, 100, 500, -1]},
       base_headers: [
         {value: 'avatar', text: ''},
         {value: 'name', text: 'Name'},

@@ -24,7 +24,7 @@ export default {
     excel_export(){
       this.loading = true
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/${this.user_type}`
-      const params = { batch_size: 1000 } //arbitrarily large
+      const params = { batch_size: -1 } //arbitrarily large
       this.axios.get(url, {params})
         .then( ({data: {items}}) => {
           const workbook = utils.book_new()

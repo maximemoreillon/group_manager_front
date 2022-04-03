@@ -5,6 +5,8 @@
     :loading="loading"
     :options.sync="options"
     :server-items-length="total"
+    :items-per-page="50"
+    :footer-props="footerProps"
     disable-sort
     disable-filtering>
 
@@ -86,9 +88,8 @@ export default {
       loading: false,
       groups: [],
       total: 0,
-      options: {
-        shallow: true
-      },
+      options: { shallow: true },
+      footerProps: {'items-per-page-options': [50, 100, 500, -1]},
       base_headers: [
         {value: 'image', text: 'Logo'},
         {value: 'name', text: 'Name'},
