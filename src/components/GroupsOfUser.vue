@@ -15,6 +15,20 @@
       </div>
     </template>
 
+    <template v-slot:item.image="{ item }">
+      <v-img
+        v-if="item.avatar_src"
+        contain
+        width="2.5em"
+        height="2.5em"
+        :src="item.avatar_src" />
+      <v-icon
+        size="2.5em"
+        v-else>
+        mdi-account-multiple
+      </v-icon>
+    </template>
+
     <template v-slot:item.name="{ item }">
       <router-link :to="{name: 'Group', params: {group_id: item._id}}">
         {{item.name}}
@@ -51,8 +65,8 @@ export default {
       total: 0,
       options: {},
       headers: [
+        {value: 'image', text: ''},
         {value: 'name', text: 'Name'},
-        // {value: 'official', text: 'Official'},
         {value: 'restricted', text: 'Restricted'},
       ]
     }
