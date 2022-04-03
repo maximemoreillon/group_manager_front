@@ -4,7 +4,9 @@
     :headers="headers"
     :loading="loading"
     :options.sync="options"
-    :server-items-length="total">
+    :server-items-length="total"
+    disable-sort
+    disable-filtering>
 
     <template v-slot:top>
       <v-row align="center">

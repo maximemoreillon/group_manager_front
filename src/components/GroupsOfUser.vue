@@ -4,7 +4,9 @@
     :headers="headers"
     :loading="loading"
     :options.sync="options"
-    :server-items-length="total">
+    :server-items-length="total"
+    disable-sort
+    disable-filtering>
 
     <template v-slot:item.name="{ item }">
       <router-link :to="{name: 'Group', params: {group_id: item._id}}">

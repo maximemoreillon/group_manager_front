@@ -4,7 +4,9 @@
     :items="members"
     :headers="headers"
     :options.sync="options"
-    :server-items-length="total">
+    :server-items-length="total"
+    disable-sort
+    disable-filtering>
 
     <template v-slot:top>
       <v-toolbar flat>
