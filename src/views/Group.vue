@@ -50,14 +50,7 @@
               </v-btn>
             </v-col>
             <v-col cols="auto">
-              <v-btn
-                :loading="deleting"
-                @click="delete_group()"
-                color="#c00000"
-                dark>
-                <v-icon>mdi-delete</v-icon>
-                <span class="ml-2">Delete</span>
-              </v-btn>
+              <DeleteGroupDialog />
             </v-col>
 
 
@@ -231,6 +224,7 @@
 
 <script>
 // @ is an alias to /src
+import DeleteGroupDialog from '@/components/DeleteGroupDialog.vue'
 import GroupsOfGroups from '@/components/GroupsOfGroups.vue'
 import UsersOfGroup from '@/components/UsersOfGroup.vue'
 
@@ -239,6 +233,7 @@ export default {
   components: {
     UsersOfGroup,
     GroupsOfGroups,
+    DeleteGroupDialog
   },
   data(){
     return {

@@ -4,20 +4,18 @@
     class="mx-auto">
     <v-toolbar flat>
 
-      <v-row align="baseline">
-        <v-toolbar-title
-          v-if="user">
-          Groups of {{user.display_name}}
-        </v-toolbar-title>
-        <v-toolbar-title v-else>
-          <v-progress-circular indeterminate/>
-        </v-toolbar-title>
-        <v-spacer />
+      <v-row align="center">
         <v-col cols="auto">
-          <v-switch
-            v-model="shallow"
-            label="Direct only"/>
+          <v-toolbar-title
+            v-if="user">
+            Groups of {{user.display_name}}
+          </v-toolbar-title>
+          <v-toolbar-title v-else>
+            <v-progress-circular indeterminate/>
+          </v-toolbar-title>
         </v-col>
+
+        <v-spacer />
         <v-col cols="auto">
           <v-btn
             exact
@@ -35,6 +33,10 @@
           <v-tab>As member</v-tab>
           <v-tab>As administrator</v-tab>
         </v-tabs>
+        <v-spacer />
+        <v-switch
+          v-model="shallow"
+          label="Direct"/>
       </template>
 
     </v-toolbar>

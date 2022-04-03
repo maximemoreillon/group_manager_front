@@ -4,8 +4,7 @@
     :headers="headers"
     :loading="loading"
     :options.sync="options"
-    :server-items-length="total"
-    @click:row="$router.push({name: 'Group', params: {group_id: $event._id}})">
+    :server-items-length="total">
 
     <template v-slot:item.name="{ item }">
       <router-link :to="{name: 'Group', params: {group_id: item._id}}">
