@@ -74,16 +74,27 @@
       <!-- Would probably be better as component -->
       <v-card-text>
         <v-card outlined>
-          <v-card-title>
-            Group details
-          </v-card-title>
+          <v-card-title>Group details</v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="5">
+              <v-col
+                cols="5"
+                align-self="center">
                 <v-img
-                  src="@/assets/logo.png"
+                  v-if="group.avatar_src"
+                  :src="group.avatar_src"
                   contain
                   height="15em"/>
+
+                <div
+                  v-else
+                  class="text-center">
+                  <v-icon
+                    size="15em">
+                    mdi-account-multiple
+                  </v-icon>
+                </div>
+
               </v-col>
 
               <v-col cols="7">
@@ -91,7 +102,7 @@
                 <v-row>
                   <v-col>
                     <v-text-field
-                      :readonly="!current_user_is_administrator_of_group && !current_user.isAdmin"
+                      :readonly="!current_user_is_administrator_of_group"
                       label="Name"
                       v-model="group.name" />
                   </v-col>
@@ -103,6 +114,14 @@
                       filled
                       label="ID"
                       v-model="group._id" />
+                  </v-col>
+                </v-row>
+
+                <v-row v-if="current_user_is_administrator_of_group">
+                  <v-col>
+                    <v-text-field
+                      label="Avatar URL"
+                      v-model="group.avatar_src" />
                   </v-col>
                 </v-row>
 
