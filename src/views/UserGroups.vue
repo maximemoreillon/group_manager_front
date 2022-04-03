@@ -101,7 +101,7 @@ export default {
       user_loading: false,
       relation_tab: null,
       officiality_tab: null,
-      shallow: true,
+      shallow: false,
 
     }
   },
