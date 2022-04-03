@@ -304,7 +304,7 @@ export default {
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}`
       this.axios.delete(url)
       .then( () => {
-        this.$router.push({name: 'UserGroups'})
+        this.$router.push({name: 'UserGroups', params: {user_id: 'self'}})
       })
       .catch( error => {
         console.error(error)
