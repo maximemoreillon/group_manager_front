@@ -7,11 +7,11 @@
     :server-items-length="total"
     @click:row="$router.push({name: 'Group', params: {group_id: $event._id}})">
 
-    <template v-slot:top>
+    <!-- <template v-slot:top>
       <v-toolbar flat>
         <v-toolbar-title>As {{as}}</v-toolbar-title>
       </v-toolbar>
-    </template>
+    </template> -->
 
   </v-data-table>
 </template>

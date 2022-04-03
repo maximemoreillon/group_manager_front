@@ -8,9 +8,9 @@
 
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title>{{user_type}}</v-toolbar-title>
         <v-spacer/>
         <AddUserDialog
+          :as="user_type"
           v-if="currentUserHasAdminRights"
           @userAdd="add_user($event)"/>
       </v-toolbar>

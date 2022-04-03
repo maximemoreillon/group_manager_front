@@ -8,8 +8,6 @@
 
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title v-if="group_type === 'parent'">Parent groups</v-toolbar-title>
-        <v-toolbar-title v-else-if="group_type === 'child'">Subgroups</v-toolbar-title>
         <v-spacer/>
         <AddGroupDialog
           @groupAdd="add_group($event)"/>

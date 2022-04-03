@@ -1,6 +1,6 @@
 <template>
   <v-card
-    max-width="500"
+    max-width="60em"
     class="mx-auto">
     <v-toolbar flat>
       <v-toolbar-title>Group browser</v-toolbar-title>

@@ -10,14 +10,12 @@
           v-bind="attrs"
           v-on="on" >
           <v-icon>mdi-account-plus</v-icon>
-          <span class="ml-2">Add user</span>
+          <span class="ml-2">Add {{as || 'user'}}</span>
         </v-btn>
       </template>
 
       <v-card>
-        <v-card-title>
-          Add user
-        </v-card-title>
+        <v-card-title>Add {{as || 'user'}}</v-card-title>
 
         <v-card-text>
           <UserPicker
@@ -48,6 +46,9 @@ export default {
   name: 'AddUserDialog',
   components: {
     UserPicker
+  },
+  props: {
+    as: String,
   },
   data(){
     return {

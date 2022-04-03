@@ -1,5 +1,7 @@
 <template>
   <v-card
+    class="mx-auto"
+    max-width="60em"
     :loading="loading">
 
     <template v-if="group">
@@ -126,54 +128,77 @@
 
       </v-card-text>
 
+      <!-- Members -->
       <v-card-text>
         <v-card outlined>
+          <v-toolbar flat>
+            <v-toolbar-title>Related users</v-toolbar-title>
+            <template v-slot:extension>
+              <v-tabs
+                v-model="members_tab">
+                <v-tab>Members</v-tab>
+                <v-tab>Administrators</v-tab>
+              </v-tabs>
+            </template>
+
+          </v-toolbar>
+          <v-divider/>
           <v-card-text>
-            <!-- <v-card-title>Members</v-card-title> -->
-            <UsersOfGroup
-              :currentUserHasAdminRights="current_user_has_admin_rights"
-              user_type="members"
-              @usersChanged="get_group()"/>
+            <v-tabs-items v-model="members_tab">
+              <v-tab-item>
+                <UsersOfGroup
+                  :currentUserHasAdminRights="current_user_has_admin_rights"
+                  user_type="members"
+                  @usersChanged="get_group()"/>
+              </v-tab-item>
+              <v-tab-item>
+                <UsersOfGroup
+                  :currentUserHasAdminRights="current_user_has_admin_rights"
+                  user_type="administrators"
+                  @usersChanged="get_group()"/>
+              </v-tab-item>
+            </v-tabs-items>
+
           </v-card-text>
         </v-card>
       </v-card-text>
 
+      <!-- Related groups -->
       <v-card-text>
         <v-card outlined>
-          <!-- <v-card-title>Administrators</v-card-title> -->
+          <v-toolbar flat>
+            <v-toolbar-title>Related groups</v-toolbar-title>
+            <template v-slot:extension>
+              <v-tabs
+                v-model="groups_tab">
+                <v-tab>Subgroups</v-tab>
+                <v-tab>Parent groups</v-tab>
+              </v-tabs>
+            </template>
+
+          </v-toolbar>
+          <v-divider/>
           <v-card-text>
-            <UsersOfGroup
-              :currentUserHasAdminRights="current_user_has_admin_rights"
-              user_type="administrators"
-              @usersChanged="get_group()"/>
+            <v-tabs-items v-model="groups_tab">
+              <v-tab-item>
+                <GroupsOfGroups
+                  group_type="child"
+                  :currentUserHasAdminRights="current_user_has_admin_rights"
+                  @groupsChanged="get_group()"/>
+              </v-tab-item>
+              <v-tab-item>
+                <GroupsOfGroups
+                  group_type="parent"
+                  :currentUserHasAdminRights="current_user_has_admin_rights"
+                  @groupsChanged="get_group()"/>
+              </v-tab-item>
+            </v-tabs-items>
+
           </v-card-text>
         </v-card>
       </v-card-text>
 
 
-      <v-card-text>
-        <v-card outlined>
-          <!-- <v-card-title>Parent groups</v-card-title> -->
-          <v-card-text>
-            <GroupsOfGroups
-              group_type="child"
-              :currentUserHasAdminRights="current_user_has_admin_rights"
-              @groupsChanged="get_group()"/>
-          </v-card-text>
-        </v-card>
-      </v-card-text>
-
-      <v-card-text>
-        <v-card outlined>
-          <!-- <v-card-title>Parent groups</v-card-title> -->
-          <v-card-text>
-            <GroupsOfGroups
-              group_type="parent"
-              :currentUserHasAdminRights="current_user_has_admin_rights"
-              @groupsChanged="get_group()"/>
-          </v-card-text>
-        </v-card>
-      </v-card-text>
 
 
 
@@ -199,6 +224,9 @@ export default {
     return {
       group: null,
       unmodified_group_copy: null,
+
+      members_tab: null,
+      groups_tab: null,
 
       // Used to check if user is member of admin
       // NOT IDEAL

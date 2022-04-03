@@ -1,6 +1,6 @@
 <template>
   <v-card
-    max-width="70vw"
+    max-width="60em"
     class="mx-auto">
     <v-toolbar flat>
       <v-btn

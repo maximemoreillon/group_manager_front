@@ -1,14 +1,15 @@
 <template>
-  <v-card>
+  <v-card
+    max-width="60em"
+    class="mx-auto">
     <v-toolbar flat>
       <v-toolbar-title
         v-if="user">
-        {{user.display_name}}
+        Groups of {{user.display_name}}
       </v-toolbar-title>
       <v-toolbar-title v-else>
         <v-progress-circular indeterminate/>
       </v-toolbar-title>
-      <v-spacer/>
       <v-spacer/>
       <v-btn
         exact
@@ -16,27 +17,27 @@
         <v-icon>mdi-account-multiple-plus</v-icon>
         <span class="ml-2">Create group</span>
       </v-btn>
+
+      <template v-slot:extension>
+        <v-tabs
+          v-model="tab">
+          <v-tab>As member</v-tab>
+          <v-tab>As administrator</v-tab>
+        </v-tabs>
+      </template>
+
     </v-toolbar>
     <v-divider/>
 
     <v-card-text>
-      <v-card outlined>
-        <v-card-text>
+      <v-tabs-items v-model="tab">
+        <v-tab-item>
           <GroupsOfUser as="member" />
-
-        </v-card-text>
-      </v-card>
-
-    </v-card-text>
-
-    <v-card-text>
-      <v-card outlined>
-        <v-card-text>
+        </v-tab-item>
+        <v-tab-item>
           <GroupsOfUser as="administrator" />
-        </v-card-text>
-      </v-card>
-
-
+        </v-tab-item>
+      </v-tabs-items>
     </v-card-text>
 
   </v-card>
@@ -59,6 +60,7 @@ export default {
     return {
       user: null,
       user_loading: false,
+      tab: null,
 
     }
   },
