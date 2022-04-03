@@ -7,6 +7,12 @@
     :server-items-length="total"
     @click:row="$router.push({name: 'Group', params: {group_id: $event._id}})">
 
+    <template v-slot:item.name="{ item }">
+      <router-link :to="{name: 'Group', params: {group_id: item._id}}">
+        {{item.name}}
+      </router-link>
+    </template>
+
     <template v-slot:item.restricted="{ item }">
       <v-icon v-if="item.restricted">mdi-lock</v-icon>
       <!-- <v-icon v-else>mdi-lock-open</v-icon> -->
@@ -16,6 +22,7 @@
       <v-icon v-if="item.official">mdi-check</v-icon>
       <!-- <v-icon v-else>mdi-close</v-icon> -->
     </template>
+
 
   </v-data-table>
 </template>

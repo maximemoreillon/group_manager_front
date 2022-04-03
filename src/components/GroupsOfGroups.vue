@@ -129,7 +129,7 @@ export default {
     },
     add_group(group){
       if(!this.currentUserHasAdminRights) return alert(`This action can only be performed by group administrators`)
-      
+
       const group_id = group._id || group.properties._id // for old picker
 
       let url, body
