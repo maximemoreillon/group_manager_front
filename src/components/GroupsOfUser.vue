@@ -65,7 +65,7 @@ export default {
       total: 0,
       options: {},
       headers: [
-        {value: 'image', text: ''},
+        {value: 'image', text: 'Avatar'},
         {value: 'name', text: 'Name'},
         {value: 'restricted', text: 'Restricted'},
       ]

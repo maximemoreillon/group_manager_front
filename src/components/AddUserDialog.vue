@@ -17,7 +17,10 @@
       <v-card>
         <v-toolbar flat>
           <v-row align="center">
-            <v-toolbar-title>Add {{as || 'user'}}</v-toolbar-title>
+            <v-col cols="auto">
+              <v-toolbar-title>Add {{as || 'user'}}</v-toolbar-title>
+            </v-col>
+
             <v-spacer />
             <v-col cols="auto">
               <v-btn
@@ -122,7 +125,7 @@ export default {
       this.selected_users.push(user)
     },
     add_selected_users(){
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/members`
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/${this.as}`
       const body = {user_ids: this.selected_users.map(({_id}) => _id)}
       this.axios.post(url, body)
       .then( () => {

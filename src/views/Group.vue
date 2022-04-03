@@ -39,7 +39,7 @@
             </v-btn>
           </v-col>
           <template
-            v-if="current_user_is_administrator_of_group || current_user.isAdmin">
+            v-if="current_user_has_admin_rights">
             <v-col cols="auto">
               <v-btn
                 :disabled="!group_has_modifications"
@@ -91,11 +91,10 @@
               </v-col>
 
               <v-col cols="7">
-                <!-- Would have been better as rows and cols -->
                 <v-row>
                   <v-col>
                     <v-text-field
-                      :readonly="!current_user_is_administrator_of_group"
+                      :readonly="!current_user_has_admin_rights"
                       label="Name"
                       v-model="group.name" />
                   </v-col>
@@ -110,7 +109,7 @@
                   </v-col>
                 </v-row>
 
-                <v-row v-if="current_user_is_administrator_of_group">
+                <v-row v-if="current_user_has_admin_rights">
                   <v-col>
                     <v-text-field
                       label="Avatar URL"
@@ -118,7 +117,7 @@
                   </v-col>
                 </v-row>
 
-                <v-row v-if="current_user_is_administrator_of_group">
+                <v-row v-if="current_user_has_admin_rights">
                   <v-col>
                     <v-switch
                       v-model="group.restricted"

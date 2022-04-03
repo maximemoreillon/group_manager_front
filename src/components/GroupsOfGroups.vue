@@ -90,7 +90,7 @@ export default {
         shallow: true
       },
       base_headers: [
-        {value: 'image', text: ''},
+        {value: 'image', text: 'Logo'},
         {value: 'name', text: 'Name'},
         {value: 'official', text: 'Official'},
         {value: 'restricted', text: 'Restricted'},
