@@ -1,29 +1,13 @@
-# group_manager_neo4j_front_vuetify
+# Group Manager GUI
 
-## Project setup
-```
-npm install
-```
+Front end for the Group Manager API.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+More information available on the project page: https://articles.maximemoreillon.com/articles/398
 
-### Compiles and minifies for production
-```
-npm run build
-```
+## Environment variables
 
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+| Variable | Description |
+| --- | --- |
+| VUE_APP_GROUP_MANAGER_API_URL | The URL of group manager API |
+| VUE_APP_LOGIN_URL | URL of the API endpoint used for login |
+| VUE_APP_IDENTIFICATION_URL | URL of the API endpoint used to identity the user |
