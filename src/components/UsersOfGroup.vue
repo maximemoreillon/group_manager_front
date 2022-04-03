@@ -18,7 +18,7 @@
             <AddUserDialog
               :as="user_type"
               v-if="currentUserHasAdminRights"
-              @userAdd="add_user($event)"/>
+              @usersChanged="$emit('usersChanged')"/>
           </v-col>
         </v-row>
       </v-toolbar>
