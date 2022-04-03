@@ -1,124 +1,93 @@
 <template>
-  <div class="groups">
-
-    <h1>Create group</h1>
-
-
-
-    <!-- Creating a group -->
-    <form class="" v-on:submit.prevent="create_group()">
-      <label>Group name:</label>
-      <input type="text" ref="new_group_name" placeholder="Group name">
-      <input type="submit" class="hidden">
-      <button
-        type="button"
-        class="bordered"
-        v-on:click="create_group()" >
-        <font-awesome-icon icon="plus" />
-        <span>Create</span>
-      </button>
-
-
-    </form>
+  <v-card
+    max-width="60em"
+    class="mx-auto">
+    <v-toolbar flat>
+      <v-btn
+        exact
+        icon
+        :to="{name: 'Groups'}" >
+        <v-icon>mdi-arrow-left</v-icon>
+      </v-btn>
+      <v-toolbar-title>Create new group</v-toolbar-title>
 
 
 
+    </v-toolbar>
+    <v-divider/>
 
-  </div>
+    <v-card-text>
+      <v-form
+        @submit.prevent="create_group()"
+        ref="form"
+        v-model="valid"
+        lazy-validation>
+
+        <v-row align="center">
+          <v-col>
+            <v-text-field
+            v-model="group.name"
+            label="Name"
+            :rules="nameRules"
+            required/>
+          </v-col>
+          <v-col cols="auto">
+            <v-btn
+              type="submit"
+              :disabled="!valid" >
+              <v-icon>mdi-account-multiple-plus</v-icon>
+              <span class="ml-2">Create group</span>
+            </v-btn>
+          </v-col>
+        </v-row>
+
+      </v-form>
+    </v-card-text>
+
+
+
+  </v-card>
 </template>
 
 <script>
-import IdUtils from '@/mixins/IdUtils.js'
-
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import {
-  faPlus,
-  faUserPlus,
-  faEdit,
-  faSave,
-  faSignInAlt,
-  faSignOutAlt,
-  faUserTie,
-  faUserSlash,
-  faTrash,
-
-} from '@fortawesome/free-solid-svg-icons'
-
-library.add(
-  faPlus,
-  faUserPlus,
-  faEdit,
-  faSave,
-  faSignInAlt,
-  faSignOutAlt,
-  faUserTie,
-  faUserSlash,
-  faTrash,
-
-)
-
 export default {
-  name: 'Group',
-  components: {
-    FontAwesomeIcon,
-  },
-  mixins: [ IdUtils ],
-
+  name: 'Users',
   data(){
     return {
-
+      error_message: null,
+      group: {
+        name: '',
+      },
+      valid: false,
+      nameRules: [
+        v => !!v || 'Name is required',
+        v => v.length <= 20 || 'Name must be less than 20 characters',
+      ],
     }
   },
 
-
-
   methods: {
-
     create_group(){
-      this.loading = true;
-      this.axios.post(`${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v2/groups`, {
-        name: this.$refs.new_group_name.value,
-      })
+      if(!this.$refs.form.validate()) return
+      this.error_message = null
+
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups`
+      const parent = this.$route.query.parent
+      const group = {...this.group, parent}
+
+      this.axios.post(url, group)
       .then( ({data}) => {
-        const group_id = this.get_id_of_item(data)
-        this.$router.push({name: 'group', params: {group_id}})
+        this.$router.push({name: 'Group', params: {group_id: data._id}})
       })
-      .catch( (error) => {
+      .catch( error => {
         console.error(error)
-        alert(`Error while creating group`)
+        if(error.response) this.error_message = error.response.data
       })
-    },
-
-
-
-  },
-  computed: {
-
-
+    }
   }
 }
 </script>
 
-<style scoped>
-
-.hidden {
-  display: none;
-}
-
-form {
-  display: flex;
-  align-items: center;
-}
-
-form > *:not(:last-child){
-  margin-right: 1em;
-}
-
-form input {
-  flex-grow: 1;
-  max-width: 400px;
-}
-
+<style>
 
 </style>

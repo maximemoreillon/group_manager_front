@@ -1,37 +1,33 @@
 <template>
-  <div class="about">
-    <h1>Group Manager</h1>
-    <p>Author: Maxime MOREILLON</p>
-    <h2>Services</h2>
-    <table>
-      <tr>
-        <th>Service</th>
-        <th>Version</th>
-        <th>URL</th>
-      </tr>
-      <tr
-        v-for="(service, index) in services"
-        :key="`service_${index}`">
-        <td>{{service.name}}</td>
-        <td>{{service.version}}</td>
-        <td>{{service.url || 'UNDEFINED'}}</td>
-      </tr>
-    </table>
+  <v-card>
+    <v-card-title>Group manager GUI</v-card-title>
+    <v-card-text>
+      GUI for the group management microservice. Developed and maintained by <a href="https://maximemoreillon.com">Maxime Moreillon</a>
+    </v-card-text>
+    <v-card-text>
+      <v-data-table
+        hide-default-footer
+        :itemsPerPage="-1"
+        :headers="headers"
+        :items="services"/>
+    </v-card-text>
 
-  </div>
+
+  </v-card>
 </template>
 
 <script>
 import pjson from '@/../package.json'
-
 export default {
-  name: 'Search',
-  components: {
-
-  },
-  data(){
+  name: 'About',
+  data () {
     return {
-      version: pjson.version,
+      headers: [
+        {text: 'Service', value: "name"},
+        {text: 'Version', value: "version"},
+        {text: 'URL', value: "url"},
+
+      ],
       services: [
         {
           name: 'Group manager GUI',
@@ -39,21 +35,15 @@ export default {
           version: pjson.version
         },
         {
-          name: 'Group manager API',
+          name: 'Group manager back-end',
           url: process.env.VUE_APP_GROUP_MANAGER_API_URL,
           version: null
         },
         {
-          name: 'Login URL',
+          name: 'Authentication',
           url: process.env.VUE_APP_IDENTIFICATION_URL,
           version: 'N/A',
         },
-        {
-          name: 'Identification URL',
-          url: process.env.VUE_APP_LOGIN_URL,
-          version: 'N/A',
-        },
-
       ],
     }
   },
@@ -73,28 +63,10 @@ export default {
     }
   }
 
-
 }
 </script>
 
 <style scoped>
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-
-}
-
-tr:not(:last-child) {
-  border-bottom: 1px solid #dddddd;
-}
-
-th {
-  text-align: left;
-}
-td {
-  padding: 0.25em;
-}
 
 </style>

@@ -1,43 +1,39 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Group from '../views/Group.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
+
   {
-    path: '/groups/browse',
-    name: 'group_browser',
-    component: () => import('../views/GroupBrowser.vue')
+    path: '/',
+    redirect: {name: 'UserGroups', params: {user_id: 'self'}}
   },
   {
-    path: '/groups/create',
-    name: 'create_group',
+    path: '/groups/new',
+    name: 'CreateGroup',
     component: () => import('../views/CreateGroup.vue')
   },
   {
-    path: '/users/:user_id/groups',
-    name: 'groups_of_user',
-    component: () => import('../views/GroupsOfUser.vue'),
-    alias: '/members/:member:id/groups'
+    path: '/groups',
+    name: 'Groups',
+    component: () => import('../views/Groups.vue')
   },
   {
     path: '/groups/:group_id',
-    name: 'group',
-    component: Group,
-    alias: '/group',
+    name: 'Group',
+    component: () => import('../views/Group.vue')
+  },
+  {
+    path: '/users/:user_id/groups',
+    name: 'UserGroups',
+    component: () => import('../views/UserGroups.vue')
   },
   {
     path: '/about',
-    name: 'about',
+    name: 'About',
     component: () => import('../views/About.vue')
-  },
-  {
-    path: '*',
-    redirect: {name :'groups_of_user', params: {user_id: 'self'}}
   }
-
-
 ]
 
 const router = new VueRouter({
