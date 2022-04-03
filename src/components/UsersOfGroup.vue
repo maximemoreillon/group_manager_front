@@ -1,7 +1,10 @@
 <template>
   <v-data-table
+    :loading="loading"
     :items="members"
-    :headers="headers">
+    :headers="headers"
+    :options.sync="options"
+    :server-items-length="total">
 
     <template v-slot:top>
       <v-toolbar flat>
@@ -57,6 +60,8 @@ export default {
     return {
       loading: false,
       members: [],
+      total: 0,
+      options: {},
       base_headers: [
         {value: 'name', text: 'Name'},
       ],
@@ -66,6 +71,14 @@ export default {
 
     }
   },
+  watch: {
+    options: {
+      handler () {
+        this.get_members()
+      },
+      deep: true,
+    },
+  },
   mounted(){
     this.get_members()
   },
@@ -73,14 +86,20 @@ export default {
     get_members(){
       this.loading = true
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/${this.user_type}`
-      this.axios.get(url)
-      .then( ({data}) => {
-        this.members = data.items
-      })
-      .catch( error => {
-        console.error(error)
-      })
-      .finally( () => { this.loading = false})
+      const { itemsPerPage, page } = this.options
+      const params = {
+        batch_size: itemsPerPage,
+        start_index: (page-1) * itemsPerPage
+      }
+      this.axios.get(url, {params})
+        .then( ({data: {count, items}}) => {
+          this.total = count
+          this.members = items
+        })
+        .catch( error => {
+          console.error(error)
+        })
+        .finally( () => { this.loading = false})
     },
     add_user(user){
       if(!this.currentUserHasAdminRights) return alert(`This action can only be performed by group administrators`)

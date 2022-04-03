@@ -1,15 +1,17 @@
 <template>
   <v-data-table
-    :items="subgroups"
+    :items="groups"
     :headers="headers"
-    :loading="loading">
+    :loading="loading"
+    :options.sync="options"
+    :server-items-length="total">
 
     <template v-slot:top>
       <v-toolbar flat>
         <v-toolbar-title>Subgroups</v-toolbar-title>
         <v-spacer/>
         <AddGroupDialog
-          @groupAdd="add_subgroup($event)"/>
+          @groupAdd="add_group($event)"/>
       </v-toolbar>
     </template>
 
@@ -22,7 +24,7 @@
     <template v-slot:item.delete="{ item }">
       <v-btn
         icon
-        @click="remove_subgroup(item)"
+        @click="remove_group(item)"
         color="#c00000"
         dark>
         <v-icon>mdi-account-multiple-remove</v-icon>
@@ -48,7 +50,9 @@ export default {
   data(){
     return {
       loading: false,
-      subgroups: [],
+      groups: [],
+      total: 0,
+      options: {},
       base_headers: [
         {value: 'name', text: 'Name'},
       ],
@@ -59,26 +63,41 @@ export default {
     }
   },
   mounted(){
-    this.get_subgroups()
+    this.get_groups()
+  },
+  watch: {
+    options: {
+      handler () {
+        this.get_groups()
+      },
+      deep: true,
+    },
   },
   methods: {
-    get_subgroups(){
+    get_groups(){
       this.loading = true
+      this.groups = []
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/groups`
-      this.axios.get(url)
-      .then( ({data}) => {
-        this.subgroups = data.items
-      })
+      const { itemsPerPage, page } = this.options
+      const params = {
+        batch_size: itemsPerPage,
+        start_index: (page-1) * itemsPerPage
+      }
+      this.axios.get(url, {params})
+        .then( ({data: {count, items}}) => {
+          this.total = count
+          this.groups = items
+        })
       .catch( error => {
         console.error(error)
       })
       .finally( () => { this.loading = false})
     },
-    add_subgroup(subgroup){
+    add_group(group){
       if(!this.currentUserHasAdminRights) return alert(`This action can only be performed by group administrators`)
-      const subgroup_id = subgroup._id || subgroup.properties._id // for old picker
+      const group_id = group._id || group.properties._id // for old picker
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/groups`
-      const body = {group_id: subgroup_id}
+      const body = {group_id}
       this.axios.post(url, body)
       .then( () => {
         this.$emit("groupsChanged")
@@ -87,7 +106,7 @@ export default {
         console.error(error)
       })
     },
-    remove_subgroup(group){
+    remove_group(group){
       if(!this.currentUserHasAdminRights) return alert(`This action can only be performed by group administrators`)
       if(!confirm(`Remove group ${group.name}?`)) return
       const group_id = group._id

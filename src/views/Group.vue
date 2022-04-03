@@ -2,78 +2,71 @@
   <v-card
     :loading="loading">
 
-    <v-toolbar flat v-if="group">
-      <v-row align="center">
-        <v-col cols="auto">
-          <v-btn
-            exact
-            icon
-            :to="{name: 'Groups'}" >
-            <v-icon>mdi-arrow-left</v-icon>
-          </v-btn>
-        </v-col>
-        <v-col cols="auto">
-          <v-toolbar-title>{{group.name}}</v-toolbar-title>
-        </v-col>
-        <v-spacer />
-        <v-col cols="auto">
-          <v-btn
-            :loading="leaving"
-            v-if="current_user_is_member_of_group"
-            @click="leave_group()">
-            <v-icon>mdi-account-multiple-minus</v-icon>
-            <span class="ml-2">Leave</span>
-          </v-btn>
-          <v-btn
-            v-else
-            :loading="joining"
-            :disabled="group.restricted"
-            @click="join_group()">
-            <v-icon>mdi-account-multiple-plus</v-icon>
-            <span class="ml-2">Join</span>
-          </v-btn>
-        </v-col>
-        <template
-          v-if="current_user_is_administrator_of_group || current_user.isAdmin">
-          <v-col cols="auto">
-            <v-btn
-              :disabled="!group_has_modifications"
-              :loading="updating"
-              @click="update_group()">
-              <v-icon>mdi-content-save</v-icon>
-              <span class="ml-2">Save</span>
-            </v-btn>
-          </v-col>
-          <v-col cols="auto">
-            <v-btn
-              :loading="deleting"
-              @click="delete_group()"
-              color="#c00000"
-              dark>
-              <v-icon>mdi-delete</v-icon>
-              <span class="ml-2">Delete</span>
-            </v-btn>
-          </v-col>
-
-
-
-        </template>
-      </v-row>
-
-
-
-
-
-
-
-
-
-
-    </v-toolbar>
-    <v-divider/>
-
-
     <template v-if="group">
+
+
+      <v-toolbar flat>
+        <v-row align="center">
+          <v-col cols="auto">
+            <v-btn
+              exact
+              icon
+              :to="{name: 'Groups'}" >
+              <v-icon>mdi-arrow-left</v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="auto">
+            <v-toolbar-title>{{group.name}}</v-toolbar-title>
+          </v-col>
+          <v-spacer />
+          <v-col cols="auto">
+            <v-btn
+              :loading="leaving"
+              v-if="current_user_is_member_of_group"
+              @click="leave_group()">
+              <v-icon>mdi-account-multiple-minus</v-icon>
+              <span class="ml-2">Leave</span>
+            </v-btn>
+            <v-btn
+              v-else
+              :loading="joining"
+              :disabled="group.restricted"
+              @click="join_group()">
+              <v-icon>mdi-account-multiple-plus</v-icon>
+              <span class="ml-2">Join</span>
+            </v-btn>
+          </v-col>
+          <template
+            v-if="current_user_is_administrator_of_group || current_user.isAdmin">
+            <v-col cols="auto">
+              <v-btn
+                :disabled="!group_has_modifications"
+                :loading="updating"
+                @click="update_group()">
+                <v-icon>mdi-content-save</v-icon>
+                <span class="ml-2">Save</span>
+              </v-btn>
+            </v-col>
+            <v-col cols="auto">
+              <v-btn
+                :loading="deleting"
+                @click="delete_group()"
+                color="#c00000"
+                dark>
+                <v-icon>mdi-delete</v-icon>
+                <span class="ml-2">Delete</span>
+              </v-btn>
+            </v-col>
+
+
+
+          </template>
+        </v-row>
+
+      </v-toolbar>
+      <v-divider/>
+
+
 
       <!-- Group metadata -->
       <!-- Would probably be better as component -->
@@ -157,11 +150,13 @@
         </v-card>
       </v-card-text>
 
+
       <v-card-text>
         <v-card outlined>
-          <!-- <v-card-title>Subgroups</v-card-title> -->
+          <!-- <v-card-title>Parent groups</v-card-title> -->
           <v-card-text>
-            <SubGroups
+            <GroupsOfGroups
+              group_type="child"
               :currentUserHasAdminRights="current_user_has_admin_rights"
               @groupsChanged="get_group()"/>
           </v-card-text>
@@ -172,7 +167,8 @@
         <v-card outlined>
           <!-- <v-card-title>Parent groups</v-card-title> -->
           <v-card-text>
-            <ParentGroups
+            <GroupsOfGroups
+              group_type="parent"
               :currentUserHasAdminRights="current_user_has_admin_rights"
               @groupsChanged="get_group()"/>
           </v-card-text>
@@ -183,21 +179,21 @@
 
     </template>
 
+    <v-card-text class="text-center pa-5" v-if="loading">Loading group...</v-card-text>
+
   </v-card>
 </template>
 
 <script>
 // @ is an alias to /src
-import SubGroups from '@/components/SubGroups.vue'
-import ParentGroups from '@/components/ParentGroups.vue'
+import GroupsOfGroups from '@/components/GroupsOfGroups.vue'
 import UsersOfGroup from '@/components/UsersOfGroup.vue'
 
 export default {
   name: 'Group',
   components: {
-    SubGroups,
-    ParentGroups,
     UsersOfGroup,
+    GroupsOfGroups,
   },
   data(){
     return {
