@@ -3,20 +3,31 @@
     max-width="60em"
     class="mx-auto">
     <v-toolbar flat>
-      <v-toolbar-title
-        v-if="user">
-        Groups of {{user.display_name}}
-      </v-toolbar-title>
-      <v-toolbar-title v-else>
-        <v-progress-circular indeterminate/>
-      </v-toolbar-title>
-      <v-spacer/>
-      <v-btn
-        exact
-        :to="{name: 'CreateGroup'}">
-        <v-icon>mdi-account-multiple-plus</v-icon>
-        <span class="ml-2">Create group</span>
-      </v-btn>
+
+      <v-row align="baseline">
+        <v-toolbar-title
+          v-if="user">
+          Groups of {{user.display_name}}
+        </v-toolbar-title>
+        <v-toolbar-title v-else>
+          <v-progress-circular indeterminate/>
+        </v-toolbar-title>
+        <v-spacer />
+        <v-col cols="auto">
+          <v-switch
+            v-model="shallow"
+            label="Direct only"/>
+        </v-col>
+        <v-col cols="auto">
+          <v-btn
+            exact
+            :to="{name: 'CreateGroup'}">
+            <v-icon>mdi-account-multiple-plus</v-icon>
+            <span class="ml-2">Create group</span>
+          </v-btn>
+        </v-col>
+      </v-row>
+
 
       <template v-slot:extension>
         <v-tabs
@@ -32,10 +43,14 @@
     <v-card-text>
       <v-tabs-items v-model="tab">
         <v-tab-item>
-          <GroupsOfUser as="member" />
+          <GroupsOfUser
+            :shallow="shallow"
+            as="member" />
         </v-tab-item>
         <v-tab-item>
-          <GroupsOfUser as="administrator" />
+          <GroupsOfUser
+            :shallow="shallow"
+            as="administrator" />
         </v-tab-item>
       </v-tabs-items>
     </v-card-text>
@@ -61,6 +76,7 @@ export default {
       user: null,
       user_loading: false,
       tab: null,
+      shallow: true,
 
     }
   },

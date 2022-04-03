@@ -32,6 +32,7 @@ export default {
   name: 'GroupsOfUser',
   props: {
     as: {type: String, default: () => 'member'},
+    shallow: Boolean,
   },
   data(){
     return {
@@ -50,6 +51,9 @@ export default {
     this.get_groups()
   },
   watch: {
+    shallow(){
+      this.get_groups()
+    },
     options: {
       handler () {
         this.get_groups()
@@ -66,7 +70,8 @@ export default {
       const { itemsPerPage, page } = this.options
       const params = {
         batch_size: itemsPerPage,
-        start_index: (page-1) * itemsPerPage
+        start_index: (page-1) * itemsPerPage,
+        shallow: this.shallow,
       }
 
       this.axios.get(url, {params})
