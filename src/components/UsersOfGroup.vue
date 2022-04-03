@@ -26,6 +26,20 @@
       </v-toolbar>
     </template>
 
+    <template v-slot:item.avatar="{ item }">
+      <v-img
+        v-if="item.avatar_src"
+        contain
+        width="2.5em"
+        height="2.5em"
+        :src="item.avatar_src" />
+      <v-icon
+        size="2.5em"
+        v-else>
+        mdi-account
+      </v-icon>
+    </template>
+
     <template v-slot:item.name="{ item }">
       <router-link :to="{name: 'UserGroups', params: {user_id: item._id}}">
         {{item.display_name}}
@@ -76,6 +90,7 @@ export default {
       total: 0,
       options: {},
       base_headers: [
+        {value: 'avatar', text: ''},
         {value: 'name', text: 'Name'},
       ],
       admin_headers: [
