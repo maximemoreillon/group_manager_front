@@ -1,0 +1,125 @@
+<template>
+  <v-data-table
+    :items="members"
+    :headers="headers">
+
+    <template v-slot:top>
+      <v-toolbar flat>
+        <v-toolbar-title>{{user_type}}</v-toolbar-title>
+        <v-spacer/>
+        <AddUserDialog
+          v-if="currentUserHasAdminRights"
+          @userAdd="add_user($event)"/>
+      </v-toolbar>
+    </template>
+
+    <template v-slot:item.name="{ item }">
+      <router-link :to="{name: 'UserGroups', params: {user_id: item._id}}">
+        {{item.display_name}}
+      </router-link>
+    </template>
+
+    <template v-slot:item.see="{ item }">
+      <v-btn
+        icon
+        @click="$router.push({name: 'UserGroups', params: {user_id: item._id}})">
+        <v-icon>mdi-eye</v-icon>
+      </v-btn>
+    </template>
+
+    <template v-slot:item.remove="{ item }">
+      <v-btn
+        icon
+        @click="remove_user(item)"
+        color="#c00000"
+        dark>
+        <v-icon>mdi-account-remove</v-icon>
+      </v-btn>
+    </template>
+
+  </v-data-table>
+
+</template>
+
+<script>
+import AddUserDialog from '@/components/AddUserDialog.vue'
+
+export default {
+  name: 'UsersOfGroup',
+  components: {
+    AddUserDialog,
+  },
+  props: {
+    user_type: String,
+    currentUserHasAdminRights: Boolean,
+  },
+  data(){
+    return {
+      loading: false,
+      members: [],
+      base_headers: [
+        {value: 'name', text: 'Name'},
+      ],
+      admin_headers: [
+        {value: 'remove', text: 'Remove'},
+      ]
+
+    }
+  },
+  mounted(){
+    this.get_members()
+  },
+  methods: {
+    get_members(){
+      this.loading = true
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/${this.user_type}`
+      this.axios.get(url)
+      .then( ({data}) => {
+        this.members = data.items
+      })
+      .catch( error => {
+        console.error(error)
+      })
+      .finally( () => { this.loading = false})
+    },
+    add_user(user){
+      if(!this.currentUserHasAdminRights) return alert(`This action can only be performed by group administrators`)
+      const user_id = user._id || user.properties._id // for old picker
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/${this.user_type}`
+      const body = {user_id}
+      this.axios.post(url, body)
+      .then( () => {
+        this.$emit("usersChanged")
+      })
+      .catch( error => {
+        console.error(error)
+      })
+    },
+    remove_user(user){
+      if(!this.currentUserHasAdminRights) return alert(`This action can only be performed by group administrators`)
+      if(!confirm(`Remove user ${user.display_name}?`)) return
+      const user_id = user._id
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/${this.user_type}/${user_id}`
+      this.axios.delete(url)
+      .then( () => {
+        this.$emit("usersChanged")
+      })
+      .catch( error => {
+        console.error(error)
+      })
+    }
+  },
+  computed: {
+    group_id(){
+      return this.$route.params.group_id
+    },
+    headers(){
+      if(this.currentUserHasAdminRights) return [...this.base_headers, ...this.admin_headers]
+      else return this.base_headers
+    }
+  }
+}
+</script>
+
+<style lang="css" scoped>
+</style>

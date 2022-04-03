@@ -1,0 +1,60 @@
+<template lang="html">
+  <v-data-table
+    :items="groups"
+    :headers="headers"
+    :loading="loading"
+    @click:row="$router.push({name: 'Group', params: {group_id: $event._id}})">
+
+    <template v-slot:top>
+
+      <v-toolbar flat>
+        <v-toolbar-title>As {{as}}</v-toolbar-title>
+      </v-toolbar>
+
+    </template>
+  </v-data-table>
+</template>
+
+<script>
+export default {
+  name: 'GroupsOfUser',
+  props: {
+    as: {type: String, default: () => 'member'},
+  },
+  data(){
+    return {
+      loading: false,
+      groups: [],
+      headers: [
+        {value: 'name', text: 'Name'}
+      ]
+    }
+  },
+  mounted(){
+    this.get_groups()
+  },
+  methods: {
+    get_groups(){
+      this.loading = true
+      // NOTE: adding 's' after 'as'
+      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/${this.as}s/${this.user_id}/groups`
+      this.axios.get(url)
+      .then( ({data}) => {
+        this.groups = data.items
+      })
+      .catch( error => {
+        console.error(error)
+      })
+      .finally( () => { this.loading = false})
+    },
+  },
+  computed: {
+    user_id(){
+      return this.$route.params.user_id
+    }
+  }
+}
+</script>
+
+<style lang="css" scoped>
+</style>
