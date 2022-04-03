@@ -10,13 +10,14 @@
       <v-row align="center">
         <v-spacer />
         <!-- Shallow flag not working in API at the moment -->
-        <!-- <v-col cols="auto">
+        <v-col cols="auto">
           <v-switch
             v-model="options.shallow"
             label="Direct only"/>
-        </v-col> -->
+        </v-col>
         <v-col cols="auto">
           <AddGroupDialog
+            :as="group_type"
             @groupAdd="add_group($event)"/>
         </v-col>
       </v-row>
@@ -72,7 +73,7 @@ export default {
       groups: [],
       total: 0,
       options: {
-        shallow: false
+        shallow: true
       },
       base_headers: [
         {value: 'name', text: 'Name'},

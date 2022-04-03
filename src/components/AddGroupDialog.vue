@@ -10,12 +10,12 @@
           v-bind="attrs"
           v-on="on" >
           <v-icon>mdi-account-multiple-plus</v-icon>
-          <span class="ml-2">Add Group</span>
+          <span class="ml-2">Add {{as || 'group'}}</span>
         </v-btn>
       </template>
 
       <v-card>
-        <v-card-title>Add group</v-card-title>
+        <v-card-title>Add {{as || 'group'}}</v-card-title>
 
         <v-card-text>
           <GroupPicker
@@ -43,6 +43,9 @@ export default {
   name: 'AddGroupDialog',
   components: {
     GroupPicker
+  },
+  props: {
+    as: String,
   },
   data(){
     return {
