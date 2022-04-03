@@ -7,11 +7,15 @@
     :server-items-length="total"
     @click:row="$router.push({name: 'Group', params: {group_id: $event._id}})">
 
-    <!-- <template v-slot:top>
-      <v-toolbar flat>
-        <v-toolbar-title>As {{as}}</v-toolbar-title>
-      </v-toolbar>
-    </template> -->
+    <template v-slot:item.restricted="{ item }">
+      <v-icon v-if="item.restricted">mdi-lock</v-icon>
+      <!-- <v-icon v-else>mdi-lock-open</v-icon> -->
+    </template>
+
+    <template v-slot:item.official="{ item }">
+      <v-icon v-if="item.official">mdi-check</v-icon>
+      <!-- <v-icon v-else>mdi-close</v-icon> -->
+    </template>
 
   </v-data-table>
 </template>
@@ -29,7 +33,9 @@ export default {
       total: 0,
       options: {},
       headers: [
-        {value: 'name', text: 'Name'}
+        {value: 'name', text: 'Name'},
+        {value: 'official', text: 'Official'},
+        {value: 'restricted', text: 'Restricted'},
       ]
     }
   },
