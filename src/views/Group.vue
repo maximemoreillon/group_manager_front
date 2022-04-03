@@ -1,6 +1,6 @@
 <template>
-
-  <v-card>
+  <v-card
+    :loading="loading">
 
     <v-toolbar flat>
       <v-btn
@@ -9,25 +9,35 @@
         :to="{name: 'Groups'}" >
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
-      <v-toolbar-title v-if="group">{{group.name}}</v-toolbar-title>
-      <v-toolbar-title v-else>Group</v-toolbar-title>
+      <v-toolbar-title>
+        <span v-if="group">{{group.name}}</span>
+        <span v-else>Group</span>
+      </v-toolbar-title>
       <v-spacer />
-      <v-btn
-        :disabled="!group_has_modifications"
-        class="mx-2"
-        @click="update_group()">
-        <v-icon>mdi-content-save</v-icon>
-        <span>Save</span>
-      </v-btn>
 
-      <v-btn
-        class="mx-2"
-        @click="delete_group()"
-        color="#c00000"
-        dark>
-        <v-icon>mdi-delete</v-icon>
-        <span>Delete</span>
-      </v-btn>
+      <template
+        v-if="current_user_is_administrator_of_group || current_user.isAdmin">
+        <v-btn
+          :disabled="!group_has_modifications"
+          class="mx-2"
+          :loading="updating"
+          @click="update_group()">
+          <v-icon>mdi-content-save</v-icon>
+          <span>Save</span>
+        </v-btn>
+
+        <v-btn
+          class="mx-2"
+          :loading="deleting"
+          @click="delete_group()"
+          color="#c00000"
+          dark>
+          <v-icon>mdi-delete</v-icon>
+          <span>Delete</span>
+        </v-btn>
+      </template>
+
+
 
 
 
@@ -37,83 +47,110 @@
 
     <template v-if="group">
 
+      <!-- Group metadata -->
+      <!-- Would probably be better as component -->
       <v-card-text>
-        <v-row>
-          <v-col cols="5">
-            <v-img
-              src="@/assets/logo.png"
-              contain
-              height="15em"/>
-          </v-col>
-          <v-col cols="7">
-            <v-list two-line>
-              <v-list-item>
-                <v-list-item-content>
-                  <v-text-field
-                    :radonly="!current_user_is_administrator_of_group || current_user.isAdmin"
-                    label="Group name"
-                    v-model="group.name" />
-                </v-list-item-content>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-subtitle>Group ID</v-list-item-subtitle>
-                  <v-list-item-title>{{group._id}}</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
+        <v-card outlined>
+          <v-card-title>
+            Group details
+          </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col cols="5">
+                <v-img
+                  src="@/assets/logo.png"
+                  contain
+                  height="15em"/>
+              </v-col>
 
-              <template v-if="current_user_is_administrator_of_group">
-                <v-list-item>
-                  <v-list-item-content>
+              <v-col cols="7">
+                <!-- Would have been better as rows and cols -->
+                <v-row>
+                  <v-col>
+                    <v-text-field
+                      :readonly="!current_user_is_administrator_of_group && !current_user.isAdmin"
+                      label="Name"
+                      v-model="group.name" />
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field
+                      readonly
+                      filled
+                      label="ID"
+                      v-model="group._id" />
+                  </v-col>
+                </v-row>
+
+                <v-row v-if="current_user_is_administrator_of_group">
+                  <v-col>
                     <v-switch
-                    v-model="group.restricted"
-                    label="Restricted"/>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
+                      v-model="group.restricted"
+                      label="Restricted"/>
+                  </v-col>
 
-              <template v-if="current_user.isAdmin">
-                <v-list-item>
-                  <v-list-item-content>
+                  <v-col v-if="current_user.isAdmin">
                     <v-switch
                       v-model="group.official"
                       label="Official"/>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
+                  </v-col>
+                </v-row>
 
-            </v-list>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
 
-
-
-
-
-          </v-col>
-        </v-row>
 
       </v-card-text>
 
       <v-card-text>
-        <Members
-          user_type="members"
-          @usersChanged="get_group()"/>
+        <v-card outlined>
+          <v-card-text>
+            <!-- <v-card-title>Members</v-card-title> -->
+            <Members
+              :currentUserHasAdminRights="current_user_has_admin_rights"
+              user_type="members"
+              @usersChanged="get_group()"/>
+          </v-card-text>
+        </v-card>
       </v-card-text>
 
       <v-card-text>
-        <Members
-          user_type="administrators"
-          @usersChanged="get_group()"/>
+        <v-card outlined>
+          <!-- <v-card-title>Administrators</v-card-title> -->
+          <v-card-text>
+            <Members
+              :currentUserHasAdminRights="current_user_has_admin_rights"
+              user_type="administrators"
+              @usersChanged="get_group()"/>
+          </v-card-text>
+        </v-card>
       </v-card-text>
 
       <v-card-text>
-        <SubGroups
-          @groupsChanged="get_group()"/>
+        <v-card outlined>
+          <!-- <v-card-title>Subgroups</v-card-title> -->
+          <v-card-text>
+            <SubGroups
+              :currentUserHasAdminRights="current_user_has_admin_rights"
+              @groupsChanged="get_group()"/>
+          </v-card-text>
+        </v-card>
       </v-card-text>
 
       <v-card-text>
-        <ParentGroups
-          @groupsChanged="get_group()"/>
+        <v-card outlined>
+          <!-- <v-card-title>Parent groups</v-card-title> -->
+          <v-card-text>
+            <ParentGroups
+              :currentUserHasAdminRights="current_user_has_admin_rights"
+              @groupsChanged="get_group()"/>
+          </v-card-text>
+        </v-card>
       </v-card-text>
+
 
 
     </template>
@@ -138,6 +175,8 @@ export default {
     return {
       group: null,
       loading: false,
+      updating: false,
+      deleting: false,
       members_table_headers: [
         {text: 'ID', value: 'user_id'},
         {text: 'Username', value: 'username'},
@@ -270,6 +309,9 @@ export default {
     },
     current_user_is_administrator_of_group(){
       return this.administrators.some( ({_id}) => _id === this.current_user_id)
+    },
+    current_user_has_admin_rights(){
+      return this.current_user_is_administrator_of_group || this.current_user.isAdmin
     },
     modified_properties(){
       if(!this.group) return {}

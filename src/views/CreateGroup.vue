@@ -1,6 +1,6 @@
 <template>
   <v-card
-    max-width="500"
+    max-width="70vw"
     class="mx-auto">
     <v-toolbar flat>
       <v-btn
@@ -36,7 +36,7 @@
               type="submit"
               :disabled="!valid" >
               <v-icon>mdi-account-multiple-plus</v-icon>
-              <span>Create group</span>
+              <span class="ml-2">Create group</span>
             </v-btn>
           </v-col>
         </v-row>

@@ -45,7 +45,9 @@ export default {
     },
     nav: [
       {title: 'My groups', to: {name: 'UserGroups', params: {user_id: 'self'}}, icon: 'mdi-account'},
-      {title: 'Group browser', to: {name: 'Groups'}, icon: 'mdi-account-group'},
+      {title: 'Group browser', to: {name: 'Groups'}, icon: 'mdi-account-multiple'},
+      {title: 'Create group', to: {name: 'CreateGroup'}, icon: 'mdi-account-multiple-plus'},
+
       {title: 'About', to: {name: 'About'}, icon: 'mdi-information-outline'},
     ]
   }),

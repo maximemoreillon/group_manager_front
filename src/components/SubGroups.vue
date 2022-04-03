@@ -11,15 +11,12 @@
         <AddGroupDialog
           @groupAdd="add_subgroup($event)"/>
       </v-toolbar>
-      <v-divider/>
     </template>
 
-    <template v-slot:item.see="{ item }">
-      <v-btn
-        icon
-        @click="$router.push({name: 'Group', params: {group_id: item._id}})">
-        <v-icon>mdi-eye</v-icon>
-      </v-btn>
+    <template v-slot:item.name="{ item }">
+      <router-link :to="{name: 'Group', params: {group_id: item._id}}">
+        {{item.name}}
+      </router-link>
     </template>
 
     <template v-slot:item.delete="{ item }">
@@ -28,7 +25,7 @@
         @click="remove_subgroup(item)"
         color="#c00000"
         dark>
-        <v-icon>mdi-delete</v-icon>
+        <v-icon>mdi-account-multiple-remove</v-icon>
       </v-btn>
     </template>
 
@@ -44,14 +41,19 @@ export default {
   components: {
     AddGroupDialog
   },
+  props: {
+    currentUserHasAdminRights: Boolean,
+
+  },
   data(){
     return {
       loading: false,
       subgroups: [],
-      headers: [
+      base_headers: [
         {value: 'name', text: 'Name'},
+      ],
+      admin_headers: [
         {value: 'delete', text: 'Delete'},
-        {value: 'see', text: 'See'},
       ]
 
     }
@@ -73,6 +75,7 @@ export default {
       .finally( () => { this.loading = false})
     },
     add_subgroup(subgroup){
+      if(!this.currentUserHasAdminRights) return alert(`This action can only be performed by group administrators`)
       const subgroup_id = subgroup._id || subgroup.properties._id // for old picker
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/groups`
       const body = {group_id: subgroup_id}
@@ -85,6 +88,7 @@ export default {
       })
     },
     remove_subgroup(group){
+      if(!this.currentUserHasAdminRights) return alert(`This action can only be performed by group administrators`)
       if(!confirm(`Remove group ${group.name}?`)) return
       const group_id = group._id
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/groups/${group_id}`
@@ -100,6 +104,10 @@ export default {
   computed: {
     group_id(){
       return this.$route.params.group_id
+    },
+    headers(){
+      if(this.currentUserHasAdminRights) return [...this.base_headers, ...this.admin_headers]
+      else return this.base_headers
     }
   }
 }

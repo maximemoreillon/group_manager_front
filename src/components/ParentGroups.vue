@@ -11,15 +11,12 @@
         <AddGroupDialog
           @groupAdd="add_parent($event)"/>
       </v-toolbar>
-      <v-divider/>
     </template>
 
-    <template v-slot:item.see="{ item }">
-      <v-btn
-        icon
-        @click="$router.push({name: 'Group', params: {group_id: item._id}})">
-        <v-icon>mdi-eye</v-icon>
-      </v-btn>
+    <template v-slot:item.name="{ item }">
+      <router-link :to="{name: 'Group', params: {group_id: item._id}}">
+        {{item.name}}
+      </router-link>
     </template>
 
     <template v-slot:item.delete="{ item }">
@@ -28,7 +25,7 @@
         @click="remove_parent(item)"
         color="#c00000"
         dark>
-        <v-icon>mdi-delete</v-icon>
+        <v-icon>mdi-account-multiple-remove</v-icon>
       </v-btn>
     </template>
 
@@ -44,14 +41,19 @@ export default {
   components: {
     AddGroupDialog
   },
+  props: {
+    currentUserHasAdminRights: Boolean,
+
+  },
   data(){
     return {
       loading: false,
       parents: [],
-      headers: [
+      base_headers: [
         {value: 'name', text: 'Name'},
+      ],
+      admin_headers: [
         {value: 'delete', text: 'Delete'},
-        {value: 'see', text: 'See'},
       ]
 
     }
@@ -100,6 +102,10 @@ export default {
   computed: {
     group_id(){
       return this.$route.params.group_id
+    },
+    headers(){
+      if(this.currentUserHasAdminRights) return [...this.base_headers, ...this.admin_headers]
+      else return this.base_headers
     }
   }
 }

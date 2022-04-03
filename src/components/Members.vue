@@ -8,15 +8,15 @@
         <v-toolbar-title>{{user_type}}</v-toolbar-title>
         <v-spacer/>
         <AddUserDialog
+          v-if="currentUserHasAdminRights"
           @userAdd="add_user($event)"/>
       </v-toolbar>
-      <v-divider/>
     </template>
 
-    <template v-slot:item.admin="{ item }">
-      <v-checkbox
-        v-model="item.admin">
-      </v-checkbox>
+    <template v-slot:item.name="{ item }">
+      <router-link :to="{name: 'UserGroups', params: {user_id: item._id}}">
+        {{item.display_name}}
+      </router-link>
     </template>
 
     <template v-slot:item.see="{ item }">
@@ -27,13 +27,13 @@
       </v-btn>
     </template>
 
-    <template v-slot:item.delete="{ item }">
+    <template v-slot:item.remove="{ item }">
       <v-btn
         icon
         @click="remove_user(item)"
         color="#c00000"
         dark>
-        <v-icon>mdi-delete</v-icon>
+        <v-icon>mdi-account-remove</v-icon>
       </v-btn>
     </template>
 
@@ -48,19 +48,20 @@ export default {
   name: 'Members',
   components: {
     AddUserDialog,
-
   },
   props: {
     user_type: String,
+    currentUserHasAdminRights: Boolean,
   },
   data(){
     return {
       loading: false,
       members: [],
-      headers: [
-        {value: 'username', text: 'Username'},
-        {value: 'delete', text: 'Delete'},
-        {value: 'see', text: 'See'},
+      base_headers: [
+        {value: 'name', text: 'Name'},
+      ],
+      admin_headers: [
+        {value: 'remove', text: 'Remove'},
       ]
 
     }
@@ -82,6 +83,7 @@ export default {
       .finally( () => { this.loading = false})
     },
     add_user(user){
+      if(!this.currentUserHasAdminRights) return alert(`This action can only be performed by group administrators`)
       const user_id = user._id || user.properties._id // for old picker
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/${this.user_type}`
       const body = {user_id}
@@ -94,7 +96,8 @@ export default {
       })
     },
     remove_user(user){
-      if(!confirm(`Remove user ${user.username}?`)) return
+      if(!this.currentUserHasAdminRights) return alert(`This action can only be performed by group administrators`)
+      if(!confirm(`Remove user ${user.display_name}?`)) return
       const user_id = user._id
       const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/${this.user_type}/${user_id}`
       this.axios.delete(url)
@@ -109,6 +112,10 @@ export default {
   computed: {
     group_id(){
       return this.$route.params.group_id
+    },
+    headers(){
+      if(this.currentUserHasAdminRights) return [...this.base_headers, ...this.admin_headers]
+      else return this.base_headers
     }
   }
 }

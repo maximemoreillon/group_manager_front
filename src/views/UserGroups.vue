@@ -20,60 +20,48 @@
     <v-divider/>
 
     <v-card-text>
-      <v-data-table
-        :items="groups"
-        :headers="headers"
-        :loading="groups_loading"
-        @click:row="$router.push({name: 'Group', params: {group_id: $event._id}})">
+      <v-card outlined>
+        <v-card-text>
+          <v-data-table
+            :items="groups"
+            :headers="headers"
+            :loading="groups_loading"
+            @click:row="$router.push({name: 'Group', params: {group_id: $event._id}})">
 
-        <template v-slot:top>
-          <v-row align="center">
-            <v-col>
+            <template v-slot:top>
 
-              <v-subheader v-if="user">
-                Groups of {{user.display_name}}
-              </v-subheader>
+              <v-toolbar flat>
+                <v-toolbar-title>As member</v-toolbar-title>
+              </v-toolbar>
 
-            </v-col>
-            <v-spacer />
+            </template>
+          </v-data-table>
+        </v-card-text>
+      </v-card>
 
-            <!-- <v-col cols="auto">
-              <v-switch
-                v-model="deep"
-                label="Query subgroups"/>
-            </v-col> -->
-
-          </v-row>
-        </template>
-      </v-data-table>
     </v-card-text>
 
     <v-card-text>
-      <v-data-table
-        :items="administrated_groups"
-        :headers="headers"
-        :loading="administrated_groups_loading"
-        @click:row="$router.push({name: 'Group', params: {group_id: $event._id}})">
+      <v-card outlined>
+        <v-card-text>
+          <v-data-table
+            :items="administrated_groups"
+            :headers="headers"
+            :loading="administrated_groups_loading"
+            @click:row="$router.push({name: 'Group', params: {group_id: $event._id}})">
 
-        <template v-slot:top>
-          <v-row align="center">
-            <v-col>
-              <v-subheader v-if="user">
-                Groups administrated by {{user.display_name}}
-              </v-subheader>
-            </v-col>
-            <v-spacer />
+            <template v-slot:top>
+              <v-toolbar flat>
+                <v-toolbar-title>As administrator</v-toolbar-title>
+              </v-toolbar>
 
-            <!-- <v-col cols="auto">
-              <v-switch
-                v-model="deep"
-                label="Query subgroups"/>
-            </v-col> -->
+            </template>
+          </v-data-table>
 
-          </v-row>
+        </v-card-text>
+      </v-card>
 
-        </template>
-      </v-data-table>
+
     </v-card-text>
 
   </v-card>

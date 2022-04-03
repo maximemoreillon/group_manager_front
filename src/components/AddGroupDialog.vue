@@ -1,23 +1,21 @@
 <template>
   <v-dialog
       v-model="dialog"
-      width="500">
-      
+      width="70vw">
+
       <template v-slot:activator="{ on, attrs }">
         <v-btn
           color="black"
           dark
           v-bind="attrs"
           v-on="on" >
-          <v-icon>mdi-account-plus</v-icon>
+          <v-icon>mdi-account-multiple-plus</v-icon>
           <span class="ml-2">Add Group</span>
         </v-btn>
       </template>
 
       <v-card>
-        <v-card-title>
-          Add a user
-        </v-card-title>
+        <v-card-title>Add group</v-card-title>
 
         <v-card-text>
           <GroupPicker
