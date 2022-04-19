@@ -81,6 +81,9 @@ export default {
     shallow(){
       this.get_groups()
     },
+    user_id(){
+      this.get_groups()
+    },
     options: {
       handler () {
         this.get_groups()

@@ -87,11 +87,6 @@ import GroupsOfUser from '@/components/GroupsOfUser.vue'
 
 export default {
   name: 'UserGroups',
-  watch:{
-    user_id(){
-      this.get_groups()
-    }
-  },
   components: {
     GroupsOfUser
   },
@@ -107,7 +102,11 @@ export default {
   },
   mounted(){
     this.get_user()
-
+  },
+  watch: {
+    user_id(){
+      this.get_user()
+    }
   },
   methods: {
     get_user(){
