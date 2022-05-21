@@ -1,0 +1,19 @@
+{
+  "message": "hello i18n !!",
+  "Group browser": "グループ",
+  "My Groups": "自分のグループ",
+  "Create group": "グループ作成",
+  "About": "アプリについて",
+  "As member": "メンバーとして",
+  "As administrator": "管理者として",
+  "Group details": "グループについて",
+  "Group name": "グループ名",
+  "Group avatar URL": "グループ写真のURL",
+  "Members": "メンバー",
+  "Administrators": "管理者",
+  "Users": "ユーザ",
+  "Related users": "関係するユーザ",
+  "Related groups": "関係するグループ",
+  "Parent groups": "親グループ",
+  "Subgroups": "子グループ"
+}
