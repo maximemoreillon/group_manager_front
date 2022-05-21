@@ -1,3 +1,7 @@
 {
-  "message": "hello i18n !!"
+  "message": "hello i18n !!",
+  "My Groups": "My Groups",
+  "Group browser": "Group browser",
+  "Create group": "Create group",
+  "About": "About"
 }

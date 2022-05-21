@@ -7,6 +7,10 @@
       <v-list
         dense
         nav >
+        <v-list-item>
+          <LocaleSelector />
+        </v-list-item>
+        <v-divider />
         <v-list-item
           v-for="(item, index) in nav"
           :key="`nav_item_${index}`"
@@ -28,11 +32,14 @@
 
 <script>
 import AppTemplate from '@moreillon/vue_application_template_vuetify'
+import LocaleSelector from './components/LocaleSelector.vue'
+
 export default {
   name: 'App',
 
   components: {
-    AppTemplate
+    AppTemplate,
+    LocaleSelector
   },
 
   data: () => ({
@@ -43,18 +50,21 @@ export default {
       login_url: process.env.VUE_APP_LOGIN_URL,
       identification_url:process.env.VUE_APP_IDENTIFICATION_URL,
     },
-    nav: [
-      {title: 'My groups', to: {name: 'UserGroups', params: {user_id: 'self'}}, icon: 'mdi-account'},
-      {title: 'Group browser', to: {name: 'Groups'}, icon: 'mdi-account-multiple'},
-      {title: 'Create group', to: {name: 'CreateGroup'}, icon: 'mdi-account-multiple-plus'},
-
-      {title: 'About', to: {name: 'About'}, icon: 'mdi-information-outline'},
-    ]
   }),
 
   methods: {
     get_user(user){
       this.$store.commit('set_current_user', user)
+    }
+  },
+  computed: {
+    nav(){
+      return [
+        {title: this.$t('My Groups'), to: {name: 'UserGroups', params: {user_id: 'self'}}, icon: 'mdi-account'},
+        {title: this.$t('Group browser'), to: {name: 'Groups'}, icon: 'mdi-account-multiple'},
+        {title: this.$t('Create group'), to: {name: 'CreateGroup'}, icon: 'mdi-account-multiple-plus'},
+        {title: this.$t('About'), to: {name: 'About'}, icon: 'mdi-information-outline'},
+      ]
     }
   }
 };
