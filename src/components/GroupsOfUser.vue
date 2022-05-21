@@ -12,8 +12,8 @@
 
     <template v-slot:top>
       <div class="text-h6" >
-        <span v-if="official">Official groups</span>
-        <span v-if="nonofficial">Non-official groups</span>
+        <span v-if="official">{{ $t('Official') }}</span>
+        <span v-if="nonofficial">{{ $t('Non-official') }}</span>
       </div>
     </template>
 

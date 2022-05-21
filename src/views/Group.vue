@@ -27,7 +27,7 @@
               v-if="current_user_is_member_of_group"
               @click="leave_group()">
               <v-icon>mdi-account-multiple-minus</v-icon>
-              <span class="ml-2">Leave</span>
+              <span class="ml-2">{{ $t('Leave') }}</span>
             </v-btn>
             <v-btn
               v-else
@@ -35,7 +35,7 @@
               :disabled="group.restricted"
               @click="join_group()">
               <v-icon>mdi-account-multiple-plus</v-icon>
-              <span class="ml-2">Join</span>
+              <span class="ml-2">{{ $t('Join') }}</span>
             </v-btn>
           </v-col>
           <template
@@ -46,7 +46,7 @@
                 :loading="updating"
                 @click="update_group()">
                 <v-icon>mdi-content-save</v-icon>
-                <span class="ml-2">Save</span>
+                <span class="ml-2">{{ $t('Save') }}</span>
               </v-btn>
             </v-col>
             <v-col cols="auto">
@@ -121,13 +121,13 @@
                   <v-col>
                     <v-switch
                       v-model="group.restricted"
-                      label="Restricted"/>
+                      :label="$t('Restricted')"/>
                   </v-col>
 
                   <v-col v-if="current_user.isAdmin">
                     <v-switch
                       v-model="group.official"
-                      label="Official"/>
+                      :label="$t('Official')"/>
                   </v-col>
                 </v-row>
 
@@ -178,8 +178,8 @@
             <template v-slot:extension>
               <v-tabs
                 v-model="groups_tab">
-                <v-tab>{{ $t('Subgroups') }} Subgroups</v-tab>
-                <v-tab>{{ $t('Parent groups') }} Parent groups</v-tab>
+                <v-tab>{{ $t('Subgroups') }}</v-tab>
+                <v-tab>{{ $t('Parent groups') }}</v-tab>
               </v-tabs>
             </template>
 

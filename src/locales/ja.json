@@ -15,5 +15,13 @@
   "Related users": "関係するユーザ",
   "Related groups": "関係するグループ",
   "Parent groups": "親グループ",
-  "Subgroups": "子グループ"
+  "Subgroups": "子グループ",
+  "Create": "作成",
+  "Excel export": "エクセルエクスポート",
+  "Non-official": "非公式",
+  "Official": "正式",
+  "Restricted": "制限付き",
+  "Leave": "グループを離れる",
+  "Join": "グループに参加",
+  "Save": "保存"
 }

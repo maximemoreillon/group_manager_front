@@ -3,13 +3,13 @@
     max-width="60em"
     class="mx-auto">
     <v-toolbar flat>
-      <v-toolbar-title>Group browser</v-toolbar-title>
+      <v-toolbar-title>{{ $t('Group browser') }}</v-toolbar-title>
       <v-spacer/>
       <v-btn
         exact
         :to="{name: 'CreateGroup'}">
         <v-icon>mdi-account-multiple-plus</v-icon>
-        <span class="ml-2">Create group</span>
+        <span class="ml-2">{{ $t('Create group') }}</span>
       </v-btn>
     </v-toolbar>
     <v-divider/>

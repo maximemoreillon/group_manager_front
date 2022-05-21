@@ -3,7 +3,7 @@
     :loading="loading"
     @click="excel_export()">
     <v-icon>mdi-file-excel</v-icon>
-    <span class="ml-2">Excel export</span>
+    <span class="ml-2">{{ $t('Excel export') }}</span>
   </v-btn>
 </template>
 

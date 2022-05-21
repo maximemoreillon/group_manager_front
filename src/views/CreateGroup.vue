@@ -9,7 +9,7 @@
         :to="{name: 'Groups'}" >
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
-      <v-toolbar-title>Create new group</v-toolbar-title>
+      <v-toolbar-title>{{ $t('Create group') }}</v-toolbar-title>
 
 
 
@@ -36,7 +36,7 @@
               type="submit"
               :disabled="!valid" >
               <v-icon>mdi-account-multiple-plus</v-icon>
-              <span class="ml-2">Create group</span>
+              <span class="ml-2">{{ $t('Create') }}</span>
             </v-btn>
           </v-col>
         </v-row>

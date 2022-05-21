@@ -15,5 +15,13 @@
   "Related users": "Related users",
   "Related groups": "Related groups",
   "Parent groups": "Parent groups",
-  "Subgroups": "Subgroups"
+  "Subgroups": "Subgroups",
+  "Create": "Create",
+  "Excel export": "Excel export",
+  "Non-official": "Non-official",
+  "Official": "Official",
+  "Restricted": "Restricted",
+  "Join": "Join",
+  "Leave": "Join",
+  "Save": "Save"
 }

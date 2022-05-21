@@ -21,7 +21,7 @@
             exact
             :to="{name: 'CreateGroup'}">
             <v-icon>mdi-account-multiple-plus</v-icon>
-            <span class="ml-2">Create group</span>
+            <span class="ml-2">{{ $t('Create group') }}</span>
           </v-btn>
         </v-col>
       </v-row>
@@ -53,8 +53,8 @@
             <v-toolbar flat>
               <v-tabs
                 v-model="officiality_tab">
-                <v-tab>Official</v-tab>
-                <v-tab>Non-official</v-tab>
+                <v-tab>{{ $t('Official') }}</v-tab>
+                <v-tab>{{ $t('Non-official') }}</v-tab>
               </v-tabs>
             </v-toolbar>
             <v-divider />
