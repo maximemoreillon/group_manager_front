@@ -67,7 +67,7 @@
       <!-- Would probably be better as component -->
       <v-card-text>
         <v-card outlined>
-          <v-card-title>Group details</v-card-title>
+          <v-card-title>{{ $t('Group details') }}</v-card-title>
           <v-card-text>
             <v-row>
               <v-col
@@ -95,7 +95,7 @@
                   <v-col>
                     <v-text-field
                       :readonly="!current_user_has_admin_rights"
-                      label="Name"
+                      :label="$t('Group name')"
                       v-model="group.name" />
                   </v-col>
                 </v-row>
@@ -112,7 +112,7 @@
                 <v-row v-if="current_user_has_admin_rights">
                   <v-col>
                     <v-text-field
-                      label="Avatar URL"
+                      :label="$t('Group avatar URL')"
                       v-model="group.avatar_src" />
                   </v-col>
                 </v-row>
@@ -143,12 +143,12 @@
       <v-card-text>
         <v-card outlined>
           <v-toolbar flat>
-            <v-toolbar-title>Related users</v-toolbar-title>
+            <v-toolbar-title>{{ $t('Related users') }}</v-toolbar-title>
             <template v-slot:extension>
               <v-tabs
                 v-model="members_tab">
-                <v-tab>Members</v-tab>
-                <v-tab>Administrators</v-tab>
+                <v-tab>{{ $t('Members') }}</v-tab>
+                <v-tab>{{ $t('Administrators') }}</v-tab>
               </v-tabs>
             </template>
 
@@ -174,12 +174,12 @@
       <v-card-text>
         <v-card outlined>
           <v-toolbar flat>
-            <v-toolbar-title>Related groups</v-toolbar-title>
+            <v-toolbar-title>{{ $t('Related groups') }}</v-toolbar-title>
             <template v-slot:extension>
               <v-tabs
                 v-model="groups_tab">
-                <v-tab>Subgroups</v-tab>
-                <v-tab>Parent groups</v-tab>
+                <v-tab>{{ $t('Subgroups') }} Subgroups</v-tab>
+                <v-tab>{{ $t('Parent groups') }} Parent groups</v-tab>
               </v-tabs>
             </template>
 

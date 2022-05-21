@@ -3,5 +3,17 @@
   "My Groups": "My Groups",
   "Group browser": "Group browser",
   "Create group": "Create group",
-  "About": "About"
+  "About": "About",
+  "As member": "As member",
+  "As administrator": "As administrator",
+  "Group details": "Group details",
+  "Group name": "Group name",
+  "Group avatar URL": "Group avatar URL",
+  "Members": "Members",
+  "Administrators": "Administrators",
+  "Users": "Users",
+  "Related users": "Related users",
+  "Related groups": "Related groups",
+  "Parent groups": "Parent groups",
+  "Subgroups": "Subgroups"
 }

@@ -8,7 +8,7 @@
         <v-col cols="auto">
           <v-toolbar-title
             v-if="user">
-            Groups of {{user.display_name}}
+            {{user.display_name}}
           </v-toolbar-title>
           <v-toolbar-title v-else>
             <v-progress-circular indeterminate/>
@@ -30,8 +30,8 @@
       <template v-slot:extension>
         <v-tabs
           v-model="relation_tab">
-          <v-tab>As member</v-tab>
-          <v-tab>As administrator</v-tab>
+          <v-tab>{{ $t('As member') }}</v-tab>
+          <v-tab>{{ $t('As administrator') }}</v-tab>
         </v-tabs>
         <v-spacer />
         <v-switch
