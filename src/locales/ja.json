@@ -23,5 +23,9 @@
   "Restricted": "制限付き",
   "Leave": "グループを離れる",
   "Join": "グループに参加",
-  "Save": "保存"
+  "Save": "保存",
+  "Also delete subgroups": "サブグループも削除",
+  "Delete group": "グループ削除",
+  "Delete": "削除",
+  "Cancel": "キャンセル"
 }

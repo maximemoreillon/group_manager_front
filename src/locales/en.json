@@ -23,5 +23,9 @@
   "Restricted": "Restricted",
   "Join": "Join",
   "Leave": "Join",
-  "Save": "Save"
+  "Save": "Save",
+  "Also delete subgroups": "Also delete subgroups",
+  "Delete group": "Delete group",
+  "Delete": "Delete",
+  "Cancel": "Cancel"
 }

@@ -10,12 +10,12 @@
           v-bind="attrs"
           v-on="on" >
           <v-icon>mdi-account-multiple-remove</v-icon>
-          <span class="ml-2">Delete</span>
+          <span class="ml-2">{{ $t('Delete')}}</span>
         </v-btn>
       </template>
 
       <v-card>
-        <v-card-title>Delete group?</v-card-title>
+        <v-card-title>{{ $t('Delete group')}}</v-card-title>
 
         <v-card-text>
           <v-row >
@@ -23,7 +23,7 @@
             <v-col cols="auto">
               <v-switch
                 v-model="deep"
-                label="Also delete subgroups"/>
+                :label="$t('Also delete subgroups')"/>
             </v-col>
             <v-spacer />
           </v-row>
@@ -36,7 +36,7 @@
               <v-btn
                 @click="dialog = false">
                 <v-icon>mdi-close</v-icon>
-                <span class="ml-2">Cancel</span>
+                <span class="ml-2">{{ $t('Cancel')}}</span>
               </v-btn>
             </v-col>
 
@@ -46,7 +46,7 @@
                 dark
                 @click="delete_group()">
                 <v-icon>mdi-account-multiple-remove</v-icon>
-                <span class="ml-2">Delete</span>
+                <span class="ml-2">{{ $t('Delete')}}</span>
               </v-btn>
             </v-col>
           </v-row>
