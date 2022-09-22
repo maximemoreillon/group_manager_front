@@ -19,9 +19,10 @@ build:
     - dind
   only:
     - master
-  script:
+  before_script:
     # Docker hub login
     - echo "${DOCKER_HUB_PASSWORD}" | docker login --username ${DOCKER_HUB_USERNAME} --password-stdin
+  script:
     # Buikd and push container image
     - docker build -t ${CONTAINER_IMAGE} .
     # Tagging
