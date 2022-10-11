@@ -16,6 +16,7 @@
 
     <v-card-text>
       <GroupPicker
+        :usersWithNoGroup="false"
         @selection="group_selected($event)"/>
     </v-card-text>
 
