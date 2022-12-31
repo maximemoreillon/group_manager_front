@@ -10,7 +10,7 @@
     disable-sort
     disable-filtering
   >
-    <template v-slot:top>
+    <template v-slot:[`top`]>
       <v-row align="center">
         <v-spacer />
         <v-col cols="auto">
@@ -22,7 +22,7 @@
       </v-row>
     </template>
 
-    <template v-slot:item.image="{ item }">
+    <template v-slot:[`item.image`]="{ item }">
       <v-img
         v-if="item.avatar_src"
         contain
@@ -33,23 +33,23 @@
       <v-icon size="2.5em" v-else> mdi-account-multiple </v-icon>
     </template>
 
-    <template v-slot:item.name="{ item }">
+    <template v-slot:[`item.name`]="{ item }">
       <router-link :to="{ name: 'Group', params: { group_id: item._id } }">
         {{ item.name }}
       </router-link>
     </template>
 
-    <template v-slot:item.restricted="{ item }">
+    <template v-slot:[`item.restricted`]="{ item }">
       <v-icon v-if="item.restricted">mdi-check</v-icon>
       <!-- <v-icon v-else>mdi-lock-open</v-icon> -->
     </template>
 
-    <template v-slot:item.official="{ item }">
+    <template v-slot:[`item.official`]="{ item }">
       <v-icon v-if="item.official">mdi-check</v-icon>
       <!-- <v-icon v-else>mdi-close</v-icon> -->
     </template>
 
-    <template v-slot:item.delete="{ item }">
+    <template v-slot:[`item.delete`]="{ item }">
       <v-btn icon @click="remove_group(item)" color="#c00000" dark>
         <v-icon>mdi-account-multiple-remove</v-icon>
       </v-btn>
