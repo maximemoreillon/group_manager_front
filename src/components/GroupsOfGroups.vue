@@ -138,10 +138,10 @@ export default {
 
       let url, body
       if (this.group_type === "parent") {
-        url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${group_id}/groups`
+        url = `/v3/groups/${group_id}/groups`
         body = { group_id: this.group_id }
       } else {
-        url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/groups`
+        url = `/v3/groups/${this.group_id}/groups`
         body = { group_id: group._id || group.properties._id } // Support for legacy picker
       }
 
@@ -165,9 +165,9 @@ export default {
 
       let url
       if (this.group_type === "parent") {
-        url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${group_id}/groups/${this.group_id}`
+        url = `/v3/groups/${group_id}/groups/${this.group_id}`
       } else {
-        url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/groups/${group_id}`
+        url = `/v3/groups/${this.group_id}/groups/${group_id}`
       }
 
       this.axios

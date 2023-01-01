@@ -106,7 +106,7 @@ export default {
   methods: {
     get_members() {
       this.loading = true
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/${this.user_type}`
+      const url = `/v3/groups/${this.group_id}/${this.user_type}`
       const { itemsPerPage, page } = this.options
       const params = {
         batch_size: itemsPerPage,
@@ -131,7 +131,7 @@ export default {
           `This action can only be performed by group administrators`
         )
       const user_id = user._id || user.properties._id // for old picker
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/${this.user_type}`
+      const url = `/v3/groups/${this.group_id}/${this.user_type}`
       const body = { user_id }
       this.axios
         .post(url, body)
@@ -149,7 +149,7 @@ export default {
         )
       if (!confirm(`Remove user ${user.display_name}?`)) return
       const user_id = user._id
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/groups/${this.group_id}/${this.user_type}/${user_id}`
+      const url = `/v3/groups/${this.group_id}/${this.user_type}/${user_id}`
       this.axios
         .delete(url)
         .then(() => {

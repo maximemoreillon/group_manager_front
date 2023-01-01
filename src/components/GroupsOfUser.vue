@@ -90,7 +90,7 @@ export default {
     get_groups() {
       this.loading = true
       // NOTE: adding 's' after 'as'
-      const url = `${process.env.VUE_APP_GROUP_MANAGER_API_URL}/v3/${this.as}s/${this.user_id}/groups`
+      const url = `/v3/${this.as}s/${this.user_id}/groups`
 
       const { itemsPerPage, page } = this.options
       const params = {
