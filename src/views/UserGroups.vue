@@ -4,7 +4,10 @@
       <v-row align="center">
         <v-col cols="auto">
           <v-toolbar-title v-if="user">
-            {{ user.display_name }}
+            <a v-if="user_profile_url" :href="user_profile_url">{{
+              user.display_name
+            }}</a>
+            <span v-else>{{ user.display_name }}</span>
           </v-toolbar-title>
           <v-toolbar-title v-else>
             <v-progress-circular indeterminate />
@@ -70,6 +73,8 @@
 <script>
 import GroupsOfUser from "@/components/GroupsOfUser.vue"
 
+const { VUE_APP_USER_MANAGER_FRONT_URL } = process.env
+
 export default {
   name: "UserGroups",
   components: {
@@ -78,7 +83,7 @@ export default {
   data() {
     return {
       user: null,
-      user_loading: false,
+      loading: false,
       relation_tab: null,
       officiality_tab: null,
       shallow: false,
@@ -94,7 +99,7 @@ export default {
   },
   methods: {
     get_user() {
-      this.user_loading = true
+      this.loading = true
       const url = `/v3/users/${this.user_id}`
       this.axios
         .get(url)
@@ -105,13 +110,17 @@ export default {
           console.error(error)
         })
         .finally(() => {
-          this.user_loading = false
+          this.loading = false
         })
     },
   },
   computed: {
     user_id() {
       return this.$route.params.user_id
+    },
+    user_profile_url() {
+      if (!VUE_APP_USER_MANAGER_FRONT_URL) return
+      return `${VUE_APP_USER_MANAGER_FRONT_URL}/users/${this.user_id}`
     },
   },
 }
