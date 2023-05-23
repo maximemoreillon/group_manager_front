@@ -23,6 +23,8 @@ spec:
           env:
             - name: VUE_APP_IDENTIFICATION_URL
               value: https://api.users.maximemoreillon.com/users/self
+            - name: VUE_APP_GROUP_MANAGER_API_URL
+              value: https://api.groups.maximemoreillon.com
 ---
 apiVersion: v1
 kind: Service
