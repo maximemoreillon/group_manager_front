@@ -6,9 +6,9 @@ variables:
   APPLICATION_NAME: group-manager-front
   CONTAINER_IMAGE: ${DOCKER_HUB_USERNAME}/${APPLICATION_NAME}
   CONTAINER_IMAGE_LATEST: ${CONTAINER_IMAGE}:latest
-  CONTAINER_IMAGE_TAGGED: ${CONTAINER_IMAGE}:${CI_COMMIT_SHORT_SHA}
+  CONTAINER_IMAGE_TAGGED: ${CONTAINER_IMAGE}:${CI_COMMIT_TAG}
   K8S_INGRESS_HOST: groups.maximemoreillon.com
-  
+
 image: moreillon/ci-dind
 services:
   - name: docker:19.03.12-dind
@@ -18,7 +18,7 @@ build:
   tags:
     - dind
   only:
-    - master
+    - tags
   before_script:
     # Docker hub login
     - echo "${DOCKER_HUB_PASSWORD}" | docker login --username ${DOCKER_HUB_USERNAME} --password-stdin
@@ -37,7 +37,7 @@ build:
 
 deploy:
   only:
-    - master
+    - tags
   stage: deploy
   tags:
     - dind
