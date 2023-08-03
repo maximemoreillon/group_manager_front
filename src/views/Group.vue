@@ -18,7 +18,7 @@
               v-if="current_user_is_member_of_group"
               @click="leave_group()"
             >
-              <v-icon left>mdi-account-multiple-minus</v-icon>
+              <v-icon left>mdi-location-exit</v-icon>
               <span>{{ $t("Leave") }}</span>
             </v-btn>
             <v-btn
@@ -27,7 +27,7 @@
               :disabled="group.restricted"
               @click="join_group()"
             >
-              <v-icon left>mdi-account-multiple-plus</v-icon>
+              <v-icon left>mdi-location-enter</v-icon>
               <span>{{ $t("Join") }}</span>
             </v-btn>
           </v-col>
