@@ -42,6 +42,7 @@ export default {
   data() {
     return {
       error_message: null,
+      creating: false,
       group: {
         name: "",
       },
@@ -54,7 +55,7 @@ export default {
     create_group() {
       if (!this.$refs.form.validate()) return
       this.error_message = null
-
+      this.creating = true
       const url = `/v3/groups`
       const parent = this.$route.query.parent
       const group = { ...this.group, parent }
@@ -67,6 +68,9 @@ export default {
         .catch((error) => {
           console.error(error)
           if (error.response) this.error_message = error.response.data
+        })
+        .finally(() => {
+          this.creating = false
         })
     },
   },

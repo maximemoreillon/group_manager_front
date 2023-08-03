@@ -215,7 +215,7 @@ export default {
       groups_tab: null,
       groups_officiality_tab: null,
 
-      // Used to check if user is member of admin
+      // Used to check if user is member or admin
       // NOT IDEAL
       members: [],
       administrators: [],
@@ -298,7 +298,6 @@ export default {
 
     join_group() {
       this.joining = true
-      // const url = `/v3/groups/${this.group_id}/join`
       const url = `/v3/groups/${this.group_id}/members`
       const body = { user_id: "self" }
       this.axios
