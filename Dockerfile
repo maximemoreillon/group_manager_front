@@ -13,4 +13,4 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 # Loading environment variables at runtime
 COPY env_replace.sh /docker-entrypoint.d/
-RUN chmod +x /docker-entrypoint.d/entrypoint.sh
+RUN chmod +x /docker-entrypoint.d/env_replace.sh

@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>Group manager GUI</v-card-title>
-    <v-card-subtitle> v {{ version }} </v-card-subtitle>
+    <v-card-subtitle> v{{ version }} </v-card-subtitle>
     <v-card-text>
       GUI for the group management microservice. Developed and maintained by
       <a href="https://maximemoreillon.com">Maxime Moreillon</a>
