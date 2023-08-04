@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@moreillon/vue_application_template_vuetify": "^2.1.1",
-    "@moreillon/vue_group_picker": "^5.0.4",
-    "@moreillon/vue_user_picker": "^5.0.4",
+    "@moreillon/vue_group_picker": "^5.0.11",
+    "@moreillon/vue_user_picker": "^5.0.8",
     "axios": "^0.24.0",
     "core-js": "^3.22.8",
     "npm": "^8.12.0",
