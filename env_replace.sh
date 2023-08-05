@@ -13,6 +13,3 @@ do
   sed -i 's|VUE_APP_USER_MANAGER_FRONT_URL_PLACEHOLDER|'${VUE_APP_USER_MANAGER_FRONT_URL}'|g' $file
 
 done
-
-echo "Starting Nginx"
-nginx -g 'daemon off;'
