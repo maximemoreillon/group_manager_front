@@ -70,7 +70,7 @@ export default {
     }
   },
   mounted() {
-    this.get_groups()
+    // this.get_groups()
   },
   watch: {
     shallow() {
