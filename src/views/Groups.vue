@@ -1,9 +1,9 @@
 <template>
   <v-card max-width="60em" class="mx-auto">
     <v-toolbar flat>
-      <v-toolbar-title>{{ $t("Group browser") }}</v-toolbar-title>
+      <v-toolbar-title>{{ $t("Groups") }}</v-toolbar-title>
       <v-spacer />
-      <v-btn exact :to="{ name: 'CreateGroup' }">
+      <v-btn exact :to="{ name: 'CreateGroup' }" color="primary">
         <v-icon left>mdi-account-multiple-plus</v-icon>
         <span>{{ $t("Create group") }}</span>
       </v-btn>
