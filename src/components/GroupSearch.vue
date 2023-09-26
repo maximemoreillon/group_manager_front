@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-form @submit.prevent="get_groups()">
-      <v-row align="center">
+      <v-row align="center" dense>
         <v-col>
           <v-text-field v-model="search" label="Group name" />
         </v-col>
@@ -10,9 +10,17 @@
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-col>
-        <v-spacer />
+      </v-row>
+      <v-row align="center" dense>
         <v-col cols="auto">
           <v-switch v-model="shallow" label="Direct" />
+        </v-col>
+        <v-spacer />
+        <v-col cols="auto">
+          <v-checkbox label="Official" v-model="official" />
+        </v-col>
+        <v-col cols="auto">
+          <v-checkbox label="Non-official" v-model="nonofficial" />
         </v-col>
       </v-row>
     </v-form>
@@ -63,6 +71,8 @@ export default {
       loading: false,
       search: "",
       shallow: false,
+      official: true,
+      nonofficial: true,
       groups: [],
       total: 0,
       options: {},
@@ -85,6 +95,12 @@ export default {
     shallow() {
       this.get_groups()
     },
+    official() {
+      this.get_groups()
+    },
+    nonofficial() {
+      this.get_groups()
+    },
   },
   methods: {
     async get_groups() {
@@ -94,10 +110,13 @@ export default {
         const { itemsPerPage, page } = this.options
         const params = {
           search: this.search,
-          shallow: this.shallow ? true : undefined, // do not send if not true
           batch_size: itemsPerPage,
           start_index: (page - 1) * itemsPerPage,
         }
+        if (this.shallow) params.shallow = this.shallow
+        if (!this.official) params.nonofficial = true
+        if (!this.nonofficial) params.official = true
+
         const {
           data: { count, items },
         } = await this.axios.get("/v3/groups", { params })
