@@ -61,7 +61,7 @@ export default {
       groups: [],
       total: 0,
       options: {},
-      footerProps: { "items-per-page-options": [3, 100, 500, -1] },
+      footerProps: { "items-per-page-options": [50, 100, 500, -1] },
       headers: [
         { value: "image", text: "Avatar" },
         { value: "name", text: "Name" },
@@ -83,7 +83,12 @@ export default {
       try {
         this.loading = true
         this.groups = []
-        const params = { search: this.search }
+        const { itemsPerPage, page } = this.options
+        const params = {
+          search: this.search,
+          batch_size: itemsPerPage,
+          start_index: (page - 1) * itemsPerPage,
+        }
         const {
           data: { count, items },
         } = await this.axios.get("/v3/groups", { params })
