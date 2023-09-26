@@ -7,25 +7,48 @@
         <v-icon left>mdi-account-multiple-plus</v-icon>
         <span>{{ $t("Create group") }}</span>
       </v-btn>
+      <template v-slot:extension>
+        <v-tabs v-model="tab">
+          <v-tab>{{ $t("Browse") }}</v-tab>
+          <v-tab>{{ $t("Search") }}</v-tab>
+        </v-tabs>
+      </template>
     </v-toolbar>
     <v-divider />
 
     <v-card-text>
-      <GroupPicker
-        :usersWithNoGroup="false"
-        @selection="group_selected($event)"
-      />
+      <v-tabs-items v-model="tab">
+        <v-tab-item>
+          <GroupPicker
+            :usersWithNoGroup="false"
+            @selection="group_selected($event)"
+          />
+        </v-tab-item>
+        <v-tab-item>
+          <v-card outlined>
+            <v-card-text>
+              <GroupSearch />
+            </v-card-text>
+          </v-card>
+        </v-tab-item>
+      </v-tabs-items>
     </v-card-text>
   </v-card>
 </template>
 
 <script>
 import GroupPicker from "@moreillon/vue_group_picker"
-
+import GroupSearch from "../components/GroupSearch.vue"
 export default {
   name: "Groups",
   components: {
     GroupPicker,
+    GroupSearch,
+  },
+  data() {
+    return {
+      tab: null,
+    }
   },
   methods: {
     group_selected(group) {
