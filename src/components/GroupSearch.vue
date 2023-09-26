@@ -13,7 +13,7 @@
       </v-row>
       <v-row align="center" dense>
         <v-col cols="auto">
-          <v-switch v-model="shallow" label="Direct" />
+          <v-switch v-model="subgroups" label="Include subgroups" />
         </v-col>
         <v-spacer />
         <v-col cols="auto">
@@ -70,7 +70,7 @@ export default {
     return {
       loading: false,
       search: "",
-      shallow: false,
+      subgroups: true,
       official: true,
       nonofficial: true,
       groups: [],
@@ -92,7 +92,7 @@ export default {
       },
       deep: true,
     },
-    shallow() {
+    subgroups() {
       this.get_groups()
     },
     official() {
@@ -113,7 +113,7 @@ export default {
           batch_size: itemsPerPage,
           start_index: (page - 1) * itemsPerPage,
         }
-        if (this.shallow) params.shallow = this.shallow
+        if (!this.subgroups) params.shallow = true
         if (!this.official) params.nonofficial = true
         if (!this.nonofficial) params.official = true
 

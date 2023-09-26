@@ -12,10 +12,10 @@
   >
     <template v-slot:[`top`]>
       <v-row align="center">
-        <v-spacer />
         <v-col cols="auto">
-          <v-switch v-model="options.direct" label="Direct only" />
+          <v-switch v-model="options.subgroups" label="Include subgroups" />
         </v-col>
+        <v-spacer />
         <v-col cols="auto">
           <AddGroupDialog :as="group_type" @groupAdd="add_group($event)" />
         </v-col>
@@ -74,7 +74,7 @@ export default {
       loading: false,
       groups: [],
       total: 0,
-      options: { direct: true },
+      options: { subgroups: true },
       footerProps: { "items-per-page-options": [50, 100, 500, -1] },
       base_headers: [
         { value: "image", text: "Logo" },
@@ -108,11 +108,11 @@ export default {
           ? `/v3/groups/${this.group_id}/parents`
           : `/v3/groups/${this.group_id}/groups`
 
-      const { itemsPerPage, page, direct } = this.options
+      const { itemsPerPage, page, subgroups } = this.options
       const params = {
         batch_size: itemsPerPage,
         start_index: (page - 1) * itemsPerPage,
-        direct: direct ? true : undefined, // do not send if not true SUPER DIRTY
+        direct: subgroups ? undefined : true,
       }
 
       this.axios

@@ -29,7 +29,7 @@
           <v-tab>{{ $t("As administrator") }}</v-tab>
         </v-tabs>
         <v-spacer />
-        <v-switch v-model="shallow" label="Direct" />
+        <v-switch v-model="subgroups" label="Subgroups" />
       </template>
     </v-toolbar>
     <v-divider />
@@ -57,7 +57,7 @@
                   <GroupsOfUser
                     :official="officiality === 'official'"
                     :nonofficial="officiality === 'nonofficial'"
-                    :shallow="shallow"
+                    :shallow="!subgroups"
                     :as="relationship"
                   />
                 </v-tab-item>
@@ -86,7 +86,7 @@ export default {
       loading: false,
       relation_tab: null,
       officiality_tab: null,
-      shallow: false,
+      subgroups: false,
     }
   },
   mounted() {
