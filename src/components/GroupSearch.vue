@@ -10,6 +10,10 @@
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-col>
+        <v-spacer />
+        <v-col cols="auto">
+          <v-switch v-model="shallow" label="Direct" />
+        </v-col>
       </v-row>
     </v-form>
     <v-data-table
@@ -58,6 +62,7 @@ export default {
     return {
       loading: false,
       search: "",
+      shallow: false,
       groups: [],
       total: 0,
       options: {},
@@ -77,6 +82,9 @@ export default {
       },
       deep: true,
     },
+    shallow() {
+      this.get_groups()
+    },
   },
   methods: {
     async get_groups() {
@@ -86,6 +94,7 @@ export default {
         const { itemsPerPage, page } = this.options
         const params = {
           search: this.search,
+          shallow: this.shallow ? true : undefined, // do not send if not true
           batch_size: itemsPerPage,
           start_index: (page - 1) * itemsPerPage,
         }
