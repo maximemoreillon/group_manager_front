@@ -16,7 +16,7 @@
 
         <v-spacer />
         <v-col cols="auto">
-          <v-btn exact :to="{ name: 'CreateGroup' }">
+          <v-btn exact :to="{ name: 'CreateGroup' }" color="primary">
             <v-icon left>mdi-account-multiple-plus</v-icon>
             <span>{{ $t("Create group") }}</span>
           </v-btn>
