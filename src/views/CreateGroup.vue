@@ -25,7 +25,7 @@
             />
           </v-col>
           <v-col cols="auto">
-            <v-btn type="submit" :disabled="!valid">
+            <v-btn type="submit" :disabled="!valid" color="primary">
               <v-icon left>mdi-account-multiple-plus</v-icon>
               <span>{{ $t("Create") }}</span>
             </v-btn>
