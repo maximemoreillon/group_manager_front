@@ -1,8 +1,8 @@
 <template lang="html">
   <v-dialog width="50vw" v-model="dialog">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn color="primary" dark v-bind="attrs" v-on="on">
-        <v-icon left>mdi-account-multiple-remove</v-icon>
+      <v-btn outlined v-bind="attrs" v-on="on">
+        <v-icon left>mdi-delete</v-icon>
         <span>{{ $t("Delete") }}</span>
       </v-btn>
     </template>

@@ -63,7 +63,7 @@ export default {
       options: {},
       footerProps: { "items-per-page-options": [50, 100, 500, -1] },
       headers: [
-        { value: "image", text: "Avatar" },
+        { value: "image", text: "", width: "50px" },
         { value: "name", text: "Name" },
         { value: "restricted", text: "Restricted" },
       ],
@@ -122,5 +122,3 @@ export default {
   },
 }
 </script>
-
-<style lang="css" scoped></style>

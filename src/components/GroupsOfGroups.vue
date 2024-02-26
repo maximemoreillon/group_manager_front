@@ -77,7 +77,7 @@ export default {
       options: { subgroups: true },
       footerProps: { "items-per-page-options": [50, 100, 500, -1] },
       base_headers: [
-        { value: "image", text: "Logo" },
+        { value: "image", text: "", width: "50px" },
         { value: "name", text: "Name" },
         { value: "official", text: "Official" },
         { value: "restricted", text: "Restricted" },
@@ -192,5 +192,3 @@ export default {
   },
 }
 </script>
-
-<style lang="css" scoped></style>

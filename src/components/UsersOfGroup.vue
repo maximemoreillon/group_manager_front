@@ -86,7 +86,7 @@ export default {
       options: {},
       footerProps: { "items-per-page-options": [50, 100, 500, -1] },
       base_headers: [
-        { value: "avatar", text: "" },
+        { value: "avatar", text: "", width: "50px" },
         { value: "name", text: "Name" },
       ],
       admin_headers: [{ value: "remove", text: "Remove" }],

@@ -1,31 +1,14 @@
 <template>
   <v-dialog width="90vw" v-model="dialog">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn color="black" dark v-bind="attrs" v-on="on">
-        <v-icon>mdi-account-plus</v-icon>
-        <span class="ml-2">Add {{ as || "user" }}</span>
+      <v-btn color="primary" v-bind="attrs" v-on="on">
+        <v-icon left>mdi-account-plus</v-icon>
+        <span>Add {{ as || "user" }}</span>
       </v-btn>
     </template>
 
     <v-card>
-      <v-toolbar flat>
-        <v-row align="center">
-          <v-col cols="auto">
-            <v-toolbar-title>Add {{ as || "user" }}</v-toolbar-title>
-          </v-col>
-
-          <v-spacer />
-          <v-col cols="auto">
-            <v-btn @click="dialog = false"> Cancel </v-btn>
-          </v-col>
-          <v-col cols="auto">
-            <v-btn dark @click="add_selected_users()">
-              Add selected users
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-toolbar>
-      <v-divider />
+      <v-card-title flat> Add {{ as || "user" }} </v-card-title>
 
       <v-card-text class="mt-3">
         <UserPicker class="picker_container" @selection="add_user($event)" />
@@ -69,6 +52,13 @@
           </v-card-text>
         </v-card>
       </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn @click="dialog = false"> Cancel </v-btn>
+        <v-btn color="primary" @click="add_selected_users()">
+          Add selected users
+        </v-btn>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>

@@ -1,67 +1,52 @@
 <template>
-  <v-dialog
-      v-model="dialog"
-      width="70vw">
+  <v-dialog v-model="dialog" width="70vw">
+    <template v-slot:activator="{ on, attrs }">
+      <v-btn color="primary" dark v-bind="attrs" v-on="on">
+        <v-icon left>mdi-account-multiple-plus</v-icon>
+        <span>Add {{ as || "group" }} group</span>
+      </v-btn>
+    </template>
 
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn
-          color="black"
-          dark
-          v-bind="attrs"
-          v-on="on" >
-          <v-icon>mdi-account-multiple-plus</v-icon>
-          <span class="ml-2">Add {{as || 'group'}} group</span>
-        </v-btn>
-      </template>
+    <v-card>
+      <v-card-title>Add {{ as || "group" }} group</v-card-title>
 
-      <v-card>
-        <v-card-title>Add {{as || 'group'}} group</v-card-title>
+      <v-card-text>
+        <GroupPicker @selection="group_selected($event)" />
+      </v-card-text>
 
-        <v-card-text>
-          <GroupPicker
-            @selection="group_selected($event)"/>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            text
-            @click="dialog = false">
-            Close
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" text @click="dialog = false"> Close </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
-import GroupPicker from '@moreillon/vue_group_picker'
+import GroupPicker from "@moreillon/vue_group_picker"
 
 export default {
-  name: 'AddGroupDialog',
+  name: "AddGroupDialog",
   components: {
-    GroupPicker
+    GroupPicker,
   },
   props: {
     as: String,
   },
-  data(){
+  data() {
     return {
       dialog: false,
     }
   },
 
   methods: {
-    group_selected(group){
+    group_selected(group) {
       const _id = group._id || group.properties._id
-      this.$emit('groupAdd', {_id})
+      this.$emit("groupAdd", { _id })
       this.dialog = false
     },
-  }
+  },
 }
 </script>
 
-<style lang="css" scoped>
-</style>
+<style lang="css" scoped></style>
