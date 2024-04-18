@@ -5,7 +5,7 @@ import store from "./store"
 import vuetify from "./plugins/vuetify"
 import axios from "axios"
 import VueAxios from "vue-axios"
-import i18n from "./i18n"
+import i18n from "./plugins/i18n"
 
 axios.defaults.baseURL = process.env.VUE_APP_GROUP_MANAGER_API_URL
 
