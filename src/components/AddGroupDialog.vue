@@ -11,7 +11,10 @@
       <v-card-title>Add {{ as || "group" }} group</v-card-title>
 
       <v-card-text>
-        <GroupPicker @selection="group_selected($event)" />
+        <GroupPicker
+          @selection="group_selected($event)"
+          :groupManagerApiUrl="groupManagerApiUrl"
+        />
       </v-card-text>
 
       <v-card-actions>
@@ -25,6 +28,8 @@
 <script>
 import GroupPicker from "@moreillon/vue_group_picker"
 
+const { VUE_APP_GROUP_MANAGER_API_URL } = process.env
+
 export default {
   name: "AddGroupDialog",
   components: {
@@ -36,6 +41,7 @@ export default {
   data() {
     return {
       dialog: false,
+      groupManagerApiUrl: VUE_APP_GROUP_MANAGER_API_URL,
     }
   },
 

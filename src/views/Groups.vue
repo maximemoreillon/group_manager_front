@@ -20,6 +20,7 @@
       <v-tabs-items v-model="tab">
         <v-tab-item>
           <GroupPicker
+            :groupManagerApiUrl="groupManagerApiUrl"
             :usersWithNoGroup="false"
             @selection="group_selected($event)"
           />
@@ -39,6 +40,9 @@
 <script>
 import GroupPicker from "@moreillon/vue_group_picker"
 import GroupSearch from "../components/GroupSearch.vue"
+
+const { VUE_APP_GROUP_MANAGER_API_URL } = process.env
+
 export default {
   name: "Groups",
   components: {
@@ -48,6 +52,7 @@ export default {
   data() {
     return {
       tab: null,
+      groupManagerApiUrl: VUE_APP_GROUP_MANAGER_API_URL,
     }
   },
   methods: {
