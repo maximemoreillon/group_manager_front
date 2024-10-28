@@ -34,6 +34,9 @@ const {
   VUE_APP_IDENTIFICATION_URL,
   VUE_APP_HOMEPAGE_URL,
   VUE_APP_LOGIN_HINT,
+  VUE_APP_OIDC_AUTHORITY,
+  VUE_APP_OIDC_CLIENT_ID,
+  VUE_APP_OIDC_AUDIENCE,
 } = process.env
 
 export default {
@@ -51,6 +54,13 @@ export default {
       identification_url: VUE_APP_IDENTIFICATION_URL,
       homepage_url: VUE_APP_HOMEPAGE_URL,
       login_hint: VUE_APP_LOGIN_HINT,
+      oidc: {
+        authority: VUE_APP_OIDC_AUTHORITY,
+        client_id: VUE_APP_OIDC_CLIENT_ID,
+        extraQueryParams: {
+          audience: VUE_APP_OIDC_AUDIENCE,
+        },
+      },
     },
   }),
 
