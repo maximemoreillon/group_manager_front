@@ -29,7 +29,12 @@
 import AppTemplate from "@moreillon/vue_application_template_vuetify"
 import LocaleSelector from "./components/LocaleSelector.vue"
 
-const { VUE_APP_LOGIN_URL, VUE_APP_IDENTIFICATION_URL } = process.env
+const {
+  VUE_APP_LOGIN_URL,
+  VUE_APP_IDENTIFICATION_URL,
+  VUE_APP_HOMEPAGE_URL,
+  VUE_APP_LOGIN_HINT,
+} = process.env
 
 export default {
   name: "App",
@@ -44,6 +49,8 @@ export default {
       title: "Group manager",
       login_url: VUE_APP_LOGIN_URL,
       identification_url: VUE_APP_IDENTIFICATION_URL,
+      homepage_url: VUE_APP_HOMEPAGE_URL,
+      login_hint: VUE_APP_LOGIN_HINT,
     },
   }),
 
