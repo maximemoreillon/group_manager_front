@@ -15,33 +15,13 @@ services:
 
 build:
   stage: build
-  tags:
-    - dind
   only:
     - tags
   before_script:
-    # Docker hub login
     - echo "${DOCKER_HUB_PASSWORD}" | docker login --username ${DOCKER_HUB_USERNAME} --password-stdin
   script:
-    # Buikd and push container image
     - docker build -t ${CONTAINER_IMAGE} .
-    # Tagging
     - docker tag ${CONTAINER_IMAGE} ${CONTAINER_IMAGE_TAGGED}
     - docker tag ${CONTAINER_IMAGE} ${CONTAINER_IMAGE_LATEST}
-    # Pushing
     - docker push ${CONTAINER_IMAGE_TAGGED}
     - docker push ${CONTAINER_IMAGE_LATEST}
-    # Cleanup
-    - docker image rm ${CONTAINER_IMAGE_TAGGED}
-    - docker image rm ${CONTAINER_IMAGE_LATEST}
-
-deploy:
-  only:
-    - tags
-  stage: deploy
-  tags:
-    - dind
-  before_script:
-    - kubectl config use-context moreillon_ci/moreillon_k8s/kubernetes-agent:cloud
-  script:
-    - envsubst < kubernetes_manifest.yml | kubectl apply -n ${KUBERNETES_NAMESPACE} -f -
