@@ -1,6 +1,3 @@
-stages:
-  - build
-
 variables:
   APPLICATION_NAME: group-manager-front
   CONTAINER_IMAGE: ${DOCKER_HUB_USERNAME}/${APPLICATION_NAME}
@@ -12,7 +9,7 @@ image: moreillon/ci-dind
 services:
   - name: docker:24.0.7-dind
 
-build:
+build-job:
   stage: build
   only:
     - tags
