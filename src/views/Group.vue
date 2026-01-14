@@ -343,7 +343,12 @@ export default {
           console.error(error)
         })
     },
+    matches_current_user(entity) {
+      const id = this.current_user_identifier
+      if (!id) return false
 
+      return entity._id === id || entity.username === id
+    },
     get_administrators() {
       // Currently not related to the administrators table
       // Simply used to check if user is administrator
@@ -368,15 +373,21 @@ export default {
     current_user() {
       return this.$store.state.current_user
     },
-    current_user_id() {
-      if (!this.current_user) return undefined
-      return this.current_user._id || this.current_user.properties._id
+    current_user_identifier() {
+      const user = this.current_user
+      if (!user) return undefined
+
+      return (
+        user._id ||
+        user.preferred_username ||
+        user?.properties?._id
+      )
     },
     current_user_is_member_of_group() {
-      return this.members.some(({ _id }) => _id === this.current_user_id)
+      return this.members.some(this.matches_current_user)
     },
     current_user_is_administrator_of_group() {
-      return this.administrators.some(({ _id }) => _id === this.current_user_id)
+      return this.administrators.some(this.matches_current_user)
     },
     current_user_has_admin_rights() {
       return (
