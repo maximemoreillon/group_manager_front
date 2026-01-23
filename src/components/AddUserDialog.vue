@@ -11,7 +11,7 @@
       <v-card-title flat> Add {{ as || "user" }} </v-card-title>
 
       <v-card-text class="mt-3">
-        <UserPicker class="picker_container" @selection="add_user($event)" />
+        <UserPicker class="picker_container" @selection="add_user($event)" :accessToken="access_token" />
       </v-card-text>
 
       <v-card-text>
@@ -19,11 +19,7 @@
           <v-card-title>Selected users</v-card-title>
           <v-card-text>
             <v-row>
-              <v-col
-                cols="auto"
-                v-for="(user, index) in selected_users"
-                :key="user._id"
-              >
+              <v-col cols="auto" v-for="(user, index) in selected_users" :key="user._id">
                 <v-chip close @click:close="remove_user(index)">
                   {{ user.display_name || user.username }}
                 </v-chip>
@@ -113,6 +109,9 @@ export default {
     group_id() {
       return this.$route.params.group_id
     },
+    access_token() {
+      return this.$store.state.tokens.access_token
+    }
   },
 }
 </script>

@@ -6,10 +6,14 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     current_user: null,
+    tokens: null,
   },
   mutations: {
     set_current_user(state, user) {
-      state.current_user = user.profile;
+      state.current_user = user.profile || user;
+    },
+    set_tokens(state, tokens) {
+      state.tokens = tokens;
     },
   },
   actions: {},
