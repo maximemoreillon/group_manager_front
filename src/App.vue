@@ -1,17 +1,12 @@
 <template>
-  <AppTemplate :options="options" @user="get_user($event)">
+  <AppTemplate :options="options" @user="handleUserEvent($event)" @tokens="handleTokensEvent($event)">
     <template v-slot:nav>
       <v-list dense nav>
         <v-list-item>
           <LocaleSelector />
         </v-list-item>
         <v-divider />
-        <v-list-item
-          v-for="(item, index) in nav"
-          :key="`nav_item_${index}`"
-          :to="item.to"
-          exact
-        >
+        <v-list-item v-for="(item, index) in nav" :key="`nav_item_${index}`" :to="item.to" exact>
           <v-list-item-icon>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-icon>
@@ -65,8 +60,11 @@ export default {
   }),
 
   methods: {
-    get_user(user) {
+    handleUserEvent(user) {
       this.$store.commit("set_current_user", user)
+    },
+    handleTokensEvent(tokens) {
+      this.$store.commit("set_tokens", tokens)
     },
   },
   computed: {
