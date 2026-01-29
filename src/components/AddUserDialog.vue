@@ -110,7 +110,7 @@ export default {
       return this.$route.params.group_id
     },
     access_token() {
-      return this.$store.state.tokens.access_token
+      return this.$store.state.tokens?.access_token
     }
   },
 }
