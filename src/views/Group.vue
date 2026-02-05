@@ -260,24 +260,6 @@ export default {
           this.loading = false
         })
     },
-
-    delete_group() {
-      if (!confirm(`Delete group ${this.group.name}?`)) return
-      this.deleting = true
-      const url = `/v3/groups/${this.group_id}`
-      this.axios
-        .delete(url)
-        .then(() => {
-          this.$router.push({ name: "UserGroups", params: { user_id: "self" } })
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-        .finally(() => {
-          this.deleting = false
-        })
-    },
-
     update_group() {
       this.updating = true
       const url = `/v3/groups/${this.group_id}`

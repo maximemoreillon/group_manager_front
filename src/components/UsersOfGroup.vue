@@ -125,23 +125,6 @@ export default {
           this.loading = false
         })
     },
-    add_user(user) {
-      if (!this.currentUserHasAdminRights)
-        return alert(
-          `This action can only be performed by group administrators`
-        )
-      const user_id = user._id || user.properties._id // for old picker
-      const url = `/v3/groups/${this.group_id}/${this.user_type}`
-      const body = { user_id }
-      this.axios
-        .post(url, body)
-        .then(() => {
-          this.$emit("usersChanged")
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    },
     remove_user(user) {
       if (!this.currentUserHasAdminRights)
         return alert(
