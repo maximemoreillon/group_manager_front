@@ -62,9 +62,22 @@ export default {
   methods: {
     handleUserEvent(user) {
       this.$store.commit("set_current_user", user)
+      this.get_admins()
+
     },
     handleTokensEvent(tokens) {
       this.$store.commit("set_tokens", tokens)
+    },
+    get_admins() {
+      const url = `/v3/system/administrators`
+      this.axios
+        .get(url)
+        .then(({ data }) => {
+          this.$store.commit("set_admins", data)
+        })
+        .catch((error) => {
+          console.error(error)
+        })
     },
   },
   computed: {

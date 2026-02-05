@@ -110,11 +110,7 @@
                   </v-col>
 
                   <v-col>
-                    <v-switch
-                      :disabled="!current_user.isAdmin"
-                      v-model="group.official"
-                      :label="$t('Official')"
-                    />
+                    <v-switch :disabled="!current_user_is_admin" v-model="group.official" :label="$t('Official')" />
                   </v-col>
                 </v-row>
               </v-col>
@@ -198,6 +194,8 @@
 import DeleteGroupDialog from "@/components/DeleteGroupDialog.vue"
 import GroupsOfGroups from "@/components/GroupsOfGroups.vue"
 import UsersOfGroup from "@/components/UsersOfGroup.vue"
+import IdUtils from '@/mixins/IdUtils'
+import adminMixin from '@/mixins/adminUtils'
 
 export default {
   name: "Group",
@@ -206,6 +204,7 @@ export default {
     GroupsOfGroups,
     DeleteGroupDialog,
   },
+  mixins: [IdUtils, adminMixin],
   data() {
     return {
       group: null,
@@ -344,7 +343,7 @@ export default {
         })
     },
     matches_current_user(entity) {
-      const id = this.current_user_identifier
+      const id = this.current_user_id
       if (!id) return false
 
       return entity._id === id || entity.username === id
@@ -370,19 +369,6 @@ export default {
     group_id() {
       return this.$route.params.group_id
     },
-    current_user() {
-      return this.$store.state.current_user
-    },
-    current_user_identifier() {
-      const user = this.current_user
-      if (!user) return undefined
-
-      return (
-        user._id ||
-        user.preferred_username ||
-        user?.properties?._id
-      )
-    },
     current_user_is_member_of_group() {
       return this.members.some(this.matches_current_user)
     },
@@ -391,7 +377,7 @@ export default {
     },
     current_user_has_admin_rights() {
       return (
-        this.current_user_is_administrator_of_group || this.current_user.isAdmin
+        this.current_user_is_administrator_of_group || this.current_user_is_admin
       )
     },
     modified_properties() {
