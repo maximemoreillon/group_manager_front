@@ -14,28 +14,25 @@
     </template>
 
     <template #item.name="{ item }">
-      <router-link :to="{ name: 'Group', params: { group_id: item._id } }">{{ item.name }}</router-link>
+      <span class="text-primary cursor-pointer" @click="$emit('selection', item)">{{ item.name }}</span>
     </template>
 
     <template #item.restricted="{ item }">
       <v-icon v-if="item.restricted">mdi-lock</v-icon>
     </template>
+
+    <template #item.official="{ item }">
+      <v-icon v-if="item.official">mdi-check</v-icon>
+    </template>
   </v-data-table-server>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref } from 'vue'
 import api from '@/api'
 
-const props = defineProps<{
-  as: string
-  shallow: boolean
-  official: boolean
-  nonofficial: boolean
-}>()
+defineEmits<{ selection: [group: any] }>()
 
-const route = useRoute()
 const loading = ref(false)
 const groups = ref<any[]>([])
 const total = ref(0)
@@ -44,24 +41,18 @@ const itemsPerPageOptions = [50, 100, 500, -1]
 const headers = [
   { key: 'image', title: '', width: '50px', sortable: false },
   { key: 'name', title: 'Name', sortable: false },
+  { key: 'official', title: 'Official', sortable: false },
   { key: 'restricted', title: 'Restricted', sortable: false },
 ]
 
-const userId = computed(() => route.params.user_id as string)
-
-let lastOptions = { page: 1, itemsPerPage: 50 }
-
 async function loadGroups({ page, itemsPerPage }: { page: number; itemsPerPage: number }) {
-  lastOptions = { page, itemsPerPage }
   loading.value = true
+  groups.value = []
   try {
-    const { data } = await api.get(`/v3/${props.as}s/${userId.value}/groups`, {
+    const { data } = await api.get('/v3/groups', {
       params: {
         batch_size: itemsPerPage,
         start_index: (page - 1) * itemsPerPage,
-        shallow: props.shallow ? true : undefined,
-        official: props.official ? true : undefined,
-        nonofficial: props.nonofficial ? true : undefined,
       },
     })
     total.value = data.count
@@ -72,6 +63,4 @@ async function loadGroups({ page, itemsPerPage }: { page: number; itemsPerPage: 
     loading.value = false
   }
 }
-
-watch([() => props.shallow, userId], () => loadGroups(lastOptions))
 </script>

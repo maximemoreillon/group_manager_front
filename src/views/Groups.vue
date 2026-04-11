@@ -1,65 +1,47 @@
 <template>
   <v-card max-width="60em" class="mx-auto">
     <v-toolbar flat>
-      <v-toolbar-title>{{ $t("Groups") }}</v-toolbar-title>
+      <v-toolbar-title>{{ $t('Groups') }}</v-toolbar-title>
       <v-spacer />
       <v-btn exact :to="{ name: 'CreateGroup' }" color="primary">
-        <v-icon left>mdi-account-multiple-plus</v-icon>
-        <span>{{ $t("Create group") }}</span>
+        <v-icon start>mdi-account-multiple-plus</v-icon>
+        {{ $t('Create group') }}
       </v-btn>
-      <template v-slot:extension>
+      <template #extension>
         <v-tabs v-model="tab">
-          <v-tab>{{ $t("Browse") }}</v-tab>
-          <v-tab>{{ $t("Search") }}</v-tab>
+          <v-tab value="browse">{{ $t('Browse') }}</v-tab>
+          <v-tab value="search">{{ $t('Search') }}</v-tab>
         </v-tabs>
       </template>
     </v-toolbar>
     <v-divider />
-
     <v-card-text>
-      <v-tabs-items v-model="tab">
-        <v-tab-item>
-          <GroupPicker
-            :groupManagerApiUrl="groupManagerApiUrl"
-            :usersWithNoGroup="false"
-            @selection="group_selected($event)"
-          />
-        </v-tab-item>
-        <v-tab-item>
-          <v-card outlined>
+      <v-window v-model="tab">
+        <v-window-item value="browse">
+          <GroupList @selection="groupSelected" />
+        </v-window-item>
+        <v-window-item value="search">
+          <v-card variant="outlined">
             <v-card-text>
-              <GroupSearch />
+              <GroupSearch @selection="groupSelected" />
             </v-card-text>
           </v-card>
-        </v-tab-item>
-      </v-tabs-items>
+        </v-window-item>
+      </v-window>
     </v-card-text>
   </v-card>
 </template>
 
-<script>
-import GroupPicker from "@moreillon/vue_group_picker"
-import GroupSearch from "../components/GroupSearch.vue"
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import GroupList from '@/components/GroupList.vue'
+import GroupSearch from '@/components/GroupSearch.vue'
 
-const { VUE_APP_GROUP_MANAGER_API_URL } = process.env
+const router = useRouter()
+const tab = ref('browse')
 
-export default {
-  name: "Groups",
-  components: {
-    GroupPicker,
-    GroupSearch,
-  },
-  data() {
-    return {
-      tab: null,
-      groupManagerApiUrl: VUE_APP_GROUP_MANAGER_API_URL,
-    }
-  },
-  methods: {
-    group_selected(group) {
-      const group_id = group._id || group.properties._id
-      this.$router.push({ name: "Group", params: { group_id } })
-    },
-  },
+function groupSelected(group: { _id: string }) {
+  router.push({ name: 'Group', params: { group_id: group._id } })
 }
 </script>

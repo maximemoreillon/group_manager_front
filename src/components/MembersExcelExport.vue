@@ -1,53 +1,36 @@
-<template lang="html">
-  <v-btn :loading="loading" @click="excel_export()">
-    <v-icon left>mdi-file-excel</v-icon>
-    <span>{{ $t("Excel export") }}</span>
+<template>
+  <v-btn :loading="loading" @click="excelExport">
+    <v-icon start>mdi-file-excel</v-icon>
+    {{ $t('Excel export') }}
   </v-btn>
 </template>
 
-<script>
-import { utils, writeFile } from "xlsx"
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { utils, writeFile } from 'xlsx'
+import api from '@/api'
 
-export default {
-  name: "MembersExcelExport",
-  data() {
-    return {
-      loading: false,
-    }
-  },
-  props: {
-    user_type: String,
-  },
-  methods: {
-    excel_export() {
-      this.loading = true
-      const url = `/v3/groups/${this.group_id}/${this.user_type}`
-      const params = { batch_size: -1 } //arbitrarily large
-      this.axios
-        .get(url, { params })
-        .then(({ data: { items } }) => {
-          const workbook = utils.book_new()
-          const ws = utils.json_to_sheet(items)
-          utils.book_append_sheet(workbook, ws, "Sheet1")
-          writeFile(
-            workbook,
-            `group_${this.group_id}_${this.user_type}_export.xlsx`
-          )
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-        .finally(() => {
-          this.loading = false
-        })
-    },
-  },
-  computed: {
-    group_id() {
-      return this.$route.params.group_id
-    },
-  },
+const props = defineProps<{ user_type: string }>()
+const route = useRoute()
+
+const loading = ref(false)
+const groupId = computed(() => route.params.group_id as string)
+
+async function excelExport() {
+  loading.value = true
+  try {
+    const { data: { items } } = await api.get(`/v3/groups/${groupId.value}/${props.user_type}`, {
+      params: { batch_size: -1 },
+    })
+    const workbook = utils.book_new()
+    const ws = utils.json_to_sheet(items)
+    utils.book_append_sheet(workbook, ws, 'Sheet1')
+    writeFile(workbook, `group_${groupId.value}_${props.user_type}_export.xlsx`)
+  } catch (error) {
+    console.error(error)
+  } finally {
+    loading.value = false
+  }
 }
 </script>
-
-<style lang="css" scoped></style>

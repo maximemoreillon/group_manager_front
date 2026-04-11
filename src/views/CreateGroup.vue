@@ -1,33 +1,22 @@
 <template>
   <v-card max-width="60em" class="mx-auto">
     <v-toolbar flat>
-      <v-btn exact icon :to="{ name: 'Groups' }">
+      <v-btn icon exact :to="{ name: 'Groups' }">
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
-      <v-toolbar-title>{{ $t("Create group") }}</v-toolbar-title>
+      <v-toolbar-title>{{ $t('Create group') }}</v-toolbar-title>
     </v-toolbar>
     <v-divider />
-
     <v-card-text>
-      <v-form
-        @submit.prevent="create_group()"
-        ref="form"
-        v-model="valid"
-        lazy-validation
-      >
+      <v-form ref="form" v-model="valid" @submit.prevent="createGroup">
         <v-row align="center">
           <v-col>
-            <v-text-field
-              v-model="group.name"
-              label="Name"
-              :rules="nameRules"
-              required
-            />
+            <v-text-field v-model="group.name" label="Name" :rules="nameRules" required />
           </v-col>
           <v-col cols="auto">
-            <v-btn type="submit" :disabled="!valid" color="primary">
-              <v-icon left>mdi-account-multiple-plus</v-icon>
-              <span>{{ $t("Create") }}</span>
+            <v-btn type="submit" :disabled="!valid" :loading="creating" color="primary">
+              <v-icon start>mdi-account-multiple-plus</v-icon>
+              {{ $t('Create') }}
             </v-btn>
           </v-col>
         </v-row>
@@ -36,45 +25,32 @@
   </v-card>
 </template>
 
-<script>
-export default {
-  name: "Users",
-  data() {
-    return {
-      error_message: null,
-      creating: false,
-      group: {
-        name: "",
-      },
-      valid: false,
-      nameRules: [(v) => !!v || "Name is required"],
-    }
-  },
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import api from '@/api'
 
-  methods: {
-    create_group() {
-      if (!this.$refs.form.validate()) return
-      this.error_message = null
-      this.creating = true
-      const url = `/v3/groups`
-      const parent = this.$route.query.parent
-      const group = { ...this.group, parent }
+const router = useRouter()
+const route = useRoute()
 
-      this.axios
-        .post(url, group)
-        .then(({ data }) => {
-          this.$router.push({ name: "Group", params: { group_id: data._id } })
-        })
-        .catch((error) => {
-          console.error(error)
-          if (error.response) this.error_message = error.response.data
-        })
-        .finally(() => {
-          this.creating = false
-        })
-    },
-  },
+const form = ref()
+const valid = ref(false)
+const creating = ref(false)
+const group = ref({ name: '' })
+const nameRules = [(v: string) => !!v || 'Name is required']
+
+async function createGroup() {
+  const { valid: isValid } = await form.value.validate()
+  if (!isValid) return
+  creating.value = true
+  try {
+    const parent = route.query.parent as string | undefined
+    const { data } = await api.post('/v3/groups', { ...group.value, parent })
+    router.push({ name: 'Group', params: { group_id: data._id } })
+  } catch (error: any) {
+    console.error(error)
+  } finally {
+    creating.value = false
+  }
 }
 </script>
-
-<style></style>

@@ -4,55 +4,52 @@
       <v-row align="center">
         <v-col cols="auto">
           <v-toolbar-title v-if="user">
-            <a v-if="user_profile_url" :href="user_profile_url">{{
-              user.display_name
-            }}</a>
+            <a v-if="userProfileUrl" :href="userProfileUrl">{{ user.display_name }}</a>
             <span v-else>{{ user.display_name }}</span>
           </v-toolbar-title>
           <v-toolbar-title v-else>
             <v-progress-circular indeterminate />
           </v-toolbar-title>
         </v-col>
-
         <v-spacer />
         <v-col cols="auto">
           <v-btn exact :to="{ name: 'CreateGroup' }" color="primary">
-            <v-icon left>mdi-account-multiple-plus</v-icon>
-            <span>{{ $t("Create group") }}</span>
+            <v-icon start>mdi-account-multiple-plus</v-icon>
+            {{ $t('Create group') }}
           </v-btn>
         </v-col>
       </v-row>
-
-      <template v-slot:extension>
-        <v-tabs v-model="relation_tab">
-          <v-tab>{{ $t("As member") }}</v-tab>
-          <v-tab>{{ $t("As administrator") }}</v-tab>
+      <template #extension>
+        <v-tabs v-model="relationTab">
+          <v-tab value="member">{{ $t('As member') }}</v-tab>
+          <v-tab value="administrator">{{ $t('As administrator') }}</v-tab>
         </v-tabs>
         <v-spacer />
-        <v-switch v-model="subgroups" label="Subgroups" />
+        <v-switch v-model="subgroups" label="Subgroups" hide-details />
       </template>
     </v-toolbar>
     <v-divider />
-
     <v-card-text>
-      <v-tabs-items v-model="relation_tab">
-        <v-tab-item
+      <v-window v-model="relationTab">
+        <v-window-item
           v-for="relationship in ['member', 'administrator']"
           :key="`as_${relationship}`"
+          :value="relationship"
         >
-          <v-card outlined>
+          <v-card variant="outlined">
             <v-toolbar flat>
-              <v-tabs v-model="officiality_tab">
-                <v-tab>{{ $t("Official") }}</v-tab>
-                <v-tab>{{ $t("Non-official") }}</v-tab>
+              <v-tabs v-model="officialityTab">
+                <v-tab value="official">{{ $t('Official') }}</v-tab>
+                <v-tab value="nonofficial">{{ $t('Non-official') }}</v-tab>
               </v-tabs>
             </v-toolbar>
             <v-divider />
             <v-card-text>
-              <v-tabs-items v-model="officiality_tab">
-                <v-tab-item
+              <v-window v-model="officialityTab">
+                <v-window-item
                   v-for="officiality in ['official', 'nonofficial']"
                   :key="`as_${relationship}_${officiality}`"
+                  :value="officiality"
                 >
                   <GroupsOfUser
                     :official="officiality === 'official'"
@@ -60,68 +57,45 @@
                     :shallow="!subgroups"
                     :as="relationship"
                   />
-                </v-tab-item>
-              </v-tabs-items>
+                </v-window-item>
+              </v-window>
             </v-card-text>
           </v-card>
-        </v-tab-item>
-      </v-tabs-items>
+        </v-window-item>
+      </v-window>
     </v-card-text>
   </v-card>
 </template>
 
-<script>
-import GroupsOfUser from "@/components/GroupsOfUser.vue"
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import GroupsOfUser from '@/components/GroupsOfUser.vue'
+import api from '@/api'
 
-const { VUE_APP_USER_MANAGER_FRONT_URL } = process.env
+const route = useRoute()
 
-export default {
-  name: "UserGroups",
-  components: {
-    GroupsOfUser,
-  },
-  data() {
-    return {
-      user: null,
-      loading: false,
-      relation_tab: null,
-      officiality_tab: null,
-      subgroups: false,
-    }
-  },
-  mounted() {
-    this.get_user()
-  },
-  watch: {
-    user_id() {
-      this.get_user()
-    },
-  },
-  methods: {
-    get_user() {
-      this.loading = true
-      const url = `/v3/users/${this.user_id}`
-      this.axios
-        .get(url)
-        .then(({ data }) => {
-          this.user = data
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-        .finally(() => {
-          this.loading = false
-        })
-    },
-  },
-  computed: {
-    user_id() {
-      return this.$route.params.user_id
-    },
-    user_profile_url() {
-      if (!VUE_APP_USER_MANAGER_FRONT_URL) return
-      return `${VUE_APP_USER_MANAGER_FRONT_URL}/users/${this.user_id}`
-    },
-  },
+const user = ref<{ display_name: string } | null>(null)
+const relationTab = ref('member')
+const officialityTab = ref('official')
+const subgroups = ref(false)
+
+const userId = computed(() => route.params.user_id as string)
+const userProfileUrl = computed(() => {
+  const base = import.meta.env.VITE_USER_MANAGER_FRONT_URL
+  if (!base) return undefined
+  return `${base}/users/${userId.value}`
+})
+
+async function getUser() {
+  try {
+    const { data } = await api.get(`/v3/users/${userId.value}`)
+    user.value = data
+  } catch (error) {
+    console.error(error)
+  }
 }
+
+watch(userId, getUser)
+onMounted(getUser)
 </script>
