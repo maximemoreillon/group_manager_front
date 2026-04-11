@@ -18,7 +18,11 @@
     <v-card-text>
       <v-window v-model="tab">
         <v-window-item value="browse">
-          <GroupList @selection="groupSelected" />
+          <GroupPicker
+            :groupManagerApiUrl="groupManagerApiUrl"
+            :accessToken="accessToken"
+            @selection="groupSelected"
+          />
         </v-window-item>
         <v-window-item value="search">
           <v-card variant="outlined">
@@ -35,13 +39,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import GroupList from '@/components/GroupList.vue'
+import { GroupPicker, type GroupItem } from '@moreillon/group-manager-vue-picker'
+import { useAuth } from '@/composables/useAuth'
 import GroupSearch from '@/components/GroupSearch.vue'
 
 const router = useRouter()
+const { accessToken } = useAuth()
 const tab = ref('browse')
+const groupManagerApiUrl = import.meta.env.VITE_GROUP_MANAGER_API_URL
 
-function groupSelected(group: { _id: string }) {
+function groupSelected(group: GroupItem) {
   router.push({ name: 'Group', params: { group_id: group._id } })
 }
 </script>

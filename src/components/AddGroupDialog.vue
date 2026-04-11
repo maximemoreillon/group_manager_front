@@ -9,7 +9,11 @@
     <v-card>
       <v-card-title>Add {{ as || 'group' }} group</v-card-title>
       <v-card-text>
-        <GroupList @selection="groupSelected" />
+        <GroupPicker
+          :groupManagerApiUrl="groupManagerApiUrl"
+          :accessToken="accessToken"
+          @selection="groupSelected"
+        />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -21,15 +25,18 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import GroupList from '@/components/GroupList.vue'
+import { GroupPicker, type GroupItem } from '@moreillon/group-manager-vue-picker'
+import { useAuth } from '@/composables/useAuth'
 
 defineProps<{ as?: string }>()
-const emit = defineEmits<{ groupAdd: [group: { _id: string }] }>()
+const emit = defineEmits<{ groupAdd: [group: GroupItem] }>()
 
+const { accessToken } = useAuth()
 const dialog = ref(false)
+const groupManagerApiUrl = import.meta.env.VITE_GROUP_MANAGER_API_URL
 
-function groupSelected(group: { _id: string }) {
-  emit('groupAdd', { _id: group._id })
+function groupSelected(group: GroupItem) {
+  emit('groupAdd', group)
   dialog.value = false
 }
 </script>

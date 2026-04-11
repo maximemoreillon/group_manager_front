@@ -9,26 +9,11 @@
     <v-card>
       <v-card-title>Add {{ as || 'user' }}</v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="searchUsers">
-          <v-row align="center" dense>
-            <v-col>
-              <v-text-field v-model="search" label="Search users" hide-details />
-            </v-col>
-            <v-col cols="auto">
-              <v-btn type="submit" icon :loading="searching">
-                <v-icon>mdi-magnify</v-icon>
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-form>
-        <v-list v-if="searchResults.length">
-          <v-list-item
-            v-for="user in searchResults"
-            :key="user._id"
-            :title="user.display_name || user.username"
-            @click="addUser(user)"
-          />
-        </v-list>
+        <UserPicker
+          :groupManagerApiUrl="groupManagerApiUrl"
+          :accessToken="accessToken"
+          @selection="addUser"
+        />
       </v-card-text>
       <v-card-text>
         <v-card variant="outlined" min-height="10vh">
@@ -56,41 +41,25 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { UserPicker, type User } from '@moreillon/group-manager-vue-picker'
+import { useAuth } from '@/composables/useAuth'
 import api from '@/api'
 
 const props = defineProps<{ as?: string }>()
 const emit = defineEmits<{ usersChanged: [] }>()
 
 const route = useRoute()
+const { accessToken } = useAuth()
 const dialog = ref(false)
-const search = ref('')
-const searching = ref(false)
-const searchResults = ref<any[]>([])
-const selectedUsers = ref<any[]>([])
-
+const selectedUsers = ref<User[]>([])
+const groupManagerApiUrl = import.meta.env.VITE_GROUP_MANAGER_API_URL
 const groupId = computed(() => route.params.group_id as string)
 
 watch(dialog, (open) => {
-  if (!open) {
-    selectedUsers.value = []
-    searchResults.value = []
-    search.value = ''
-  }
+  if (!open) selectedUsers.value = []
 })
 
-async function searchUsers() {
-  searching.value = true
-  try {
-    const { data } = await api.get('/v3/users', { params: { search: search.value } })
-    searchResults.value = data.items ?? data
-  } catch (error) {
-    console.error(error)
-  } finally {
-    searching.value = false
-  }
-}
-
-function addUser(user: any) {
+function addUser(user: User) {
   if (selectedUsers.value.some(({ _id }) => _id === user._id)) return alert('Duplicates not allowed')
   selectedUsers.value.push(user)
 }
