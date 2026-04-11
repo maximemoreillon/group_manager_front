@@ -19,29 +19,43 @@
           <v-tab value="administrator">{{ $t('As administrator') }}</v-tab>
         </v-tabs>
         <v-spacer />
-        <v-checkbox v-model="showOfficial" :label="$t('Official')" hide-details density="compact" class="mr-2" />
-        <v-checkbox v-model="showNonOfficial" :label="$t('Non-official')" hide-details density="compact" class="mr-2" />
         <v-switch v-model="subgroups" label="Subgroups" hide-details density="compact" class="mr-4" />
       </template>
     </v-toolbar>
     <v-divider />
+
     <v-card-text>
       <v-window v-model="relationTab">
-        <v-window-item value="member">
-          <GroupsOfUser
-            as="member"
-            :official="showOfficial"
-            :nonofficial="showNonOfficial"
-            :shallow="!subgroups"
-          />
-        </v-window-item>
-        <v-window-item value="administrator">
-          <GroupsOfUser
-            as="administrator"
-            :official="showOfficial"
-            :nonofficial="showNonOfficial"
-            :shallow="!subgroups"
-          />
+        <v-window-item
+          v-for="relationship in ['member', 'administrator']"
+          :key="relationship"
+          :value="relationship"
+        >
+          <v-card variant="outlined">
+            <v-toolbar flat density="compact">
+              <v-tabs v-model="officialityTab">
+                <v-tab value="official">{{ $t('Official') }}</v-tab>
+                <v-tab value="nonofficial">{{ $t('Non-official') }}</v-tab>
+              </v-tabs>
+            </v-toolbar>
+            <v-divider />
+            <v-card-text>
+              <v-window v-model="officialityTab">
+                <v-window-item
+                  v-for="officiality in ['official', 'nonofficial']"
+                  :key="`${relationship}_${officiality}`"
+                  :value="officiality"
+                >
+                  <GroupsOfUser
+                    :as="relationship"
+                    :official="officiality === 'official'"
+                    :nonofficial="officiality === 'nonofficial'"
+                    :shallow="!subgroups"
+                  />
+                </v-window-item>
+              </v-window>
+            </v-card-text>
+          </v-card>
         </v-window-item>
       </v-window>
     </v-card-text>
@@ -58,8 +72,7 @@ const route = useRoute()
 
 const user = ref<{ display_name: string } | null>(null)
 const relationTab = ref('member')
-const showOfficial = ref(true)
-const showNonOfficial = ref(true)
+const officialityTab = ref('official')
 const subgroups = ref(false)
 
 const userId = computed(() => route.params.user_id as string)

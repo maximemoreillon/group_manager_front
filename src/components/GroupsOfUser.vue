@@ -74,9 +74,8 @@ async function loadGroups({
         batch_size: itemsPerPage,
         start_index: (page - 1) * itemsPerPage,
         shallow: props.shallow ? true : undefined,
-        // Only send a filter when one side is deselected; both selected = no filter = show all
-        official: props.official && !props.nonofficial ? true : undefined,
-        nonofficial: props.nonofficial && !props.official ? true : undefined,
+        official: props.official ? true : undefined,
+        nonofficial: props.nonofficial ? true : undefined,
       },
     });
     total.value = data.count;
@@ -88,8 +87,5 @@ async function loadGroups({
   }
 }
 
-watch(
-  [() => props.shallow, () => props.official, () => props.nonofficial, userId],
-  () => loadGroups(lastOptions),
-);
+watch([() => props.shallow, userId], () => loadGroups(lastOptions));
 </script>
