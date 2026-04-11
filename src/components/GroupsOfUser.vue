@@ -9,12 +9,20 @@
     @update:options="loadGroups"
   >
     <template #item.image="{ item }">
-      <v-img v-if="item.avatar_src" contain width="2.5em" height="2.5em" :src="item.avatar_src" />
-      <v-icon size="2.5em" v-else>mdi-account-multiple</v-icon>
+      <v-img
+        v-if="item.avatar_src"
+        contain
+        width="2em"
+        height="2em"
+        :src="item.avatar_src"
+      />
+      <v-icon v-else>mdi-account-multiple</v-icon>
     </template>
 
     <template #item.name="{ item }">
-      <router-link :to="{ name: 'Group', params: { group_id: item._id } }">{{ item.name }}</router-link>
+      <router-link :to="{ name: 'Group', params: { group_id: item._id } }">{{
+        item.name
+      }}</router-link>
     </template>
 
     <template #item.restricted="{ item }">
@@ -24,54 +32,64 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import api from '@/api'
+import { ref, computed, watch } from "vue";
+import { useRoute } from "vue-router";
+import api from "@/api";
 
 const props = defineProps<{
-  as: string
-  shallow: boolean
-  official: boolean
-  nonofficial: boolean
-}>()
+  as: string;
+  shallow: boolean;
+  official: boolean;
+  nonofficial: boolean;
+}>();
 
-const route = useRoute()
-const loading = ref(false)
-const groups = ref<any[]>([])
-const total = ref(0)
-const itemsPerPageOptions = [50, 100, 500, -1]
+const route = useRoute();
+const loading = ref(false);
+const groups = ref<any[]>([]);
+const total = ref(0);
+const itemsPerPageOptions = [50, 100, 500, -1];
 
 const headers = [
-  { key: 'image', title: '', width: '50px', sortable: false },
-  { key: 'name', title: 'Name', sortable: false },
-  { key: 'restricted', title: 'Restricted', sortable: false },
-]
+  { key: "image", title: "", width: "50px", sortable: false },
+  { key: "name", title: "Name", sortable: false },
+  { key: "restricted", title: "Restricted", sortable: false },
+];
 
-const userId = computed(() => route.params.user_id as string)
+const userId = computed(() => route.params.user_id as string);
 
-let lastOptions = { page: 1, itemsPerPage: 50 }
+let lastOptions = { page: 1, itemsPerPage: 50 };
 
-async function loadGroups({ page, itemsPerPage }: { page: number; itemsPerPage: number }) {
-  lastOptions = { page, itemsPerPage }
-  loading.value = true
+async function loadGroups({
+  page,
+  itemsPerPage,
+}: {
+  page: number;
+  itemsPerPage: number;
+}) {
+  lastOptions = { page, itemsPerPage };
+  loading.value = true;
   try {
     const { data } = await api.get(`/v3/${props.as}s/${userId.value}/groups`, {
       params: {
         batch_size: itemsPerPage,
         start_index: (page - 1) * itemsPerPage,
         shallow: props.shallow ? true : undefined,
-        official: props.official ? true : undefined,
-        nonofficial: props.nonofficial ? true : undefined,
+        // Only send a filter when one side is deselected; both selected = no filter = show all
+        official: props.official && !props.nonofficial ? true : undefined,
+        nonofficial: props.nonofficial && !props.official ? true : undefined,
       },
-    })
-    total.value = data.count
-    groups.value = data.items
+    });
+    total.value = data.count;
+    groups.value = data.items;
   } catch (error) {
-    console.error(error)
+    console.error(error);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
-watch([() => props.shallow, userId], () => loadGroups(lastOptions))
+watch(
+  [() => props.shallow, () => props.official, () => props.nonofficial, userId],
+  () => loadGroups(lastOptions),
+);
 </script>
