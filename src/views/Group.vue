@@ -43,48 +43,38 @@
           <v-card-title>{{ $t('Group details') }}</v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="5" align-self="center">
-                <v-img v-if="group.avatar_src" :src="group.avatar_src" contain height="15em" />
-                <div v-else class="text-center">
-                  <v-icon size="15em">mdi-account-multiple</v-icon>
-                </div>
+              <v-col>
+                <v-text-field
+                  :readonly="!currentUserHasAdminRights"
+                  :label="$t('Group name')"
+                  v-model="group.name"
+                />
               </v-col>
-              <v-col cols="7">
-                <v-row>
-                  <v-col>
-                    <v-text-field
-                      :readonly="!currentUserHasAdminRights"
-                      :label="$t('Group name')"
-                      v-model="group.name"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-col>
-                    <v-text-field readonly variant="filled" label="ID" v-model="group._id" />
-                  </v-col>
-                </v-row>
-                <v-row v-if="currentUserHasAdminRights">
-                  <v-col>
-                    <v-text-field :label="$t('Group avatar URL')" v-model="group.avatar_src" />
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-col>
-                    <v-switch
-                      :disabled="!currentUserHasAdminRights"
-                      v-model="group.restricted"
-                      :label="$t('Restricted')"
-                    />
-                  </v-col>
-                  <v-col>
-                    <v-switch
-                      :disabled="!currentUser?.isAdmin"
-                      v-model="group.official"
-                      :label="$t('Official')"
-                    />
-                  </v-col>
-                </v-row>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field readonly variant="filled" label="ID" v-model="group._id" />
+              </v-col>
+            </v-row>
+            <v-row v-if="currentUserHasAdminRights">
+              <v-col>
+                <v-text-field :label="$t('Group avatar URL')" v-model="group.avatar_src" />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-switch
+                  :disabled="!currentUserHasAdminRights"
+                  v-model="group.restricted"
+                  :label="$t('Restricted')"
+                />
+              </v-col>
+              <v-col>
+                <v-switch
+                  :disabled="!currentUser?.isAdmin"
+                  v-model="group.official"
+                  :label="$t('Official')"
+                />
               </v-col>
             </v-row>
           </v-card-text>

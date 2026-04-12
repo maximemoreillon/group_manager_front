@@ -2,7 +2,9 @@
   <v-card max-width="60em" class="mx-auto">
     <v-toolbar flat>
       <v-toolbar-title v-if="user">
-        <a v-if="userProfileUrl" :href="userProfileUrl">{{ user.display_name }}</a>
+        <a v-if="userProfileUrl" :href="userProfileUrl">{{
+          user.display_name
+        }}</a>
         <span v-else>{{ user.display_name }}</span>
       </v-toolbar-title>
       <v-toolbar-title v-else>
@@ -11,15 +13,36 @@
       <v-spacer />
       <v-btn exact :to="{ name: 'CreateGroup' }" color="primary">
         <v-icon start>mdi-account-multiple-plus</v-icon>
-        {{ $t('Create group') }}
+        {{ $t("Create group") }}
       </v-btn>
       <template #extension>
         <v-tabs v-model="relationTab">
-          <v-tab value="member">{{ $t('As member') }}</v-tab>
-          <v-tab value="administrator">{{ $t('As administrator') }}</v-tab>
+          <v-tab value="member">{{ $t("As member") }}</v-tab>
+          <v-tab value="administrator">{{ $t("As administrator") }}</v-tab>
         </v-tabs>
         <v-spacer />
-        <v-switch v-model="subgroups" label="Subgroups" hide-details density="compact" class="mr-4" />
+        <v-row justify="end">
+          <v-col cols="auto">
+            <v-select
+              v-model="officiality"
+              :items="officialityItems"
+              hide-details
+              density="compact"
+              variant="outlined"
+              style="max-width: 160px"
+              class="mr-2"
+            />
+          </v-col>
+          <v-col cols="auto">
+            <v-switch
+              v-model="subgroups"
+              label="Subgroups"
+              hide-details
+              density="compact"
+              class="mr-4"
+            />
+          </v-col>
+        </v-row>
       </template>
     </v-toolbar>
     <v-divider />
@@ -31,31 +54,13 @@
           :key="relationship"
           :value="relationship"
         >
-          <v-card variant="outlined">
-            <v-toolbar flat density="compact">
-              <v-tabs v-model="officialityTab">
-                <v-tab value="official">{{ $t('Official') }}</v-tab>
-                <v-tab value="nonofficial">{{ $t('Non-official') }}</v-tab>
-              </v-tabs>
-            </v-toolbar>
-            <v-divider />
-            <v-card-text>
-              <v-window v-model="officialityTab">
-                <v-window-item
-                  v-for="officiality in ['official', 'nonofficial']"
-                  :key="`${relationship}_${officiality}`"
-                  :value="officiality"
-                >
-                  <GroupsOfUser
-                    :as="relationship"
-                    :official="officiality === 'official'"
-                    :nonofficial="officiality === 'nonofficial'"
-                    :shallow="!subgroups"
-                  />
-                </v-window-item>
-              </v-window>
-            </v-card-text>
-          </v-card>
+          <GroupsOfUser
+            :key="officiality"
+            :as="relationship"
+            :official="officiality === 'official'"
+            :nonofficial="officiality === 'nonofficial'"
+            :shallow="!subgroups"
+          />
         </v-window-item>
       </v-window>
     </v-card-text>
@@ -63,34 +68,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import GroupsOfUser from '@/components/GroupsOfUser.vue'
-import api from '@/api'
+import { ref, computed, watch, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
+import GroupsOfUser from "@/components/GroupsOfUser.vue";
+import api from "@/api";
 
-const route = useRoute()
+const { t } = useI18n();
+const route = useRoute();
 
-const user = ref<{ display_name: string } | null>(null)
-const relationTab = ref('member')
-const officialityTab = ref('official')
-const subgroups = ref(false)
+const user = ref<{ display_name: string } | null>(null);
+const relationTab = ref("member");
+const officiality = ref("official");
+const subgroups = ref(false);
 
-const userId = computed(() => route.params.user_id as string)
+const officialityItems = computed(() => [
+  { title: t("Official"), value: "official" },
+  { title: t("Non-official"), value: "nonofficial" },
+]);
+
+const userId = computed(() => route.params.user_id as string);
 const userProfileUrl = computed(() => {
-  const base = import.meta.env.VITE_USER_MANAGER_FRONT_URL
-  if (!base) return undefined
-  return `${base}/users/${userId.value}`
-})
+  const base = import.meta.env.VITE_USER_MANAGER_FRONT_URL;
+  if (!base) return undefined;
+  return `${base}/users/${userId.value}`;
+});
 
 async function getUser() {
   try {
-    const { data } = await api.get(`/v3/users/${userId.value}`)
-    user.value = data
+    const { data } = await api.get(`/v3/users/${userId.value}`);
+    user.value = data;
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
 }
 
-watch(userId, getUser)
-onMounted(getUser)
+watch(userId, getUser);
+onMounted(getUser);
 </script>
