@@ -9,21 +9,19 @@
     @update:options="loadMembers"
   >
     <template #top>
-      <v-toolbar flat>
-        <v-row align="center">
-          <v-spacer />
-          <v-col cols="auto">
-            <MembersExcelExport :user_type="props.user_type" />
-          </v-col>
-          <v-col cols="auto">
-            <AddUserDialog
-              v-if="props.currentUserHasAdminRights"
-              :as="props.user_type"
-              @usersChanged="$emit('usersChanged')"
-            />
-          </v-col>
-        </v-row>
-      </v-toolbar>
+      <v-row align="center">
+        <v-col cols="auto">
+          <AddUserDialog
+            v-if="props.currentUserHasAdminRights"
+            :as="props.user_type"
+            @usersChanged="$emit('usersChanged')"
+          />
+        </v-col>
+        <v-spacer />
+        <v-col cols="auto">
+          <MembersExcelExport :user_type="props.user_type" />
+        </v-col>
+      </v-row>
     </template>
 
     <template #item.avatar="{ item }">
@@ -44,9 +42,12 @@
     </template>
 
     <template #item.remove="{ item }">
-      <v-btn icon color="#c00000" @click="removeUser(item)">
-        <v-icon>mdi-account-remove</v-icon>
-      </v-btn>
+      <v-btn
+        icon="mdi-account-remove"
+        color="#c00000"
+        @click="removeUser(item)"
+        variant="plain"
+      />
     </template>
   </v-data-table-server>
 </template>
@@ -57,6 +58,7 @@ import { useRoute } from "vue-router";
 import AddUserDialog from "@/components/AddUserDialog.vue";
 import MembersExcelExport from "@/components/MembersExcelExport.vue";
 import api from "@/api";
+import { avatarHeader } from "@/common";
 
 const props = defineProps<{
   user_type: string;
@@ -74,7 +76,7 @@ const itemsPerPageOptions = [50, 100, 500, -1];
 const groupId = computed(() => route.params.group_id as string);
 
 const baseHeaders = [
-  { key: "avatar", title: "", width: "50px", sortable: false },
+  avatarHeader,
   { key: "name", title: "Name", sortable: false },
 ];
 const adminHeaders = [{ key: "remove", title: "Remove", sortable: false }];

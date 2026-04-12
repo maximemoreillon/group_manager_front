@@ -8,7 +8,7 @@
     :items-per-page-options="itemsPerPageOptions"
     @update:options="loadGroups"
   >
-    <template #item.image="{ item }">
+    <template #item.avatar="{ item }">
       <v-img
         v-if="item.avatar_src"
         contain
@@ -28,6 +28,9 @@
     <template #item.restricted="{ item }">
       <v-icon v-if="item.restricted">mdi-lock</v-icon>
     </template>
+    <template #item.hidden="{ item }">
+      <v-icon v-if="item.hidden">mdi-eye-off</v-icon>
+    </template>
   </v-data-table-server>
 </template>
 
@@ -35,6 +38,7 @@
 import { ref, computed, watch } from "vue";
 import { useRoute } from "vue-router";
 import api from "@/api";
+import { avatarHeader, hiddenHeader, restrictedheader } from "@/common";
 
 const props = defineProps<{
   as: string;
@@ -50,10 +54,11 @@ const total = ref(0);
 const itemsPerPageOptions = [50, 100, 500, -1];
 
 const headers = [
-  { key: "image", title: "", width: "50px", sortable: false },
+  avatarHeader,
   { key: "name", title: "Name", sortable: false },
-  { key: "restricted", title: "Restricted", sortable: false },
-];
+  restrictedheader,
+  hiddenHeader,
+] as const;
 
 const userId = computed(() => route.params.user_id as string);
 

@@ -30,5 +30,7 @@
   "Cancel": "Cancel",
   "Browse": "Browse",
   "Search": "Search",
-  "Groups": "Groups"
+  "Groups": "Groups",
+  "Visible": "Visible",
+  "Hidden": "Hidden"
 }

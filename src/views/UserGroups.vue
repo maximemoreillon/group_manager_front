@@ -2,10 +2,7 @@
   <v-card max-width="60em" class="mx-auto">
     <v-toolbar flat>
       <v-toolbar-title v-if="user">
-        <a v-if="userProfileUrl" :href="userProfileUrl">{{
-          user.display_name
-        }}</a>
-        <span v-else>{{ user.display_name }}</span>
+        <span>{{ user.display_name }}</span>
       </v-toolbar-title>
       <v-toolbar-title v-else>
         <v-progress-circular indeterminate />
@@ -20,29 +17,6 @@
           <v-tab value="member">{{ $t("As member") }}</v-tab>
           <v-tab value="administrator">{{ $t("As administrator") }}</v-tab>
         </v-tabs>
-        <v-spacer />
-        <v-row justify="end">
-          <v-col cols="auto">
-            <v-select
-              v-model="officiality"
-              :items="officialityItems"
-              hide-details
-              density="compact"
-              variant="outlined"
-              style="max-width: 160px"
-              class="mr-2"
-            />
-          </v-col>
-          <v-col cols="auto">
-            <v-switch
-              v-model="subgroups"
-              label="Subgroups"
-              hide-details
-              density="compact"
-              class="mr-4"
-            />
-          </v-col>
-        </v-row>
       </template>
     </v-toolbar>
     <v-divider />
@@ -54,6 +28,23 @@
           :key="relationship"
           :value="relationship"
         >
+          <v-row justify="end">
+            <v-col cols="auto">
+              <v-select
+                v-model="officiality"
+                :items="officialityItems"
+                hide-details
+                density="compact"
+                variant="outlined"
+                style="width: 150px"
+                class="mr-2"
+              />
+            </v-col>
+            <v-spacer />
+            <v-col cols="auto">
+              <v-switch v-model="subgroups" label="Subgroups" hide-details />
+            </v-col>
+          </v-row>
           <GroupsOfUser
             :key="officiality"
             :as="relationship"
@@ -88,11 +79,12 @@ const officialityItems = computed(() => [
 ]);
 
 const userId = computed(() => route.params.user_id as string);
-const userProfileUrl = computed(() => {
-  const base = import.meta.env.VITE_USER_MANAGER_FRONT_URL;
-  if (!base) return undefined;
-  return `${base}/users/${userId.value}`;
-});
+
+// const userProfileUrl = computed(() => {
+//   const base = import.meta.env.VITE_USER_MANAGER_FRONT_URL;
+//   if (!base) return undefined;
+//   return `${base}/users/${userId.value}`;
+// });
 
 async function getUser() {
   try {

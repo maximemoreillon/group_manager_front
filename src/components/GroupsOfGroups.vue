@@ -11,6 +11,10 @@
     <template #top>
       <v-row align="center">
         <v-col cols="auto">
+          <AddGroupDialog :as="props.group_type" @groupAdd="addGroup" />
+        </v-col>
+        <v-spacer />
+        <v-col cols="auto">
           <v-switch
             v-model="includeSubgroups"
             label="Include subgroups"
@@ -18,14 +22,10 @@
             @update:model-value="reload"
           />
         </v-col>
-        <v-spacer />
-        <v-col cols="auto">
-          <AddGroupDialog :as="props.group_type" @groupAdd="addGroup" />
-        </v-col>
       </v-row>
     </template>
 
-    <template #item.image="{ item }">
+    <template #item.avatar="{ item }">
       <v-img
         v-if="item.avatar_src"
         contain
@@ -51,8 +51,12 @@
     </template>
 
     <template #item.delete="{ item }">
-      <v-btn icon color="#c00000" @click="removeGroup(item)">
-        <v-icon>mdi-account-multiple-remove</v-icon>
+      <v-btn
+        color="#c00000"
+        @click="removeGroup(item)"
+        icon="mdi-account-multiple-remove"
+        variant="plain"
+      >
       </v-btn>
     </template>
   </v-data-table-server>
@@ -63,6 +67,7 @@ import { ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import AddGroupDialog from "@/components/AddGroupDialog.vue";
 import api from "@/api";
+import { avatarHeader, restrictedheader } from "@/common";
 
 const props = defineProps<{
   group_type: string;
@@ -84,11 +89,11 @@ let lastOptions = { page: 1, itemsPerPage: 50 };
 const groupId = computed(() => route.params.group_id as string);
 
 const baseHeaders = [
-  { key: "image", title: "", width: "50px", sortable: false },
+  avatarHeader,
   { key: "name", title: "Name", sortable: false },
-  { key: "official", title: "Official", sortable: false },
-  { key: "restricted", title: "Restricted", sortable: false },
-];
+  { key: "official", title: "Official", sortable: false, align: "center" },
+  restrictedheader,
+] as const;
 const adminHeaders = [{ key: "delete", title: "Delete", sortable: false }];
 
 const headers = computed(() =>

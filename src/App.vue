@@ -39,7 +39,7 @@
       </v-navigation-drawer>
 
       <v-main>
-        <v-container fluid>
+        <v-container>
           <router-view />
         </v-container>
       </v-main>
