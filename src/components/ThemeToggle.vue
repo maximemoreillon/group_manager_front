@@ -15,7 +15,7 @@ const isDark = computed(() => theme.global.current.value.dark);
 
 function toggle() {
   const next = isDark.value ? "light" : "dark";
-  theme.global.name.value = next;
+  theme.change(next);
   localStorage.setItem("theme", next);
 }
 </script>
