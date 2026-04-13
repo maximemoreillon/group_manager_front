@@ -6,6 +6,7 @@
         <v-app-bar-title>Group manager</v-app-bar-title>
         <template #append>
           <LocaleSelector />
+          <ThemeToggle />
           <v-btn icon="mdi-logout" @click="handleLogout" />
         </template>
       </v-app-bar>
@@ -38,6 +39,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useAuth } from "@/composables/useAuth";
 import LocaleSelector from "@/components/LocaleSelector.vue";
+import ThemeToggle from "@/components/ThemeToggle.vue";
 
 const { t } = useI18n();
 const route = useRoute();
