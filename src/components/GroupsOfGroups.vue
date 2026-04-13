@@ -1,7 +1,11 @@
 <template>
   <GroupsTable
     :items="groups"
-    :extra-headers="props.currentUserHasAdminRights ? [{ key: 'delete', title: '', sortable: false }] : undefined"
+    :extra-headers="
+      props.currentUserHasAdminRights
+        ? [{ key: 'delete', title: '', sortable: false }]
+        : undefined
+    "
     :loading="loading"
     :items-length="total"
     :items-per-page="50"
@@ -39,10 +43,16 @@
     </template>
   </GroupsTable>
 
-  <v-dialog :model-value="!!pendingRemove" max-width="400" @update:model-value="pendingRemove = null">
+  <v-dialog
+    :model-value="!!pendingRemove"
+    max-width="400"
+    @update:model-value="pendingRemove = null"
+  >
     <v-card>
       <v-card-title>{{ $t("Remove group") }}</v-card-title>
-      <v-card-text>{{ $t("Remove {name}?", { name: pendingRemove?.name }) }}</v-card-text>
+      <v-card-text>{{
+        $t("Remove {name}?", { name: pendingRemove?.name })
+      }}</v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn @click="pendingRemove = null">{{ $t("Cancel") }}</v-btn>
@@ -70,7 +80,7 @@ const route = useRoute();
 const loading = ref(false);
 const groups = ref<any[]>([]);
 const total = ref(0);
-const includeSubgroups = ref(true);
+const includeSubgroups = ref(false);
 const pendingRemove = ref<any>(null);
 const itemsPerPageOptions = [50, 100, 500, -1];
 
