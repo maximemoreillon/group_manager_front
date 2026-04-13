@@ -1,7 +1,7 @@
 <template>
-  <v-data-table-server
+  <GroupsTable
     :items="groups"
-    :headers="headers"
+    :extra-headers="props.currentUserHasAdminRights ? [{ key: 'delete', title: '', sortable: false }] : undefined"
     :loading="loading"
     :items-length="total"
     :items-per-page="50"
@@ -29,35 +29,6 @@
       </v-row>
     </template>
 
-    <template #item.avatar="{ item }">
-      <v-img
-        v-if="item.avatar_src"
-        contain
-        width="2.5em"
-        height="2.5em"
-        :src="item.avatar_src"
-      />
-      <v-icon v-else>mdi-account-multiple</v-icon>
-    </template>
-
-    <template #item.name="{ item }">
-      <router-link :to="{ name: 'Group', params: { group_id: item._id } }">{{
-        item.name
-      }}</router-link>
-    </template>
-
-    <template #item.restricted="{ item }">
-      <v-icon v-if="item.restricted">mdi-lock</v-icon>
-    </template>
-
-    <template #item.hidden="{ item }">
-      <v-icon v-if="item.hidden">mdi-eye-off</v-icon>
-    </template>
-
-    <template #item.official="{ item }">
-      <v-icon v-if="item.official">mdi-check-decagram</v-icon>
-    </template>
-
     <template #item.delete="{ item }">
       <v-btn
         color="error"
@@ -66,7 +37,7 @@
         variant="plain"
       />
     </template>
-  </v-data-table-server>
+  </GroupsTable>
 
   <v-dialog :model-value="!!pendingRemove" max-width="400" @update:model-value="pendingRemove = null">
     <v-card>
@@ -85,8 +56,8 @@
 import { ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import AddGroupDialog from "@/components/AddGroupDialog.vue";
+import GroupsTable from "@/components/GroupsTable.vue";
 import api from "@/api";
-import { avatarHeader, hiddenHeader, restrictedHeader } from "@/common";
 
 const props = defineProps<{
   group_type: string;
@@ -106,21 +77,6 @@ const itemsPerPageOptions = [50, 100, 500, -1];
 let lastOptions = { page: 1, itemsPerPage: 50 };
 
 const groupId = computed(() => route.params.group_id as string);
-
-const baseHeaders = [
-  avatarHeader,
-  { key: "name", title: "Name", sortable: false },
-  { key: "official", title: "Official", sortable: false, align: "center" },
-  restrictedHeader,
-  hiddenHeader,
-] as const;
-const adminHeaders = [{ key: "delete", title: "", sortable: false }];
-
-const headers = computed(() =>
-  props.currentUserHasAdminRights
-    ? [...baseHeaders, ...adminHeaders]
-    : baseHeaders,
-);
 
 async function loadGroups({
   page,

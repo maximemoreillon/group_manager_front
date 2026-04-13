@@ -51,10 +51,16 @@
     </template>
   </v-data-table-server>
 
-  <v-dialog :model-value="!!pendingRemove" max-width="400" @update:model-value="pendingRemove = null">
+  <v-dialog
+    :model-value="!!pendingRemove"
+    max-width="400"
+    @update:model-value="pendingRemove = null"
+  >
     <v-card>
       <v-card-title>{{ $t("Remove user") }}</v-card-title>
-      <v-card-text>{{ $t("Remove {name}?", { name: pendingRemove?.display_name }) }}</v-card-text>
+      <v-card-text>{{
+        $t("Remove {name}?", { name: pendingRemove?.display_name })
+      }}</v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn @click="pendingRemove = null">{{ $t("Cancel") }}</v-btn>
@@ -67,10 +73,10 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
 import AddUserDialog from "@/components/AddUserDialog.vue";
 import MembersExcelExport from "@/components/MembersExcelExport.vue";
 import api from "@/api";
-import { avatarHeader } from "@/common";
 
 const props = defineProps<{
   user_type: string;
@@ -79,6 +85,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{ usersChanged: [] }>();
 
+const { t } = useI18n();
 const route = useRoute();
 const loading = ref(false);
 const members = ref<any[]>([]);
@@ -88,18 +95,22 @@ const itemsPerPageOptions = [50, 100, 500, -1];
 
 const groupId = computed(() => route.params.group_id as string);
 
-const baseHeaders = [
-  avatarHeader,
-  { key: "name", title: "Name", sortable: false },
-];
-const adminHeaders = [{ key: "remove", title: "", sortable: false }];
-
 const headers = computed(() => {
-  let h = [...baseHeaders];
+  const result = [
+    {
+      key: "avatar",
+      title: "",
+      width: "50px",
+      sortable: false,
+      align: "center" as const,
+    },
+    { key: "name", title: t("Name"), sortable: false },
+  ];
   if (members.value.length && members.value[0].role)
-    h.push({ key: "role", title: "Role", sortable: false });
-  if (props.currentUserHasAdminRights) h = [...h, ...adminHeaders];
-  return h;
+    result.push({ key: "role", title: t("Role"), sortable: false } as any);
+  if (props.currentUserHasAdminRights)
+    result.push({ key: "remove", title: "", sortable: false } as any);
+  return result;
 });
 
 async function loadMembers({
@@ -133,7 +144,9 @@ async function confirmRemove() {
   const user = pendingRemove.value;
   pendingRemove.value = null;
   try {
-    await api.delete(`/v3/groups/${groupId.value}/${props.user_type}/${user._id}`);
+    await api.delete(
+      `/v3/groups/${groupId.value}/${props.user_type}/${user._id}`,
+    );
     emit("usersChanged");
   } catch (error) {
     console.error(error);

@@ -49,6 +49,8 @@
   "Selected users": "選択されたユーザー",
   "Add selected users": "ユーザーを追加",
   "User already added": "このユーザーはすでに追加されています",
+  "Name": "名前",
+  "Role": "役割",
   "Name is required": "名前は必須です",
   "Sign in with SSO": "SSOでサインイン",
   "or": "または",
