@@ -49,5 +49,10 @@
   "Selected users": "選択されたユーザー",
   "Add selected users": "ユーザーを追加",
   "User already added": "このユーザーはすでに追加されています",
-  "Name is required": "名前は必須です"
+  "Name is required": "名前は必須です",
+  "Sign in with SSO": "SSOでサインイン",
+  "or": "または",
+  "Sign in failed": "サインインに失敗しました",
+  "Back to sign in": "サインイン画面に戻る",
+  "Signing in…": "サインイン中…"
 }

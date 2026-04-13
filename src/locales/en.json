@@ -50,5 +50,10 @@
   "Selected users": "Selected users",
   "Add selected users": "Add selected users",
   "User already added": "User already added",
-  "Name is required": "Name is required"
+  "Name is required": "Name is required",
+  "Sign in with SSO": "Sign in with SSO",
+  "or": "or",
+  "Sign in failed": "Sign in failed",
+  "Back to sign in": "Back to sign in",
+  "Signing in…": "Signing in…"
 }

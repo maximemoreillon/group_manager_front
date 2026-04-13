@@ -15,6 +15,12 @@ const router = createRouter({
       meta: { public: true },
     },
     {
+      path: '/oidc-callback',
+      name: 'OidcCallback',
+      component: () => import('../views/OidcCallback.vue'),
+      meta: { public: true },
+    },
+    {
       path: '/groups/new',
       name: 'CreateGroup',
       component: () => import('../views/CreateGroup.vue'),
