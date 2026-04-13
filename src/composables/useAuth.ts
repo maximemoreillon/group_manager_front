@@ -21,6 +21,10 @@ interface Tokens {
 const currentUser = ref<User | null>(null);
 const tokens = ref<Tokens | null>(null);
 
+// Prevents the response interceptor from redirecting during the identify() call
+// (the router guard handles that case instead)
+let isIdentifying = false;
+
 function getStoredJwt(): string | null {
   const local = localStorage.getItem("jwt");
   if (local) return local;
@@ -33,6 +37,28 @@ function clearStoredJwt() {
   document.cookie = "jwt=; Max-Age=0; path=/";
 }
 
+function clearAuthState() {
+  clearStoredJwt();
+  delete api.defaults.headers.common["Authorization"];
+  currentUser.value = null;
+  tokens.value = null;
+}
+
+// Intercept 401 responses that occur mid-session (token expired after login)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 && !isIdentifying && tokens.value) {
+      clearAuthState();
+      const path = window.location.pathname;
+      if (path !== "/login" && path !== "/oidc-callback") {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  },
+);
+
 async function identify(): Promise<boolean> {
   const jwt = getStoredJwt();
   if (!jwt) return false;
@@ -43,17 +69,18 @@ async function identify(): Promise<boolean> {
   const identificationUrl = import.meta.env.VITE_IDENTIFICATION_URL;
   if (!identificationUrl) return true;
 
+  isIdentifying = true;
   try {
     const { data } = await api.get(identificationUrl);
     currentUser.value = data?.profile ?? data;
     return true;
   } catch (error: any) {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      clearStoredJwt();
-      delete api.defaults.headers.common["Authorization"];
-      tokens.value = null;
+      clearAuthState();
     }
     return false;
+  } finally {
+    isIdentifying = false;
   }
 }
 
@@ -68,10 +95,7 @@ async function login(identifier: string, password: string): Promise<void> {
 }
 
 function logout() {
-  clearStoredJwt();
-  delete api.defaults.headers.common["Authorization"];
-  currentUser.value = null;
-  tokens.value = null;
+  clearAuthState();
 }
 
 export function useAuth() {
