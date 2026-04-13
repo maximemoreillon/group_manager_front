@@ -6,6 +6,13 @@ export const avatarHeader = {
   align: "center",
 } as const;
 
+export const officialHeader = {
+  key: "official",
+  title: "official",
+  sortable: false,
+  align: "center",
+} as const;
+
 export const restrictedheader = {
   key: "restricted",
   title: "Restricted",

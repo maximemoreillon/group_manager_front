@@ -8,8 +8,7 @@
     <v-row>
       <v-col>
         <!-- Group metadata -->
-        <v-card variant="outlined">
-          <!-- <v-card-title>{{ $t("Group details") }}</v-card-title> -->
+        <v-card>
           <v-toolbar flat>
             <v-toolbar-title>{{ group.name }}</v-toolbar-title>
             <v-spacer />
@@ -109,7 +108,7 @@
     <!-- Members -->
     <v-row>
       <v-col>
-        <v-card variant="outlined">
+        <v-card>
           <v-toolbar flat>
             <v-toolbar-title>{{ $t("Related users") }}</v-toolbar-title>
             <template #extension>
@@ -142,7 +141,7 @@
     <!-- Related groups -->
     <v-row>
       <v-col>
-        <v-card variant="outlined">
+        <v-card>
           <v-toolbar flat>
             <v-toolbar-title>{{ $t("Related groups") }}</v-toolbar-title>
             <template #extension>
@@ -178,11 +177,16 @@
       {{ error }}
     </v-col>
   </v-row>
+
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    {{ snackbar.message }}
+  </v-snackbar>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { useAuth } from "@/composables/useAuth";
 import DeleteGroupDialog from "@/components/DeleteGroupDialog.vue";
 import GroupsOfGroups from "@/components/GroupsOfGroups.vue";
@@ -190,6 +194,7 @@ import UsersOfGroup from "@/components/UsersOfGroup.vue";
 import api from "@/api";
 
 const route = useRoute();
+const { t } = useI18n();
 const { currentUser, currentUserId } = useAuth();
 
 const group = ref<any>(null);
@@ -205,6 +210,7 @@ const updating = ref(false);
 const joining = ref(false);
 const leaving = ref(false);
 const error = ref<string | null>(null);
+const snackbar = ref({ show: false, message: "", color: "" });
 
 const groupId = computed(() => route.params.group_id as string);
 
@@ -281,9 +287,18 @@ async function updateGroup() {
   updating.value = true;
   try {
     await api.patch(`/v3/groups/${groupId.value}`, modifiedProperties.value);
-    getGroup();
+    snackbar.value = {
+      show: true,
+      message: t("Group updated successfully"),
+      color: "success",
+    };
   } catch (err) {
     console.error(err);
+    snackbar.value = {
+      show: true,
+      message: t("Failed to update group"),
+      color: "error",
+    };
   } finally {
     updating.value = false;
   }

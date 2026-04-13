@@ -1,12 +1,18 @@
 <template>
   <v-app>
     <!-- Authenticated layout -->
+    <v-app-bar color="#333">
+      <v-app-bar-nav-icon
+        @click="drawer = !drawer"
+        v-if="state === 'content'"
+      />
+      <v-app-bar-title> Group manager </v-app-bar-title>
+      <template #append>
+        <LocaleSelector />
+        <v-btn icon="mdi-logout" @click="logout" />
+      </template>
+    </v-app-bar>
     <template v-if="state === 'content'">
-      <v-app-bar>
-        <v-app-bar-nav-icon @click="drawer = !drawer" />
-        <v-app-bar-title>Group manager</v-app-bar-title>
-        <template #append> </template>
-      </v-app-bar>
       <v-navigation-drawer v-model="drawer">
         <v-list nav>
           <v-list-item
@@ -18,24 +24,7 @@
             exact
           />
         </v-list>
-        <template v-slot:append>
-          <v-divider />
-          <v-list nav>
-            <v-list-item>
-              <LocaleSelector />
-            </v-list-item>
-            <v-list-item>
-              <v-btn
-                prepend-icon="mdi-logout"
-                @click="logout"
-                text="logout"
-                block
-                variant="outlined"
-              >
-              </v-btn>
-            </v-list-item>
-          </v-list>
-        </template>
+        <template v-slot:append> </template>
       </v-navigation-drawer>
 
       <v-main>

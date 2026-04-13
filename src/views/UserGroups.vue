@@ -42,7 +42,7 @@
             </v-col>
             <v-spacer />
             <v-col cols="auto">
-              <v-switch v-model="subgroups" label="Subgroups" hide-details />
+              <v-switch v-model="subgroups" :label="$t('Include subgroups')" hide-details />
             </v-col>
           </v-row>
           <GroupsOfUser

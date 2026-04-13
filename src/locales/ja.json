@@ -30,5 +30,9 @@
   "Cancel": "キャンセル",
   "Search": "検索",
   "Browse": "ブラウズ",
-  "Groups": "グループ"
+  "Groups": "グループ",
+  "Include subgroups": "サブグループを含む",
+  "Hidden": "関係者以外には非表示",
+  "Group updated successfully": "グループが更新されました",
+  "Failed to update group": "グループの更新に失敗しました"
 }

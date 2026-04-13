@@ -3,10 +3,10 @@
     <v-form @submit.prevent="searchGroups">
       <v-row align="center" dense>
         <v-col>
-          <v-text-field v-model="search" label="Group name" />
+          <v-text-field v-model="search" label="Group name" hide-details />
         </v-col>
         <v-col cols="auto">
-          <v-btn type="submit" icon>
+          <v-btn type="submit" icon variant="plain" :loading="loading">
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-col>
@@ -49,7 +49,7 @@
       :items-per-page-options="itemsPerPageOptions"
       @update:options="loadGroups"
     >
-      <template #item.image="{ item }">
+      <template #item.avatar="{ item }">
         <v-img
           v-if="item.avatar_src"
           contain
@@ -75,6 +75,10 @@
       <template #item.official="{ item }">
         <v-icon v-if="item.official">mdi-check</v-icon>
       </template>
+
+      <template #item.hidden="{ item }">
+        <v-icon v-if="item.hidden">mdi-eye-off</v-icon>
+      </template>
     </v-data-table-server>
   </div>
 </template>
@@ -82,6 +86,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import api from "@/api";
+import {
+  avatarHeader,
+  hiddenHeader,
+  officialHeader,
+  restrictedheader,
+} from "@/common";
 
 defineEmits<{ selection: [group: any] }>();
 
@@ -95,10 +105,11 @@ const total = ref(0);
 const itemsPerPageOptions = [50, 100, 500, -1];
 
 const headers = [
-  { key: "image", title: "Avatar", sortable: false },
+  avatarHeader,
   { key: "name", title: "Name", sortable: false },
-  { key: "official", title: "Official", sortable: false },
-  { key: "restricted", title: "Restricted", sortable: false },
+  officialHeader,
+  restrictedheader,
+  hiddenHeader,
 ];
 
 let lastOptions = { page: 1, itemsPerPage: 50 };

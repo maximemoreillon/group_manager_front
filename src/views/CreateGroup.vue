@@ -1,5 +1,5 @@
 <template>
-  <v-card max-width="60em" class="mx-auto">
+  <v-card max-width="30em" class="mx-auto">
     <v-toolbar flat>
       <v-toolbar-title>{{ $t("Create group") }}</v-toolbar-title>
     </v-toolbar>

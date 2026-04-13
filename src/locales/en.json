@@ -32,5 +32,8 @@
   "Search": "Search",
   "Groups": "Groups",
   "Visible": "Visible",
-  "Hidden": "Hidden"
+  "Hidden": "Hidden",
+  "Include subgroups": "Include subgroups",
+  "Group updated successfully": "Group updated successfully",
+  "Failed to update group": "Failed to update group"
 }

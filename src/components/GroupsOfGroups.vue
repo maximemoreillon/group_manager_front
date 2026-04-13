@@ -46,6 +46,10 @@
       <v-icon v-if="item.restricted">mdi-check</v-icon>
     </template>
 
+    <template #item.hidden="{ item }">
+      <v-icon v-if="item.hidden">mdi-eye-off</v-icon>
+    </template>
+
     <template #item.official="{ item }">
       <v-icon v-if="item.official">mdi-check</v-icon>
     </template>
@@ -67,7 +71,7 @@ import { ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import AddGroupDialog from "@/components/AddGroupDialog.vue";
 import api from "@/api";
-import { avatarHeader, restrictedheader } from "@/common";
+import { avatarHeader, hiddenHeader, restrictedheader } from "@/common";
 
 const props = defineProps<{
   group_type: string;
@@ -93,8 +97,9 @@ const baseHeaders = [
   { key: "name", title: "Name", sortable: false },
   { key: "official", title: "Official", sortable: false, align: "center" },
   restrictedheader,
+  hiddenHeader,
 ] as const;
-const adminHeaders = [{ key: "delete", title: "Delete", sortable: false }];
+const adminHeaders = [{ key: "delete", title: "Remove", sortable: false }];
 
 const headers = computed(() =>
   props.currentUserHasAdminRights
