@@ -10,7 +10,14 @@
         <!-- Group metadata -->
         <v-card>
           <v-toolbar flat>
-            <v-toolbar-title>{{ group.name }}</v-toolbar-title>
+            <v-toolbar-title>
+              <v-avatar start color="transparent">
+                <v-img :src="group.avatar_src" v-if="group.avatar_src" />
+                <v-icon v-else>mdi-account-multiple</v-icon>
+              </v-avatar>
+
+              {{ group.name }}
+            </v-toolbar-title>
             <v-spacer />
 
             <v-btn
