@@ -60,18 +60,19 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import GroupsOfUser from "@/components/GroupsOfUser.vue";
 import api from "@/api";
 
 const { t } = useI18n();
 const route = useRoute();
+const router = useRouter();
 
 const user = ref<{ display_name: string } | null>(null);
-const relationTab = ref("member");
-const officiality = ref("official");
-const subgroups = ref(false);
+const relationTab = ref((route.query.relation as string) || "member");
+const officiality = ref((route.query.officiality as string) || "official");
+const subgroups = ref(route.query.subgroups === "true");
 
 const officialityItems = computed(() => [
   { title: t("Official"), value: "official" },
@@ -85,6 +86,17 @@ const userId = computed(() => route.params.user_id as string);
 //   if (!base) return undefined;
 //   return `${base}/users/${userId.value}`;
 // });
+
+watch([relationTab, officiality, subgroups], ([tab, off, sub]) => {
+  router.replace({
+    query: {
+      ...route.query,
+      relation: tab,
+      officiality: off,
+      subgroups: String(sub),
+    },
+  });
+});
 
 async function getUser() {
   try {
