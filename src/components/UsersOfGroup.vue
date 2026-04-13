@@ -1,34 +1,30 @@
 <template>
-  <v-data-table
+  <v-data-table-server
     :loading="loading"
     :items="members"
     :headers="headers"
-    :options.sync="options"
-    :server-items-length="total"
+    :items-length="total"
     :items-per-page="50"
-    :footer-props="footerProps"
-    disable-sort
-    disable-filtering
+    :items-per-page-options="itemsPerPageOptions"
+    @update:options="loadMembers"
   >
-    <template v-slot:[`top`]>
-      <v-toolbar flat>
-        <v-row align="center">
-          <v-spacer />
-          <v-col cols="auto">
-            <MembersExcelExport :user_type="user_type" />
-          </v-col>
-          <v-col cols="auto">
-            <AddUserDialog
-              :as="user_type"
-              v-if="currentUserHasAdminRights"
-              @usersChanged="$emit('usersChanged')"
-            />
-          </v-col>
-        </v-row>
-      </v-toolbar>
+    <template #top>
+      <v-row align="center">
+        <v-col cols="auto">
+          <AddUserDialog
+            v-if="props.currentUserHasAdminRights"
+            :as="props.user_type"
+            @usersChanged="$emit('usersChanged')"
+          />
+        </v-col>
+        <v-spacer />
+        <v-col cols="auto">
+          <MembersExcelExport :user_type="props.user_type" />
+        </v-col>
+      </v-row>
     </template>
 
-    <template v-slot:[`item.avatar`]="{ item }">
+    <template #item.avatar="{ item }">
       <v-img
         v-if="item.avatar_src"
         contain
@@ -36,144 +32,111 @@
         height="2.5em"
         :src="item.avatar_src"
       />
-      <v-icon size="2.5em" v-else> mdi-account </v-icon>
+      <v-icon v-else>mdi-account</v-icon>
     </template>
 
-    <template v-slot:[`item.name`]="{ item }">
+    <template #item.name="{ item }">
       <router-link :to="{ name: 'UserGroups', params: { user_id: item._id } }">
         {{ item.display_name }}
       </router-link>
     </template>
 
-    <template v-slot:[`item.see`]="{ item }">
+    <template #item.remove="{ item }">
       <v-btn
-        icon
-        @click="
-          $router.push({ name: 'UserGroups', params: { user_id: item._id } })
-        "
-      >
-        <v-icon>mdi-eye</v-icon>
-      </v-btn>
+        icon="mdi-account-remove"
+        color="error"
+        @click="pendingRemove = item"
+        variant="plain"
+      />
     </template>
+  </v-data-table-server>
 
-    <template v-slot:[`item.remove`]="{ item }">
-      <v-btn icon @click="remove_user(item)" color="#c00000" dark>
-        <v-icon>mdi-account-remove</v-icon>
-      </v-btn>
-    </template>
-  </v-data-table>
+  <v-dialog :model-value="!!pendingRemove" max-width="400" @update:model-value="pendingRemove = null">
+    <v-card>
+      <v-card-title>{{ $t("Remove user") }}</v-card-title>
+      <v-card-text>{{ $t("Remove {name}?", { name: pendingRemove?.display_name }) }}</v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn @click="pendingRemove = null">{{ $t("Cancel") }}</v-btn>
+        <v-btn color="error" @click="confirmRemove">{{ $t("Remove") }}</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
-<script>
-import AddUserDialog from "@/components/AddUserDialog.vue"
-import MembersExcelExport from "@/components/MembersExcelExport.vue"
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { useRoute } from "vue-router";
+import AddUserDialog from "@/components/AddUserDialog.vue";
+import MembersExcelExport from "@/components/MembersExcelExport.vue";
+import api from "@/api";
+import { avatarHeader } from "@/common";
 
-export default {
-  name: "UsersOfGroup",
-  components: {
-    AddUserDialog,
-    MembersExcelExport,
-  },
-  props: {
-    user_type: String,
-    currentUserHasAdminRights: Boolean,
-  },
-  data() {
-    return {
-      loading: false,
-      members: [],
-      total: 0,
-      options: {},
-      footerProps: { "items-per-page-options": [50, 100, 500, -1] },
-      base_headers: [
-        { value: "avatar", text: "", width: "50px" },
-        { value: "name", text: "Name" },
-      ],
-      admin_headers: [{ value: "remove", text: "Remove" }],
-    }
-  },
-  watch: {
-    options: {
-      handler() {
-        this.get_members()
+const props = defineProps<{
+  user_type: string;
+  currentUserHasAdminRights: boolean;
+}>();
+
+const emit = defineEmits<{ usersChanged: [] }>();
+
+const route = useRoute();
+const loading = ref(false);
+const members = ref<any[]>([]);
+const total = ref(0);
+const pendingRemove = ref<any>(null);
+const itemsPerPageOptions = [50, 100, 500, -1];
+
+const groupId = computed(() => route.params.group_id as string);
+
+const baseHeaders = [
+  avatarHeader,
+  { key: "name", title: "Name", sortable: false },
+];
+const adminHeaders = [{ key: "remove", title: "", sortable: false }];
+
+const headers = computed(() => {
+  let h = [...baseHeaders];
+  if (members.value.length && members.value[0].role)
+    h.push({ key: "role", title: "Role", sortable: false });
+  if (props.currentUserHasAdminRights) h = [...h, ...adminHeaders];
+  return h;
+});
+
+async function loadMembers({
+  page,
+  itemsPerPage,
+}: {
+  page: number;
+  itemsPerPage: number;
+}) {
+  loading.value = true;
+  try {
+    const { data } = await api.get(
+      `/v3/groups/${groupId.value}/${props.user_type}`,
+      {
+        params: {
+          batch_size: itemsPerPage,
+          start_index: (page - 1) * itemsPerPage,
+        },
       },
-      deep: true,
-    },
-  },
-  mounted() {
-    this.get_members()
-  },
-  methods: {
-    get_members() {
-      this.loading = true
-      const url = `/v3/groups/${this.group_id}/${this.user_type}`
-      const { itemsPerPage, page } = this.options
-      const params = {
-        batch_size: itemsPerPage,
-        start_index: (page - 1) * itemsPerPage,
-      }
-      this.axios
-        .get(url, { params })
-        .then(({ data: { count, items } }) => {
-          this.total = count
-          this.members = items
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-        .finally(() => {
-          this.loading = false
-        })
-    },
-    add_user(user) {
-      if (!this.currentUserHasAdminRights)
-        return alert(
-          `This action can only be performed by group administrators`
-        )
-      const user_id = user._id || user.properties._id // for old picker
-      const url = `/v3/groups/${this.group_id}/${this.user_type}`
-      const body = { user_id }
-      this.axios
-        .post(url, body)
-        .then(() => {
-          this.$emit("usersChanged")
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    },
-    remove_user(user) {
-      if (!this.currentUserHasAdminRights)
-        return alert(
-          `This action can only be performed by group administrators`
-        )
-      if (!confirm(`Remove user ${user.display_name}?`)) return
-      const user_id = user._id
-      const url = `/v3/groups/${this.group_id}/${this.user_type}/${user_id}`
-      this.axios
-        .delete(url)
-        .then(() => {
-          this.$emit("usersChanged")
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    },
-  },
-  computed: {
-    group_id() {
-      return this.$route.params.group_id
-    },
-    headers() {
-      let headers = this.base_headers
-      if (this.members.length && this.members[0].role)
-        headers = [...headers, { value: "role", text: "Role" }]
-      if (this.currentUserHasAdminRights)
-        headers = [...headers, ...this.admin_headers]
-      return headers
-    },
-  },
+    );
+    total.value = data.count;
+    members.value = data.items;
+  } catch (error) {
+    console.error(error);
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function confirmRemove() {
+  const user = pendingRemove.value;
+  pendingRemove.value = null;
+  try {
+    await api.delete(`/v3/groups/${groupId.value}/${props.user_type}/${user._id}`);
+    emit("usersChanged");
+  } catch (error) {
+    console.error(error);
+  }
 }
 </script>
-
-<style lang="css" scoped></style>

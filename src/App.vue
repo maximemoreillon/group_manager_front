@@ -1,97 +1,78 @@
 <template>
-  <AppTemplate :options="options" @user="handleUserEvent($event)" @tokens="handleTokensEvent($event)">
-    <template v-slot:nav>
-      <v-list dense nav>
-        <v-list-item>
+  <v-app>
+    <template v-if="!route.meta.public">
+      <v-app-bar color="#333">
+        <v-app-bar-nav-icon @click="drawer = !drawer" />
+        <v-app-bar-title>Group manager</v-app-bar-title>
+        <template #append>
           <LocaleSelector />
-        </v-list-item>
-        <v-divider />
-        <v-list-item v-for="(item, index) in nav" :key="`nav_item_${index}`" :to="item.to" exact>
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
+          <ThemeToggle />
+          <v-btn icon="mdi-logout" @click="handleLogout" />
+        </template>
+      </v-app-bar>
 
-          <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
+      <v-navigation-drawer v-model="drawer">
+        <v-list nav>
+          <v-list-item
+            v-for="(item, index) in nav"
+            :key="`nav_item_${index}`"
+            :to="item.to"
+            :prepend-icon="item.icon"
+            :title="item.title"
+            exact
+          />
+        </v-list>
+      </v-navigation-drawer>
     </template>
-  </AppTemplate>
+
+    <v-main>
+      <v-container :fluid="!!route.meta.public">
+        <router-view />
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
-<script>
-import AppTemplate from "@moreillon/vue_application_template_vuetify"
-import LocaleSelector from "./components/LocaleSelector.vue"
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
+import { useAuth } from "@/composables/useAuth";
+import LocaleSelector from "@/components/LocaleSelector.vue";
+import ThemeToggle from "@/components/ThemeToggle.vue";
 
-const {
-  VUE_APP_LOGIN_URL,
-  VUE_APP_IDENTIFICATION_URL,
-  VUE_APP_HOMEPAGE_URL,
-  VUE_APP_LOGIN_HINT,
-  VUE_APP_OIDC_AUTHORITY,
-  VUE_APP_OIDC_CLIENT_ID,
-  VUE_APP_OIDC_AUDIENCE,
-} = process.env
+const { t } = useI18n();
+const route = useRoute();
+const router = useRouter();
+const { logout } = useAuth();
 
-export default {
-  name: "App",
+const drawer = ref(true);
 
-  components: {
-    AppTemplate,
-    LocaleSelector,
+const nav = computed(() => [
+  {
+    title: t("My Groups"),
+    to: { name: "UserGroups", params: { user_id: "self" } },
+    icon: "mdi-account",
   },
-
-  data: () => ({
-    options: {
-      title: "Group manager",
-      login_url: VUE_APP_LOGIN_URL,
-      identification_url: VUE_APP_IDENTIFICATION_URL,
-      homepage_url: VUE_APP_HOMEPAGE_URL,
-      login_hint: VUE_APP_LOGIN_HINT,
-      oidc: {
-        authority: VUE_APP_OIDC_AUTHORITY,
-        client_id: VUE_APP_OIDC_CLIENT_ID,
-        extraQueryParams: {
-          audience: VUE_APP_OIDC_AUDIENCE,
-        },
-      },
-    },
-  }),
-
-  methods: {
-    handleUserEvent(user) {
-      this.$store.commit("set_current_user", user)
-    },
-    handleTokensEvent(tokens) {
-      this.$store.commit("set_tokens", tokens)
-    },
+  {
+    title: t("Groups"),
+    to: { name: "Groups" },
+    icon: "mdi-account-multiple",
   },
-  computed: {
-    nav() {
-      return [
-        {
-          title: this.$t("My Groups"),
-          to: { name: "UserGroups", params: { user_id: "self" } },
-          icon: "mdi-account",
-        },
-        {
-          title: this.$t("Groups"),
-          to: { name: "Groups" },
-          icon: "mdi-account-multiple",
-        },
-        {
-          title: this.$t("Create group"),
-          to: { name: "CreateGroup" },
-          icon: "mdi-account-multiple-plus",
-        },
-        {
-          title: this.$t("About"),
-          to: { name: "About" },
-          icon: "mdi-information-outline",
-        },
-      ]
-    },
+  {
+    title: t("Create group"),
+    to: { name: "CreateGroup" },
+    icon: "mdi-account-multiple-plus",
   },
+  {
+    title: t("About"),
+    to: { name: "About" },
+    icon: "mdi-information-outline",
+  },
+]);
+
+function handleLogout() {
+  logout();
+  router.push({ name: "Login" });
 }
 </script>

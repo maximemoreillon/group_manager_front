@@ -1,422 +1,341 @@
 <template>
-  <v-card class="mx-auto" max-width="60em" :loading="loading">
-    <template v-if="group">
-      <v-toolbar flat>
-        <v-row align="center">
-          <v-col cols="auto">
-            <v-btn exact icon :to="{ name: 'Groups' }">
-              <v-icon>mdi-arrow-left</v-icon>
-            </v-btn>
-          </v-col>
-          <v-col cols="auto">
-            <v-toolbar-title>{{ group.name }}</v-toolbar-title>
-          </v-col>
-          <v-spacer />
-          <v-col cols="auto">
+  <v-row justify="center" v-if="loading">
+    <v-col cols="auto">
+      <v-progress-circular indeterminate color="primary" size="50" />
+    </v-col>
+  </v-row>
+  <template v-else-if="group">
+    <v-row>
+      <v-col>
+        <!-- Group metadata -->
+        <v-card>
+          <v-toolbar flat>
+            <v-toolbar-title>
+              <v-avatar start color="transparent">
+                <v-img :src="group.avatar_src" v-if="group.avatar_src" />
+                <v-icon v-else>mdi-account-multiple</v-icon>
+              </v-avatar>
+
+              {{ group.name }}
+            </v-toolbar-title>
+            <v-spacer />
+
             <v-btn
+              v-if="currentUserIsMember"
               :loading="leaving"
-              v-if="current_user_is_member_of_group"
-              @click="leave_group()"
+              @click="leaveGroup"
             >
-              <v-icon left>mdi-location-exit</v-icon>
-              <span>{{ $t("Leave") }}</span>
+              <v-icon start>mdi-location-exit</v-icon>
+              {{ $t("Leave") }}
             </v-btn>
             <v-btn
               v-else
               :loading="joining"
               :disabled="group.restricted"
-              @click="join_group()"
+              @click="joinGroup"
             >
-              <v-icon left>mdi-location-enter</v-icon>
-              <span>{{ $t("Join") }}</span>
+              <v-icon start>mdi-location-enter</v-icon>
+              {{ $t("Join") }}
             </v-btn>
-          </v-col>
-          <template v-if="current_user_has_admin_rights">
-            <v-col cols="auto">
+            <template v-if="currentUserHasAdminRights">
               <v-btn
-                :disabled="!group_has_modifications"
+                :disabled="!groupHasModifications"
                 :loading="updating"
-                @click="update_group()"
+                @click="updateGroup"
               >
-                <v-icon left>mdi-content-save</v-icon>
-                <span>{{ $t("Save") }}</span>
+                <v-icon start>mdi-content-save</v-icon>
+                {{ $t("Save") }}
               </v-btn>
-            </v-col>
-            <v-col cols="auto">
-              <DeleteGroupDialog />
-            </v-col>
-          </template>
-        </v-row>
-      </v-toolbar>
-      <v-divider />
 
-      <!-- Group metadata -->
-      <!-- Would probably be better as component -->
-      <v-card-text>
-        <v-card outlined>
-          <v-card-title>{{ $t("Group details") }}</v-card-title>
+              <DeleteGroupDialog />
+            </template>
+          </v-toolbar>
           <v-card-text>
             <v-row>
-              <v-col cols="5" align-self="center">
-                <v-img
-                  v-if="group.avatar_src"
-                  :src="group.avatar_src"
-                  contain
-                  height="15em"
+              <v-col>
+                <v-text-field
+                  :readonly="!currentUserHasAdminRights"
+                  :label="$t('Group name')"
+                  v-model="group.name"
+                  hide-details
                 />
-
-                <div v-else class="text-center">
-                  <v-icon size="15em"> mdi-account-multiple </v-icon>
-                </div>
               </v-col>
-
-              <v-col cols="7">
-                <v-row>
-                  <v-col>
-                    <v-text-field
-                      :readonly="!current_user_has_admin_rights"
-                      :label="$t('Group name')"
-                      v-model="group.name"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-col>
-                    <v-text-field
-                      readonly
-                      filled
-                      label="ID"
-                      v-model="group._id"
-                    />
-                  </v-col>
-                </v-row>
-
-                <v-row v-if="current_user_has_admin_rights">
-                  <v-col>
-                    <v-text-field
-                      :label="$t('Group avatar URL')"
-                      v-model="group.avatar_src"
-                    />
-                  </v-col>
-                </v-row>
-
-                <v-row>
-                  <v-col>
-                    <v-switch
-                      :disabled="!current_user_has_admin_rights"
-                      v-model="group.restricted"
-                      :label="$t('Restricted')"
-                    />
-                  </v-col>
-
-                  <v-col>
-                    <v-switch
-                      :disabled="!current_user.isAdmin"
-                      v-model="group.official"
-                      :label="$t('Official')"
-                    />
-                  </v-col>
-                </v-row>
+            </v-row>
+            <v-row v-if="currentUserHasAdminRights">
+              <v-col>
+                <v-text-field
+                  :label="$t('Group avatar URL')"
+                  v-model="group.avatar_src"
+                  hide-details
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  readonly
+                  variant="filled"
+                  label="ID"
+                  v-model="group._id"
+                  hide-details
+                />
+              </v-col>
+            </v-row>
+            <v-row justify="space-between">
+              <v-col cols="auto">
+                <v-switch
+                  :disabled="!currentUserHasAdminRights"
+                  v-model="group.restricted"
+                  :label="$t('Restricted')"
+                  hide-details
+                />
+              </v-col>
+              <v-col cols="auto">
+                <v-switch
+                  :disabled="!currentUserHasAdminRights"
+                  v-model="group.hidden"
+                  :label="$t('Hidden')"
+                  hide-details
+                />
+              </v-col>
+              <v-col cols="auto">
+                <v-switch
+                  :disabled="!currentUser?.isAdmin"
+                  v-model="group.official"
+                  :label="$t('Official')"
+                  hide-details
+                />
               </v-col>
             </v-row>
           </v-card-text>
         </v-card>
-      </v-card-text>
+      </v-col>
+    </v-row>
 
-      <!-- Members -->
-      <v-card-text>
-        <v-card outlined>
+    <!-- Members -->
+    <v-row>
+      <v-col>
+        <v-card>
           <v-toolbar flat>
             <v-toolbar-title>{{ $t("Related users") }}</v-toolbar-title>
-            <template v-slot:extension>
-              <v-tabs v-model="members_tab">
-                <v-tab>{{ $t("Members") }}</v-tab>
-                <v-tab>{{ $t("Administrators") }}</v-tab>
+            <template #extension>
+              <v-tabs v-model="membersTab">
+                <v-tab value="members">{{ $t("Members") }}</v-tab>
+                <v-tab value="administrators">{{ $t("Administrators") }}</v-tab>
               </v-tabs>
             </template>
           </v-toolbar>
           <v-divider />
           <v-card-text>
-            <v-tabs-items v-model="members_tab">
-              <v-tab-item
-                v-for="user_type in ['members', 'administrators']"
-                :key="`user_type_${user_type}`"
+            <v-window v-model="membersTab">
+              <v-window-item
+                v-for="userType in ['members', 'administrators']"
+                :key="`user_type_${userType}`"
+                :value="userType"
               >
                 <UsersOfGroup
-                  :currentUserHasAdminRights="current_user_has_admin_rights"
-                  :user_type="user_type"
-                  @usersChanged="get_group()"
+                  :currentUserHasAdminRights="currentUserHasAdminRights"
+                  :user_type="userType"
+                  @usersChanged="getGroup"
                 />
-              </v-tab-item>
-            </v-tabs-items>
+              </v-window-item>
+            </v-window>
           </v-card-text>
         </v-card>
-      </v-card-text>
+      </v-col>
+    </v-row>
 
-      <!-- Related groups -->
-      <v-card-text>
-        <v-card outlined>
+    <!-- Related groups -->
+    <v-row>
+      <v-col>
+        <v-card>
           <v-toolbar flat>
             <v-toolbar-title>{{ $t("Related groups") }}</v-toolbar-title>
-            <template v-slot:extension>
-              <v-tabs v-model="groups_tab">
-                <v-tab>{{ $t("Subgroups") }}</v-tab>
-                <v-tab>{{ $t("Parent groups") }}</v-tab>
+            <template #extension>
+              <v-tabs v-model="groupsTab">
+                <v-tab value="child">{{ $t("Subgroups") }}</v-tab>
+                <v-tab value="parent">{{ $t("Parent groups") }}</v-tab>
               </v-tabs>
             </template>
           </v-toolbar>
           <v-divider />
           <v-card-text>
-            <v-tabs-items v-model="groups_tab">
-              <v-tab-item
-                v-for="group_type in ['child', 'parent']"
-                :key="`group_type_${group_type}`"
+            <v-window v-model="groupsTab">
+              <v-window-item
+                v-for="groupType in ['child', 'parent']"
+                :key="`group_type_${groupType}`"
+                :value="groupType"
               >
                 <GroupsOfGroups
-                  :group_type="group_type"
-                  :currentUserHasAdminRights="current_user_has_admin_rights"
-                  @groupsChanged="get_group()"
+                  :group_type="groupType"
+                  :currentUserHasAdminRights="currentUserHasAdminRights"
+                  @groupsChanged="getGroup"
                 />
-              </v-tab-item>
-            </v-tabs-items>
+              </v-window-item>
+            </v-window>
           </v-card-text>
         </v-card>
-      </v-card-text>
-    </template>
+      </v-col>
+    </v-row>
+  </template>
 
-    <v-card-text class="text-center pa-5" v-if="loading"
-      >Loading group...</v-card-text
-    >
-    <v-card-text class="text-center pa-5 error--text" v-if="error">{{
-      error
-    }}</v-card-text>
-  </v-card>
+  <v-row v-else-if="error" justify="center">
+    <v-col cols="auto">
+      {{ error }}
+    </v-col>
+  </v-row>
+
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    {{ snackbar.message }}
+  </v-snackbar>
 </template>
 
-<script>
-// @ is an alias to /src
-import DeleteGroupDialog from "@/components/DeleteGroupDialog.vue"
-import GroupsOfGroups from "@/components/GroupsOfGroups.vue"
-import UsersOfGroup from "@/components/UsersOfGroup.vue"
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
+import { useAuth } from "@/composables/useAuth";
+import DeleteGroupDialog from "@/components/DeleteGroupDialog.vue";
+import GroupsOfGroups from "@/components/GroupsOfGroups.vue";
+import UsersOfGroup from "@/components/UsersOfGroup.vue";
+import api from "@/api";
 
-export default {
-  name: "Group",
-  components: {
-    UsersOfGroup,
-    GroupsOfGroups,
-    DeleteGroupDialog,
-  },
-  data() {
-    return {
-      group: null,
-      unmodified_group_copy: null,
+const route = useRoute();
+const { t } = useI18n();
+const { currentUser, currentUserId } = useAuth();
 
-      members_tab: null,
-      groups_tab: null,
-      groups_officiality_tab: null,
+const group = ref<any>(null);
+const unmodifiedGroupCopy = ref<any>(null);
+const members = ref<any[]>([]);
+const administrators = ref<any[]>([]);
 
-      // Used to check if user is member or admin
-      // NOT IDEAL
-      members: [],
-      administrators: [],
+const membersTab = ref("members");
+const groupsTab = ref("child");
 
-      // Used for loaders
-      loading: false,
-      updating: false,
-      deleting: false,
-      joining: false,
-      leaving: false,
+const loading = ref(false);
+const updating = ref(false);
+const joining = ref(false);
+const leaving = ref(false);
+const error = ref<string | null>(null);
+const snackbar = ref({ show: false, message: "", color: "" });
 
-      error: null,
-    }
-  },
-  mounted() {
-    this.get_group()
-  },
-  watch: {
-    group_id() {
-      this.get_group()
-    },
-  },
-  methods: {
-    get_group() {
-      this.group = null
-      this.loading = true
-      const url = `/v3/groups/${this.group_id}`
-      this.axios
-        .get(url)
-        .then(({ data }) => {
-          this.group = data
+const groupId = computed(() => route.params.group_id as string);
 
-          this.get_members()
-          this.get_administrators()
-
-          this.save_copy_of_group()
-        })
-        .catch((error) => {
-          console.error(error)
-          this.error = error
-        })
-        .finally(() => {
-          this.loading = false
-        })
-    },
-
-    delete_group() {
-      if (!confirm(`Delete group ${this.group.name}?`)) return
-      this.deleting = true
-      const url = `/v3/groups/${this.group_id}`
-      this.axios
-        .delete(url)
-        .then(() => {
-          this.$router.push({ name: "UserGroups", params: { user_id: "self" } })
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-        .finally(() => {
-          this.deleting = false
-        })
-    },
-
-    update_group() {
-      this.updating = true
-      const url = `/v3/groups/${this.group_id}`
-      const body = this.modified_properties
-      this.axios
-        .patch(url, body)
-        .then(() => {
-          this.get_group()
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-        .finally(() => {
-          this.updating = false
-        })
-    },
-
-    join_group() {
-      this.joining = true
-      const url = `/v3/groups/${this.group_id}/members`
-      const body = { user_id: "self" }
-      this.axios
-        .post(url, body)
-        .then(() => {
-          this.get_group()
-        })
-        .catch((error) => {
-          alert("Failed to join group")
-          console.error(error)
-        })
-        .finally(() => {
-          this.joining = false
-        })
-    },
-
-    leave_group() {
-      this.leaving = true
-      const url = `/v3/groups/${this.group_id}/members/self`
-      this.axios
-        .delete(url)
-        .then(() => {
-          this.get_group()
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-        .finally(() => {
-          this.leaving = false
-        })
-    },
-
-    get_members() {
-      // Currently not related to the members table
-      // Simply used to check if user is member
-      const url = `/v3/groups/${this.group_id}/members`
-      this.axios
-        .get(url)
-        .then(({ data }) => {
-          this.members = data.items
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    },
-    matches_current_user(entity) {
-      const id = this.current_user_identifier
-      if (!id) return false
-
-      return entity._id === id || entity.username === id
-    },
-    get_administrators() {
-      // Currently not related to the administrators table
-      // Simply used to check if user is administrator
-      const url = `/v3/groups/${this.group_id}/administrators`
-      this.axios
-        .get(url)
-        .then(({ data }) => {
-          this.administrators = data.items
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    },
-    save_copy_of_group() {
-      this.unmodified_group_copy = JSON.parse(JSON.stringify(this.group))
-    },
-  },
-  computed: {
-    group_id() {
-      return this.$route.params.group_id
-    },
-    current_user() {
-      return this.$store.state.current_user
-    },
-    current_user_identifier() {
-      const user = this.current_user
-      if (!user) return undefined
-
-      return (
-        user._id ||
-        user.preferred_username ||
-        user?.properties?._id
-      )
-    },
-    current_user_is_member_of_group() {
-      return this.members.some(this.matches_current_user)
-    },
-    current_user_is_administrator_of_group() {
-      return this.administrators.some(this.matches_current_user)
-    },
-    current_user_has_admin_rights() {
-      return (
-        this.current_user_is_administrator_of_group || this.current_user.isAdmin
-      )
-    },
-    modified_properties() {
-      if (!this.group) return {}
-      if (!this.unmodified_group_copy) return {}
-
-      const current_keys = Object.keys(this.group)
-
-      return current_keys.reduce((acc, key) => {
-        const current_value = this.group[key]
-        const original_value = this.unmodified_group_copy[key]
-
-        // Only deal with non-nested stuff
-        if (current_value != null && typeof current_value === "object")
-          return acc
-
-        // If there is a modification, add it to an object of modified properties
-        if (original_value !== current_value) acc[key] = current_value
-
-        return acc
-      }, {})
-    },
-    group_has_modifications() {
-      return Object.keys(this.modified_properties).length > 0
-    },
-  },
+function matchesCurrentUser(entity: any) {
+  const id = currentUserId.value;
+  if (!id) return false;
+  return entity._id === id || entity.username === id;
 }
+
+const currentUserIsMember = computed(() =>
+  members.value.some(matchesCurrentUser),
+);
+const currentUserIsAdministrator = computed(() =>
+  administrators.value.some(matchesCurrentUser),
+);
+const currentUserHasAdminRights = computed(
+  () => currentUserIsAdministrator.value || !!currentUser.value?.isAdmin,
+);
+
+const modifiedProperties = computed(() => {
+  if (!group.value || !unmodifiedGroupCopy.value) return {};
+  return Object.keys(group.value).reduce((acc: any, key) => {
+    const current = group.value[key];
+    const original = unmodifiedGroupCopy.value[key];
+    if (current != null && typeof current === "object") return acc;
+    if (original !== current) acc[key] = current;
+    return acc;
+  }, {});
+});
+
+const groupHasModifications = computed(
+  () => Object.keys(modifiedProperties.value).length > 0,
+);
+
+async function getMembers() {
+  try {
+    const { data } = await api.get(`/v3/groups/${groupId.value}/members`);
+    members.value = data.items;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function getAdministrators() {
+  try {
+    const { data } = await api.get(
+      `/v3/groups/${groupId.value}/administrators`,
+    );
+    administrators.value = data.items;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function getGroup() {
+  group.value = null;
+  loading.value = true;
+  error.value = null;
+  try {
+    const { data } = await api.get(`/v3/groups/${groupId.value}`);
+    group.value = data;
+    unmodifiedGroupCopy.value = JSON.parse(JSON.stringify(data));
+    getMembers();
+    getAdministrators();
+  } catch (err: any) {
+    console.error(err);
+    error.value = err.message;
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function updateGroup() {
+  updating.value = true;
+  try {
+    await api.patch(`/v3/groups/${groupId.value}`, modifiedProperties.value);
+    snackbar.value = {
+      show: true,
+      message: t("Group updated successfully"),
+      color: "success",
+    };
+  } catch (err) {
+    console.error(err);
+    snackbar.value = {
+      show: true,
+      message: t("Failed to update group"),
+      color: "error",
+    };
+  } finally {
+    updating.value = false;
+  }
+}
+
+async function joinGroup() {
+  joining.value = true;
+  try {
+    await api.post(`/v3/groups/${groupId.value}/members`, { user_id: "self" });
+    getGroup();
+  } catch (err) {
+    alert("Failed to join group");
+    console.error(err);
+  } finally {
+    joining.value = false;
+  }
+}
+
+async function leaveGroup() {
+  leaving.value = true;
+  try {
+    await api.delete(`/v3/groups/${groupId.value}/members/self`);
+    getGroup();
+  } catch (err) {
+    console.error(err);
+  } finally {
+    leaving.value = false;
+  }
+}
+
+watch(groupId, getGroup);
+onMounted(getGroup);
 </script>

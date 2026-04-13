@@ -1,123 +1,93 @@
 <template>
   <v-dialog width="90vw" v-model="dialog">
-    <template v-slot:activator="{ on, attrs }">
-      <v-btn color="primary" v-bind="attrs" v-on="on">
-        <v-icon left>mdi-account-plus</v-icon>
-        <span>Add {{ as || "user" }}</span>
+    <template #activator="{ props }">
+      <v-btn color="primary" v-bind="props">
+        <v-icon start>mdi-account-plus</v-icon>
+        Add {{ as || 'user' }}
       </v-btn>
     </template>
-
     <v-card>
-      <v-card-title flat> Add {{ as || "user" }} </v-card-title>
-
-      <v-card-text class="mt-3">
-        <UserPicker class="picker_container" @selection="add_user($event)" :accessToken="access_token" />
-      </v-card-text>
-
+      <v-card-title>Add {{ as || 'user' }}</v-card-title>
       <v-card-text>
-        <v-card outlined min-height="20vh">
-          <v-card-title>Selected users</v-card-title>
+        <UserPicker
+          :groupManagerApiUrl="groupManagerApiUrl"
+          :accessToken="accessToken"
+          @selection="addUser"
+        />
+      </v-card-text>
+      <v-card-text>
+        <v-card variant="outlined" min-height="10vh">
+          <v-card-title>{{ $t("Selected users") }}</v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="auto" v-for="(user, index) in selected_users" :key="user._id">
-                <v-chip close @click:close="remove_user(index)">
+              <v-col cols="auto" v-for="(user, index) in selectedUsers" :key="user._id">
+                <v-chip closable @click:close="removeUser(index)">
                   {{ user.display_name || user.username }}
                 </v-chip>
               </v-col>
             </v-row>
-
-            <!-- <v-list dense>
-                <v-list-item
-                  v-for="(user, index) in selected_users"
-                  :key="user._id">
-
-                  <v-list-item-content>
-                    {{user.display_name || user.username}}
-                  </v-list-item-content>
-                  <v-list-item-action>
-                    <v-btn
-                      small
-                      icon
-                      @click="remove_user(index)">
-                      <v-icon>mdi-delete</v-icon>
-                    </v-btn>
-                  </v-list-item-action>
-
-                </v-list-item>
-              </v-list> -->
           </v-card-text>
         </v-card>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn @click="dialog = false"> Cancel </v-btn>
-        <v-btn color="primary" @click="add_selected_users()">
-          Add selected users
-        </v-btn>
+        <v-btn @click="dialog = false">{{ $t("Cancel") }}</v-btn>
+        <v-btn color="primary" @click="addSelectedUsers">{{ $t("Add selected users") }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    {{ snackbar.message }}
+  </v-snackbar>
 </template>
 
-<script>
-import UserPicker from "@moreillon/vue_user_picker"
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { UserPicker, type User } from '@moreillon/group-manager-vue-picker'
+import { useAuth } from '@/composables/useAuth'
+import api from '@/api'
 
-export default {
-  name: "AddUserDialog",
-  components: {
-    UserPicker,
-  },
-  props: {
-    as: String,
-  },
-  data() {
-    return {
-      dialog: false,
-      selected_users: [],
-    }
-  },
+const props = defineProps<{ as?: string }>()
+const emit = defineEmits<{ usersChanged: [] }>()
 
-  watch: {
-    dialog() {
-      this.selected_users = []
-    },
-  },
-  methods: {
-    add_user(user) {
-      if (this.selected_users.some(({ _id }) => _id === user._id)) {
-        return alert("Duplicates not allowed")
-      }
-      this.selected_users.push(user)
-    },
-    add_selected_users() {
-      const url = `/v3/groups/${this.group_id}/${this.as}`
-      const body = { user_ids: this.selected_users.map(({ _id }) => _id) }
-      this.axios
-        .post(url, body)
-        .then(() => {
-          this.$emit("usersChanged")
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    },
-    remove_user(index) {
-      this.selected_users.splice(index, 1)
-    },
-  },
-  computed: {
-    group_id() {
-      return this.$route.params.group_id
-    },
-    access_token() {
-      return this.$store.state.tokens?.access_token
-    }
-  },
+const { t } = useI18n()
+const route = useRoute()
+const { accessToken } = useAuth()
+const dialog = ref(false)
+const selectedUsers = ref<User[]>([])
+const groupManagerApiUrl = import.meta.env.VITE_GROUP_MANAGER_API_URL
+const snackbar = ref({ show: false, message: '', color: '' })
+
+const groupId = ref(route.params.group_id as string)
+
+watch(dialog, (open) => {
+  if (!open) selectedUsers.value = []
+})
+
+function addUser(user: User) {
+  if (selectedUsers.value.some(({ _id }) => _id === user._id)) {
+    snackbar.value = { show: true, message: t('User already added'), color: 'warning' }
+    return
+  }
+  selectedUsers.value.push(user)
+}
+
+function removeUser(index: number) {
+  selectedUsers.value.splice(index, 1)
+}
+
+async function addSelectedUsers() {
+  try {
+    await api.post(`/v3/groups/${groupId.value}/${props.as}`, {
+      user_ids: selectedUsers.value.map(({ _id }) => _id),
+    })
+    emit('usersChanged')
+    dialog.value = false
+  } catch (error) {
+    console.error(error)
+  }
 }
 </script>
-
-<style lang="css" scoped>
-.picker_container {
-  max-height: 40vh;
-}
-</style>

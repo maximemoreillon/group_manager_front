@@ -1,134 +1,184 @@
 <template>
   <div>
-    <v-form @submit.prevent="get_groups()">
+    <v-form @submit.prevent="searchGroups">
       <v-row align="center" dense>
         <v-col>
-          <v-text-field v-model="search" label="Group name" />
+          <v-text-field v-model="search" label="Group name" hide-details />
         </v-col>
         <v-col cols="auto">
-          <v-btn type="submit" icon>
+          <v-btn type="submit" icon variant="plain" :loading="loading">
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-col>
       </v-row>
       <v-row align="center" dense>
         <v-col cols="auto">
-          <v-switch v-model="subgroups" label="Include subgroups" />
+          <v-select
+            v-model="officiality"
+            :items="officialityItems"
+            hide-details
+            density="compact"
+            variant="outlined"
+            style="width: 150px"
+          />
         </v-col>
         <v-spacer />
         <v-col cols="auto">
-          <v-checkbox label="Official" v-model="official" />
-        </v-col>
-        <v-col cols="auto">
-          <v-checkbox label="Non-official" v-model="nonofficial" />
+          <v-switch
+            v-model="subgroups"
+            :label="t('Include subgroups')"
+            hide-details
+          />
         </v-col>
       </v-row>
     </v-form>
-    <v-data-table
+
+    <v-data-table-server
       :items="groups"
       :headers="headers"
       :loading="loading"
-      :options.sync="options"
-      :server-items-length="total"
-      :items-per-page="50"
-      :footer-props="footerProps"
-      disable-sort
-      disable-filtering
+      :items-length="total"
+      v-model:page="page"
+      v-model:items-per-page="itemsPerPage"
+      :items-per-page-options="itemsPerPageOptions"
+      @update:options="loadGroups"
     >
-      <template v-slot:[`item.image`]="{ item }">
+      <template #item.avatar="{ item }">
         <v-img
           v-if="item.avatar_src"
           contain
-          width="2.5em"
-          height="2.5em"
+          width="2em"
+          height="2em"
           :src="item.avatar_src"
         />
-        <v-icon size="2.5em" v-else> mdi-account-multiple </v-icon>
+        <v-icon v-else>mdi-account-multiple</v-icon>
       </template>
 
-      <template v-slot:[`item.name`]="{ item }">
-        <router-link :to="{ name: 'Group', params: { group_id: item._id } }">
-          {{ item.name }}
-        </router-link>
+      <template #item.name="{ item }">
+        <span
+          class="text-primary cursor-pointer"
+          @click="$emit('selection', item)"
+          >{{ item.name }}</span
+        >
       </template>
 
-      <template v-slot:[`item.restricted`]="{ item }">
+      <template #item.restricted="{ item }">
         <v-icon v-if="item.restricted">mdi-lock</v-icon>
       </template>
 
-      <template v-slot:[`item.official`]="{ item }">
-        <v-icon v-if="item.official">mdi-check</v-icon>
+      <template #item.official="{ item }">
+        <v-icon v-if="item.official">mdi-check-decagram</v-icon>
       </template>
-    </v-data-table>
+
+      <template #item.hidden="{ item }">
+        <v-icon v-if="item.hidden">mdi-eye-off</v-icon>
+      </template>
+    </v-data-table-server>
   </div>
+
+  <v-snackbar v-model="errorSnackbar" color="error" timeout="3000">
+    {{ t("Failed to search groups") }}
+  </v-snackbar>
 </template>
 
-<script>
-export default {
-  name: "GroupSearch",
-  data() {
-    return {
-      loading: false,
-      search: "",
-      subgroups: true,
-      official: true,
-      nonofficial: true,
-      groups: [],
-      total: 0,
-      options: {},
-      footerProps: { "items-per-page-options": [50, 100, 500, -1] },
-      headers: [
-        { value: "image", text: "Avatar" },
-        { value: "name", text: "Name" },
-        { value: "official", text: "Official" },
-        { value: "restricted", text: "Restricted" },
-      ],
-    }
-  },
-  watch: {
-    options: {
-      handler() {
-        this.get_groups()
-      },
-      deep: true,
-    },
-    subgroups() {
-      this.get_groups()
-    },
-    official() {
-      this.get_groups()
-    },
-    nonofficial() {
-      this.get_groups()
-    },
-  },
-  methods: {
-    async get_groups() {
-      try {
-        this.loading = true
-        this.groups = []
-        const { itemsPerPage, page } = this.options
-        const params = {
-          search: this.search,
-          batch_size: itemsPerPage,
-          start_index: (page - 1) * itemsPerPage,
-        }
-        if (!this.subgroups) params.shallow = true
-        if (!this.official) params.nonofficial = true
-        if (!this.nonofficial) params.official = true
+<script setup lang="ts">
+import { ref, computed, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
+import api from "@/api";
+import {
+  avatarHeader,
+  hiddenHeader,
+  officialHeader,
+  restrictedHeader,
+} from "@/common";
 
-        const {
-          data: { count, items },
-        } = await this.axios.get("/v3/groups", { params })
-        this.total = count
-        this.groups = items
-      } catch (error) {
-        alert("Failed to search groups")
-        console.error(error)
-      } finally {
-        this.loading = false
-      }
-    },
-  },
+defineEmits<{ selection: [group: any] }>();
+
+const { t } = useI18n();
+const route = useRoute();
+const router = useRouter();
+
+const loading = ref(false);
+const errorSnackbar = ref(false);
+const search = ref((route.query.search as string) || "");
+const subgroups = ref(route.query.subgroups !== "false");
+const officiality = ref((route.query.officiality as string) || "all");
+const page = ref(Number(route.query.page) || 1);
+const itemsPerPage = ref(Number(route.query.itemsPerPage) || 50);
+
+const officialityItems = computed(() => [
+  { title: t("All"), value: "all" },
+  { title: t("Official"), value: "official" },
+  { title: t("Non-official"), value: "nonofficial" },
+]);
+const groups = ref<any[]>([]);
+const total = ref(0);
+const itemsPerPageOptions = [50, 100, 500, -1];
+
+const headers = [
+  avatarHeader,
+  { key: "name", title: "Name", sortable: false },
+  officialHeader,
+  restrictedHeader,
+  hiddenHeader,
+];
+
+async function loadGroups({
+  page: p,
+  itemsPerPage: ipp,
+}: {
+  page: number;
+  itemsPerPage: number;
+}) {
+  loading.value = true;
+  groups.value = [];
+  try {
+    const params: Record<string, any> = {
+      search: search.value,
+      batch_size: ipp,
+      start_index: (p - 1) * ipp,
+    };
+    if (!subgroups.value) params.shallow = true;
+    if (officiality.value === "official") params.official = true;
+    if (officiality.value === "nonofficial") params.nonofficial = true;
+
+    const { data } = await api.get("/v3/groups", { params });
+    total.value = data.count;
+    groups.value = data.items;
+  } catch {
+    errorSnackbar.value = true;
+  } finally {
+    loading.value = false;
+  }
 }
+
+function syncQuery() {
+  router.replace({
+    query: {
+      ...route.query,
+      search: search.value || undefined,
+      officiality: officiality.value !== "all" ? officiality.value : undefined,
+      subgroups: !subgroups.value ? "false" : undefined,
+      page: page.value !== 1 ? String(page.value) : undefined,
+      itemsPerPage:
+        itemsPerPage.value !== 50 ? String(itemsPerPage.value) : undefined,
+    },
+  });
+}
+
+function searchGroups() {
+  page.value = 1;
+  syncQuery();
+  loadGroups({ page: page.value, itemsPerPage: itemsPerPage.value });
+}
+
+watch([officiality, subgroups], () => {
+  syncQuery();
+  loadGroups({ page: page.value, itemsPerPage: itemsPerPage.value });
+});
+
+watch([page, itemsPerPage], () => {
+  syncQuery();
+});
 </script>

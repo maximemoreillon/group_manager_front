@@ -1,28 +1,35 @@
 <template>
-  <v-data-table
+  <v-data-table-server
     :items="groups"
     :headers="headers"
     :loading="loading"
-    :options.sync="options"
-    :server-items-length="total"
+    :items-length="total"
     :items-per-page="50"
-    :footer-props="footerProps"
-    disable-sort
-    disable-filtering
+    :items-per-page-options="itemsPerPageOptions"
+    @update:options="loadGroups"
   >
-    <template v-slot:[`top`]>
+    <template #top>
       <v-row align="center">
         <v-col cols="auto">
-          <v-switch v-model="options.subgroups" label="Include subgroups" />
+          <AddGroupDialog
+            v-if="props.currentUserHasAdminRights"
+            :as="props.group_type"
+            @groupAdd="addGroup"
+          />
         </v-col>
         <v-spacer />
         <v-col cols="auto">
-          <AddGroupDialog :as="group_type" @groupAdd="add_group($event)" />
+          <v-switch
+            v-model="includeSubgroups"
+            :label="$t('Include subgroups')"
+            hide-details
+            @update:model-value="reload"
+          />
         </v-col>
       </v-row>
     </template>
 
-    <template v-slot:[`item.image`]="{ item }">
+    <template #item.avatar="{ item }">
       <v-img
         v-if="item.avatar_src"
         contain
@@ -30,165 +37,156 @@
         height="2.5em"
         :src="item.avatar_src"
       />
-      <v-icon size="2.5em" v-else> mdi-account-multiple </v-icon>
+      <v-icon v-else>mdi-account-multiple</v-icon>
     </template>
 
-    <template v-slot:[`item.name`]="{ item }">
-      <router-link :to="{ name: 'Group', params: { group_id: item._id } }">
-        {{ item.name }}
-      </router-link>
+    <template #item.name="{ item }">
+      <router-link :to="{ name: 'Group', params: { group_id: item._id } }">{{
+        item.name
+      }}</router-link>
     </template>
 
-    <template v-slot:[`item.restricted`]="{ item }">
-      <v-icon v-if="item.restricted">mdi-check</v-icon>
-      <!-- <v-icon v-else>mdi-lock-open</v-icon> -->
+    <template #item.restricted="{ item }">
+      <v-icon v-if="item.restricted">mdi-lock</v-icon>
     </template>
 
-    <template v-slot:[`item.official`]="{ item }">
-      <v-icon v-if="item.official">mdi-check</v-icon>
-      <!-- <v-icon v-else>mdi-close</v-icon> -->
+    <template #item.hidden="{ item }">
+      <v-icon v-if="item.hidden">mdi-eye-off</v-icon>
     </template>
 
-    <template v-slot:[`item.delete`]="{ item }">
-      <v-btn icon @click="remove_group(item)" color="#c00000" dark>
-        <v-icon>mdi-account-multiple-remove</v-icon>
-      </v-btn>
+    <template #item.official="{ item }">
+      <v-icon v-if="item.official">mdi-check-decagram</v-icon>
     </template>
-  </v-data-table>
+
+    <template #item.delete="{ item }">
+      <v-btn
+        color="error"
+        @click="pendingRemove = item"
+        icon="mdi-account-multiple-remove"
+        variant="plain"
+      />
+    </template>
+  </v-data-table-server>
+
+  <v-dialog :model-value="!!pendingRemove" max-width="400" @update:model-value="pendingRemove = null">
+    <v-card>
+      <v-card-title>{{ $t("Remove group") }}</v-card-title>
+      <v-card-text>{{ $t("Remove {name}?", { name: pendingRemove?.name }) }}</v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn @click="pendingRemove = null">{{ $t("Cancel") }}</v-btn>
+        <v-btn color="error" @click="confirmRemove">{{ $t("Remove") }}</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
-<script>
-import AddGroupDialog from "@/components/AddGroupDialog.vue"
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { useRoute } from "vue-router";
+import AddGroupDialog from "@/components/AddGroupDialog.vue";
+import api from "@/api";
+import { avatarHeader, hiddenHeader, restrictedHeader } from "@/common";
 
-export default {
-  name: "GroupsOfGroups",
-  components: {
-    AddGroupDialog,
-  },
-  props: {
-    currentUserHasAdminRights: Boolean,
-    group_type: String, // 'child' or 'parent'
-  },
-  data() {
-    return {
-      loading: false,
-      groups: [],
-      total: 0,
-      options: { subgroups: true },
-      footerProps: { "items-per-page-options": [50, 100, 500, -1] },
-      base_headers: [
-        { value: "image", text: "", width: "50px" },
-        { value: "name", text: "Name" },
-        { value: "official", text: "Official" },
-        { value: "restricted", text: "Restricted" },
-      ],
-      admin_headers: [{ value: "delete", text: "Delete" }],
-    }
-  },
-  mounted() {
-    this.get_groups()
-  },
-  watch: {
-    options: {
-      handler() {
-        // WARNING: DOUBLE QUERY WHEN CHANGING SHALLOW
-        this.get_groups()
-      },
-      deep: true,
-    },
-  },
-  methods: {
-    get_groups() {
-      this.loading = true
-      this.groups = []
+const props = defineProps<{
+  group_type: string;
+  currentUserHasAdminRights: boolean;
+}>();
 
-      // URL changes with group type
-      let url =
-        this.group_type === "parent"
-          ? `/v3/groups/${this.group_id}/parents`
-          : `/v3/groups/${this.group_id}/groups`
+const emit = defineEmits<{ groupsChanged: [] }>();
 
-      const { itemsPerPage, page, subgroups } = this.options
-      const params = {
+const route = useRoute();
+const loading = ref(false);
+const groups = ref<any[]>([]);
+const total = ref(0);
+const includeSubgroups = ref(true);
+const pendingRemove = ref<any>(null);
+const itemsPerPageOptions = [50, 100, 500, -1];
+
+let lastOptions = { page: 1, itemsPerPage: 50 };
+
+const groupId = computed(() => route.params.group_id as string);
+
+const baseHeaders = [
+  avatarHeader,
+  { key: "name", title: "Name", sortable: false },
+  { key: "official", title: "Official", sortable: false, align: "center" },
+  restrictedHeader,
+  hiddenHeader,
+] as const;
+const adminHeaders = [{ key: "delete", title: "", sortable: false }];
+
+const headers = computed(() =>
+  props.currentUserHasAdminRights
+    ? [...baseHeaders, ...adminHeaders]
+    : baseHeaders,
+);
+
+async function loadGroups({
+  page,
+  itemsPerPage,
+}: {
+  page: number;
+  itemsPerPage: number;
+}) {
+  lastOptions = { page, itemsPerPage };
+  loading.value = true;
+  groups.value = [];
+  const url =
+    props.group_type === "parent"
+      ? `/v3/groups/${groupId.value}/parents`
+      : `/v3/groups/${groupId.value}/groups`;
+  try {
+    const { data } = await api.get(url, {
+      params: {
         batch_size: itemsPerPage,
         start_index: (page - 1) * itemsPerPage,
-        direct: subgroups ? undefined : true,
-      }
+        direct: includeSubgroups.value ? undefined : true,
+      },
+    });
+    total.value = data.count;
+    groups.value = data.items;
+  } catch (error) {
+    console.error(error);
+  } finally {
+    loading.value = false;
+  }
+}
 
-      this.axios
-        .get(url, { params })
-        .then(({ data: { count, items } }) => {
-          this.total = count
-          this.groups = items
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-        .finally(() => {
-          this.loading = false
-        })
-    },
-    add_group(group) {
-      if (!this.currentUserHasAdminRights)
-        return alert(
-          `This action can only be performed by group administrators`
-        )
+function reload() {
+  loadGroups(lastOptions);
+}
 
-      const group_id = group._id || group.properties._id // for old picker
+async function addGroup(group: { _id: string }) {
+  let url: string;
+  let body: object;
+  if (props.group_type === "parent") {
+    url = `/v3/groups/${group._id}/groups`;
+    body = { group_id: groupId.value };
+  } else {
+    url = `/v3/groups/${groupId.value}/groups`;
+    body = { group_id: group._id };
+  }
+  try {
+    await api.post(url, body);
+    emit("groupsChanged");
+  } catch (error) {
+    console.error(error);
+  }
+}
 
-      let url, body
-      if (this.group_type === "parent") {
-        url = `/v3/groups/${group_id}/groups`
-        body = { group_id: this.group_id }
-      } else {
-        url = `/v3/groups/${this.group_id}/groups`
-        body = { group_id: group._id || group.properties._id } // Support for legacy picker
-      }
-
-      this.axios
-        .post(url, body)
-        .then(() => {
-          this.$emit("groupsChanged")
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    },
-    remove_group(group) {
-      if (!this.currentUserHasAdminRights)
-        return alert(
-          `This action can only be performed by group administrators`
-        )
-      if (!confirm(`Remove group ${group.name}?`)) return
-
-      const group_id = group._id
-
-      let url
-      if (this.group_type === "parent") {
-        url = `/v3/groups/${group_id}/groups/${this.group_id}`
-      } else {
-        url = `/v3/groups/${this.group_id}/groups/${group_id}`
-      }
-
-      this.axios
-        .delete(url)
-        .then(() => {
-          this.$emit("groupsChanged")
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    },
-  },
-  computed: {
-    group_id() {
-      return this.$route.params.group_id
-    },
-    headers() {
-      if (this.currentUserHasAdminRights)
-        return [...this.base_headers, ...this.admin_headers]
-      else return this.base_headers
-    },
-  },
+async function confirmRemove() {
+  const group = pendingRemove.value;
+  pendingRemove.value = null;
+  const url =
+    props.group_type === "parent"
+      ? `/v3/groups/${group._id}/groups/${groupId.value}`
+      : `/v3/groups/${groupId.value}/groups/${group._id}`;
+  try {
+    await api.delete(url);
+    emit("groupsChanged");
+  } catch (error) {
+    console.error(error);
+  }
 }
 </script>

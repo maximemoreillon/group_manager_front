@@ -1,58 +1,42 @@
 <template>
   <v-dialog v-model="dialog" width="70vw">
-    <template v-slot:activator="{ on, attrs }">
-      <v-btn color="primary" dark v-bind="attrs" v-on="on">
-        <v-icon left>mdi-account-multiple-plus</v-icon>
-        <span>Add {{ as || "group" }} group</span>
+    <template #activator="{ props }">
+      <v-btn color="primary" v-bind="props">
+        <v-icon start>mdi-account-multiple-plus</v-icon>
+        Add {{ as || 'group' }} group
       </v-btn>
     </template>
-
     <v-card>
-      <v-card-title>Add {{ as || "group" }} group</v-card-title>
-
+      <v-card-title>Add {{ as || 'group' }} group</v-card-title>
       <v-card-text>
         <GroupPicker
-          @selection="group_selected($event)"
           :groupManagerApiUrl="groupManagerApiUrl"
+          :accessToken="accessToken"
+          @selection="groupSelected"
         />
       </v-card-text>
-
       <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="primary" text @click="dialog = false"> Close </v-btn>
+        <v-spacer />
+        <v-btn variant="text" color="primary" @click="dialog = false">{{ $t("Close") }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
-<script>
-import GroupPicker from "@moreillon/vue_group_picker"
+<script setup lang="ts">
+import { ref } from 'vue'
+import { GroupPicker, type GroupItem } from '@moreillon/group-manager-vue-picker'
+import { useAuth } from '@/composables/useAuth'
 
-const { VUE_APP_GROUP_MANAGER_API_URL } = process.env
+defineProps<{ as?: string }>()
+const emit = defineEmits<{ groupAdd: [group: GroupItem] }>()
 
-export default {
-  name: "AddGroupDialog",
-  components: {
-    GroupPicker,
-  },
-  props: {
-    as: String,
-  },
-  data() {
-    return {
-      dialog: false,
-      groupManagerApiUrl: VUE_APP_GROUP_MANAGER_API_URL,
-    }
-  },
+const { accessToken } = useAuth()
+const dialog = ref(false)
+const groupManagerApiUrl = import.meta.env.VITE_GROUP_MANAGER_API_URL
 
-  methods: {
-    group_selected(group) {
-      const _id = group._id || group.properties._id
-      this.$emit("groupAdd", { _id })
-      this.dialog = false
-    },
-  },
+function groupSelected(group: GroupItem) {
+  emit('groupAdd', group)
+  dialog.value = false
 }
 </script>
-
-<style lang="css" scoped></style>
