@@ -1,7 +1,12 @@
 <template>
   <v-card max-width="30em" class="mx-auto">
     <v-toolbar flat>
-      <v-toolbar-title>{{ $t("Create group") }}</v-toolbar-title>
+      <v-toolbar-title>
+        <v-avatar start color="transparent">
+          <v-icon>mdi-account-multiple-plus</v-icon>
+        </v-avatar>
+        {{ $t("Create group") }}
+      </v-toolbar-title>
     </v-toolbar>
     <v-divider />
     <v-card-text>

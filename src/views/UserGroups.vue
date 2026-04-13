@@ -77,7 +77,7 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 
-const user = ref<{ display_name: string } | null>(null);
+const user = ref<{ display_name: string; avatar_src?: string } | null>(null);
 const relationTab = ref((route.query.relation as string) || "member");
 const officiality = ref((route.query.officiality as string) || "official");
 const subgroups = ref(route.query.subgroups === "true");
