@@ -38,7 +38,7 @@
 import { ref, computed, watch } from "vue";
 import { useRoute } from "vue-router";
 import api from "@/api";
-import { avatarHeader, hiddenHeader, restrictedheader } from "@/common";
+import { avatarHeader, hiddenHeader, restrictedHeader } from "@/common";
 
 const props = defineProps<{
   as: string;
@@ -56,7 +56,7 @@ const itemsPerPageOptions = [50, 100, 500, -1];
 const headers = [
   avatarHeader,
   { key: "name", title: "Name", sortable: false },
-  restrictedheader,
+  restrictedHeader,
   hiddenHeader,
 ] as const;
 
@@ -92,5 +92,8 @@ async function loadGroups({
   }
 }
 
-watch([() => props.shallow, userId], () => loadGroups(lastOptions));
+watch(
+  [() => props.shallow, () => props.official, () => props.nonofficial, userId],
+  () => loadGroups(lastOptions),
+);
 </script>

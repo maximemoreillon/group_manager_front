@@ -40,8 +40,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
 import api from "@/api";
 
+const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
 
@@ -49,7 +51,7 @@ const form = ref();
 const valid = ref(false);
 const creating = ref(false);
 const group = ref({ name: "" });
-const nameRules = [(v: string) => !!v || "Name is required"];
+const nameRules = [(v: string) => !!v || t("Name is required")];
 
 async function createGroup() {
   const { valid: isValid } = await form.value.validate();

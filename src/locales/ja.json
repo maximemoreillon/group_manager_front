@@ -38,5 +38,16 @@
   "Include subgroups": "サブグループを含む",
   "Hidden": "関係者以外には非表示",
   "Group updated successfully": "グループが更新されました",
-  "Failed to update group": "グループの更新に失敗しました"
+  "Failed to update group": "グループの更新に失敗しました",
+  "Failed to delete group": "グループの削除に失敗しました",
+  "Failed to search groups": "グループの検索に失敗しました",
+  "Remove group": "グループを除外",
+  "Remove user": "ユーザーを除外",
+  "Remove {name}?": "{name}を除外しますか？",
+  "Remove": "除外",
+  "Close": "閉じる",
+  "Selected users": "選択されたユーザー",
+  "Add selected users": "ユーザーを追加",
+  "User already added": "このユーザーはすでに追加されています",
+  "Name is required": "名前は必須です"
 }

@@ -8,12 +8,12 @@ export const avatarHeader = {
 
 export const officialHeader = {
   key: "official",
-  title: "official",
+  title: "Official",
   sortable: false,
   align: "center",
 } as const;
 
-export const restrictedheader = {
+export const restrictedHeader = {
   key: "restricted",
   title: "Restricted",
   sortable: false,
@@ -22,7 +22,7 @@ export const restrictedheader = {
 
 export const hiddenHeader = {
   key: "hidden",
-  title: "Hiden",
+  title: "Hidden",
   sortable: false,
   align: "center",
 } as const;

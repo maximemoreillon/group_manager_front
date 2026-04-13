@@ -17,7 +17,7 @@
       </v-card-text>
       <v-card-text>
         <v-card variant="outlined" min-height="10vh">
-          <v-card-title>Selected users</v-card-title>
+          <v-card-title>{{ $t("Selected users") }}</v-card-title>
           <v-card-text>
             <v-row>
               <v-col cols="auto" v-for="(user, index) in selectedUsers" :key="user._id">
@@ -31,16 +31,21 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn @click="dialog = false">Cancel</v-btn>
-        <v-btn color="primary" @click="addSelectedUsers">Add selected users</v-btn>
+        <v-btn @click="dialog = false">{{ $t("Cancel") }}</v-btn>
+        <v-btn color="primary" @click="addSelectedUsers">{{ $t("Add selected users") }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    {{ snackbar.message }}
+  </v-snackbar>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { UserPicker, type User } from '@moreillon/group-manager-vue-picker'
 import { useAuth } from '@/composables/useAuth'
 import api from '@/api'
@@ -48,19 +53,25 @@ import api from '@/api'
 const props = defineProps<{ as?: string }>()
 const emit = defineEmits<{ usersChanged: [] }>()
 
+const { t } = useI18n()
 const route = useRoute()
 const { accessToken } = useAuth()
 const dialog = ref(false)
 const selectedUsers = ref<User[]>([])
 const groupManagerApiUrl = import.meta.env.VITE_GROUP_MANAGER_API_URL
-const groupId = computed(() => route.params.group_id as string)
+const snackbar = ref({ show: false, message: '', color: '' })
+
+const groupId = ref(route.params.group_id as string)
 
 watch(dialog, (open) => {
   if (!open) selectedUsers.value = []
 })
 
 function addUser(user: User) {
-  if (selectedUsers.value.some(({ _id }) => _id === user._id)) return alert('Duplicates not allowed')
+  if (selectedUsers.value.some(({ _id }) => _id === user._id)) {
+    snackbar.value = { show: true, message: t('User already added'), color: 'warning' }
+    return
+  }
   selectedUsers.value.push(user)
 }
 

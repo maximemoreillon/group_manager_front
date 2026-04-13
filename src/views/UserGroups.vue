@@ -54,7 +54,6 @@
             </v-col>
           </v-row>
           <GroupsOfUser
-            :key="officiality"
             :as="relationship"
             :official="officiality === 'official'"
             :nonofficial="officiality === 'nonofficial'"

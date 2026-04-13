@@ -39,5 +39,16 @@
   "Hidden": "Hidden",
   "Include subgroups": "Include subgroups",
   "Group updated successfully": "Group updated successfully",
-  "Failed to update group": "Failed to update group"
+  "Failed to update group": "Failed to update group",
+  "Failed to delete group": "Failed to delete group",
+  "Failed to search groups": "Failed to search groups",
+  "Remove group": "Remove group",
+  "Remove user": "Remove user",
+  "Remove {name}?": "Remove {name}?",
+  "Remove": "Remove",
+  "Close": "Close",
+  "Selected users": "Selected users",
+  "Add selected users": "Add selected users",
+  "User already added": "User already added",
+  "Name is required": "Name is required"
 }

@@ -44,12 +44,24 @@
     <template #item.remove="{ item }">
       <v-btn
         icon="mdi-account-remove"
-        color="#c00000"
-        @click="removeUser(item)"
+        color="error"
+        @click="pendingRemove = item"
         variant="plain"
       />
     </template>
   </v-data-table-server>
+
+  <v-dialog :model-value="!!pendingRemove" max-width="400" @update:model-value="pendingRemove = null">
+    <v-card>
+      <v-card-title>{{ $t("Remove user") }}</v-card-title>
+      <v-card-text>{{ $t("Remove {name}?", { name: pendingRemove?.display_name }) }}</v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn @click="pendingRemove = null">{{ $t("Cancel") }}</v-btn>
+        <v-btn color="error" @click="confirmRemove">{{ $t("Remove") }}</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -71,6 +83,7 @@ const route = useRoute();
 const loading = ref(false);
 const members = ref<any[]>([]);
 const total = ref(0);
+const pendingRemove = ref<any>(null);
 const itemsPerPageOptions = [50, 100, 500, -1];
 
 const groupId = computed(() => route.params.group_id as string);
@@ -79,7 +92,7 @@ const baseHeaders = [
   avatarHeader,
   { key: "name", title: "Name", sortable: false },
 ];
-const adminHeaders = [{ key: "remove", title: "Remove", sortable: false }];
+const adminHeaders = [{ key: "remove", title: "", sortable: false }];
 
 const headers = computed(() => {
   let h = [...baseHeaders];
@@ -116,14 +129,11 @@ async function loadMembers({
   }
 }
 
-async function removeUser(user: any) {
-  if (!props.currentUserHasAdminRights)
-    return alert("This action can only be performed by group administrators");
-  if (!confirm(`Remove user ${user.display_name}?`)) return;
+async function confirmRemove() {
+  const user = pendingRemove.value;
+  pendingRemove.value = null;
   try {
-    await api.delete(
-      `/v3/groups/${groupId.value}/${props.user_type}/${user._id}`,
-    );
+    await api.delete(`/v3/groups/${groupId.value}/${props.user_type}/${user._id}`);
     emit("usersChanged");
   } catch (error) {
     console.error(error);

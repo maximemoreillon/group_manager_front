@@ -75,6 +75,10 @@
       </template>
     </v-data-table-server>
   </div>
+
+  <v-snackbar v-model="errorSnackbar" color="error" timeout="3000">
+    {{ t("Failed to search groups") }}
+  </v-snackbar>
 </template>
 
 <script setup lang="ts">
@@ -86,7 +90,7 @@ import {
   avatarHeader,
   hiddenHeader,
   officialHeader,
-  restrictedheader,
+  restrictedHeader,
 } from "@/common";
 
 defineEmits<{ selection: [group: any] }>();
@@ -96,6 +100,7 @@ const route = useRoute();
 const router = useRouter();
 
 const loading = ref(false);
+const errorSnackbar = ref(false);
 const search = ref((route.query.search as string) || "");
 const subgroups = ref(route.query.subgroups !== "false");
 const officiality = ref((route.query.officiality as string) || "all");
@@ -115,7 +120,7 @@ const headers = [
   avatarHeader,
   { key: "name", title: "Name", sortable: false },
   officialHeader,
-  restrictedheader,
+  restrictedHeader,
   hiddenHeader,
 ];
 
@@ -142,7 +147,7 @@ async function loadGroups({
     total.value = data.count;
     groups.value = data.items;
   } catch {
-    alert("Failed to search groups");
+    errorSnackbar.value = true;
   } finally {
     loading.value = false;
   }

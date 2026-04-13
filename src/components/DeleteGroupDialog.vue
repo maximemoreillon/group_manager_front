@@ -27,7 +27,7 @@
             </v-btn>
           </v-col>
           <v-col cols="auto">
-            <v-btn color="primary" @click="deleteGroup">
+            <v-btn color="error" :loading="deleting" @click="deleteGroup">
               <v-icon start>mdi-account-multiple-remove</v-icon>
               {{ $t("Delete") }}
             </v-btn>
@@ -36,6 +36,10 @@
       </v-card-text>
     </v-card>
   </v-dialog>
+
+  <v-snackbar v-model="errorSnackbar" color="error" timeout="3000">
+    {{ $t("Failed to delete group") }}
+  </v-snackbar>
 </template>
 
 <script setup lang="ts">
@@ -48,10 +52,13 @@ const router = useRouter();
 
 const dialog = ref(false);
 const deep = ref(false);
+const deleting = ref(false);
+const errorSnackbar = ref(false);
 
 const groupId = computed(() => route.params.group_id as string);
 
 async function deleteGroup() {
+  deleting.value = true;
   try {
     await api.delete(`/v3/groups/${groupId.value}`, {
       params: { deep: deep.value },
@@ -59,6 +66,9 @@ async function deleteGroup() {
     router.push({ name: "UserGroups", params: { user_id: "self" } });
   } catch (error) {
     console.error(error);
+    errorSnackbar.value = true;
+  } finally {
+    deleting.value = false;
   }
 }
 </script>

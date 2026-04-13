@@ -11,13 +11,17 @@
     <template #top>
       <v-row align="center">
         <v-col cols="auto">
-          <AddGroupDialog :as="props.group_type" @groupAdd="addGroup" />
+          <AddGroupDialog
+            v-if="props.currentUserHasAdminRights"
+            :as="props.group_type"
+            @groupAdd="addGroup"
+          />
         </v-col>
         <v-spacer />
         <v-col cols="auto">
           <v-switch
             v-model="includeSubgroups"
-            label="Include subgroups"
+            :label="$t('Include subgroups')"
             hide-details
             @update:model-value="reload"
           />
@@ -43,7 +47,7 @@
     </template>
 
     <template #item.restricted="{ item }">
-      <v-icon v-if="item.restricted">mdi-check</v-icon>
+      <v-icon v-if="item.restricted">mdi-lock</v-icon>
     </template>
 
     <template #item.hidden="{ item }">
@@ -51,19 +55,30 @@
     </template>
 
     <template #item.official="{ item }">
-      <v-icon v-if="item.official">mdi-check</v-icon>
+      <v-icon v-if="item.official">mdi-check-decagram</v-icon>
     </template>
 
     <template #item.delete="{ item }">
       <v-btn
-        color="#c00000"
-        @click="removeGroup(item)"
+        color="error"
+        @click="pendingRemove = item"
         icon="mdi-account-multiple-remove"
         variant="plain"
-      >
-      </v-btn>
+      />
     </template>
   </v-data-table-server>
+
+  <v-dialog :model-value="!!pendingRemove" max-width="400" @update:model-value="pendingRemove = null">
+    <v-card>
+      <v-card-title>{{ $t("Remove group") }}</v-card-title>
+      <v-card-text>{{ $t("Remove {name}?", { name: pendingRemove?.name }) }}</v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn @click="pendingRemove = null">{{ $t("Cancel") }}</v-btn>
+        <v-btn color="error" @click="confirmRemove">{{ $t("Remove") }}</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -71,7 +86,7 @@ import { ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import AddGroupDialog from "@/components/AddGroupDialog.vue";
 import api from "@/api";
-import { avatarHeader, hiddenHeader, restrictedheader } from "@/common";
+import { avatarHeader, hiddenHeader, restrictedHeader } from "@/common";
 
 const props = defineProps<{
   group_type: string;
@@ -85,9 +100,9 @@ const loading = ref(false);
 const groups = ref<any[]>([]);
 const total = ref(0);
 const includeSubgroups = ref(true);
+const pendingRemove = ref<any>(null);
 const itemsPerPageOptions = [50, 100, 500, -1];
 
-// Keep last options for reload when includeSubgroups changes
 let lastOptions = { page: 1, itemsPerPage: 50 };
 
 const groupId = computed(() => route.params.group_id as string);
@@ -96,10 +111,10 @@ const baseHeaders = [
   avatarHeader,
   { key: "name", title: "Name", sortable: false },
   { key: "official", title: "Official", sortable: false, align: "center" },
-  restrictedheader,
+  restrictedHeader,
   hiddenHeader,
 ] as const;
-const adminHeaders = [{ key: "delete", title: "Remove", sortable: false }];
+const adminHeaders = [{ key: "delete", title: "", sortable: false }];
 
 const headers = computed(() =>
   props.currentUserHasAdminRights
@@ -143,8 +158,6 @@ function reload() {
 }
 
 async function addGroup(group: { _id: string }) {
-  if (!props.currentUserHasAdminRights)
-    return alert("This action can only be performed by group administrators");
   let url: string;
   let body: object;
   if (props.group_type === "parent") {
@@ -162,10 +175,9 @@ async function addGroup(group: { _id: string }) {
   }
 }
 
-async function removeGroup(group: any) {
-  if (!props.currentUserHasAdminRights)
-    return alert("This action can only be performed by group administrators");
-  if (!confirm(`Remove group ${group.name}?`)) return;
+async function confirmRemove() {
+  const group = pendingRemove.value;
+  pendingRemove.value = null;
   const url =
     props.group_type === "parent"
       ? `/v3/groups/${group._id}/groups/${groupId.value}`
