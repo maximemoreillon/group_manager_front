@@ -35,15 +35,16 @@ async function generateCodeChallenge(verifier: string): Promise<string> {
 
 export function isOidcConfigured(): boolean {
   return !!(
-    import.meta.env.VITE_OIDC_AUTHORITY && import.meta.env.VITE_OIDC_CLIENT_ID
+    import.meta.env.VITE_OIDC_AUTHORITY &&
+    import.meta.env.VITE_OIDC_CLIENT_ID &&
+    window.isSecureContext
   );
 }
 
 export async function startOidcLogin(redirectPath?: string): Promise<void> {
   const authority = import.meta.env.VITE_OIDC_AUTHORITY;
   const clientId = import.meta.env.VITE_OIDC_CLIENT_ID;
-  const scope =
-    import.meta.env.VITE_OIDC_SCOPE || "openid profile email";
+  const scope = import.meta.env.VITE_OIDC_SCOPE || "openid profile email";
 
   const discovery = await fetchDiscovery();
 
