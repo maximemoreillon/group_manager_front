@@ -108,3 +108,10 @@ async function addSelectedUsers() {
   }
 }
 </script>
+
+<style>
+.user_picker,
+.group_picker {
+  max-height: 50vh;
+}
+</style>
