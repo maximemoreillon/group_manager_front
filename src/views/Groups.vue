@@ -33,6 +33,7 @@
             :groupManagerApiUrl="groupManagerApiUrl"
             :accessToken="accessToken"
             @selection="groupSelected"
+            :usersWithNoGroup="false"
           />
         </v-window-item>
         <v-window-item value="search">
