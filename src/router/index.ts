@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -6,6 +7,12 @@ const router = createRouter({
     {
       path: '/',
       redirect: { name: 'UserGroups', params: { user_id: 'self' } },
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: () => import('../views/Login.vue'),
+      meta: { public: true },
     },
     {
       path: '/groups/new',
@@ -33,6 +40,25 @@ const router = createRouter({
       component: () => import('../views/About.vue'),
     },
   ],
+})
+
+router.beforeEach(async (to) => {
+  const { tokens, identify } = useAuth()
+
+  if (to.meta.public) {
+    // Redirect away from login if already authenticated
+    if (to.name === 'Login' && tokens.value) {
+      return { name: 'UserGroups', params: { user_id: 'self' } }
+    }
+    return true
+  }
+
+  if (tokens.value) return true
+
+  const success = await identify()
+  if (success) return true
+
+  return { name: 'Login', query: { redirect: to.fullPath } }
 })
 
 export default router

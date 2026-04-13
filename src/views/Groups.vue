@@ -14,8 +14,14 @@
       </v-btn>
       <template #extension>
         <v-tabs v-model="tab">
-          <v-tab value="browse">{{ $t("Browse") }}</v-tab>
-          <v-tab value="search">{{ $t("Search") }}</v-tab>
+          <v-tab value="browse">
+            <v-icon start>mdi-file-tree</v-icon>
+            <span>{{ $t("Browse") }}</span>
+          </v-tab>
+          <v-tab value="search">
+            <v-icon start>mdi-magnify</v-icon>
+            <span>{{ $t("Search") }}</span>
+          </v-tab>
         </v-tabs>
       </template>
     </v-toolbar>
@@ -30,11 +36,7 @@
           />
         </v-window-item>
         <v-window-item value="search">
-          <v-card variant="outlined">
-            <v-card-text>
-              <GroupSearch @selection="groupSelected" />
-            </v-card-text>
-          </v-card>
+          <GroupSearch @selection="groupSelected" />
         </v-window-item>
       </v-window>
     </v-card-text>
@@ -42,8 +44,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import {
   GroupPicker,
   type GroupItem,
@@ -51,10 +53,17 @@ import {
 import { useAuth } from "@/composables/useAuth";
 import GroupSearch from "@/components/GroupSearch.vue";
 
+const route = useRoute();
 const router = useRouter();
 const { accessToken } = useAuth();
-const tab = ref("browse");
+const tab = ref((route.query.tab as string) || "browse");
 const groupManagerApiUrl = import.meta.env.VITE_GROUP_MANAGER_API_URL;
+
+watch(tab, (value) => {
+  router.replace({
+    query: { ...route.query, tab: value !== "browse" ? value : undefined },
+  });
+});
 
 function groupSelected(group: GroupItem) {
   router.push({ name: "Group", params: { group_id: group._id } });
