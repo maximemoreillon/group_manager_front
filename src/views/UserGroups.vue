@@ -2,6 +2,10 @@
   <v-card max-width="60em" class="mx-auto">
     <v-toolbar flat>
       <v-toolbar-title v-if="user">
+        <v-avatar start color="transparent">
+          <v-img :src="user.avatar_src" v-if="user.avatar_src" />
+          <v-icon v-else>mdi-account-multiple</v-icon>
+        </v-avatar>
         <span>{{ user.display_name }}</span>
       </v-toolbar-title>
       <v-toolbar-title v-else>
@@ -42,7 +46,11 @@
             </v-col>
             <v-spacer />
             <v-col cols="auto">
-              <v-switch v-model="subgroups" :label="$t('Include subgroups')" hide-details />
+              <v-switch
+                v-model="subgroups"
+                :label="$t('Include subgroups')"
+                hide-details
+              />
             </v-col>
           </v-row>
           <GroupsOfUser
