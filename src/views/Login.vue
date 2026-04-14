@@ -1,85 +1,100 @@
 <template>
-  <v-container fluid class="fill-height">
+  <div>
     <div style="position: absolute; top: 16px; right: 16px; width: 150px">
       <LocaleSelector />
     </div>
-    <v-row align="center" justify="center" class="fill-height">
-      <v-col cols="12" sm="8" md="5" lg="4" xl="3">
-        <div class="text-center mb-6">
-          <v-icon size="72">mdi-account-multiple</v-icon>
-          <div class="text-h5 mt-2">Group manager</div>
+    <v-row justify="center">
+      <v-col cols="auto">
+        <div class="text-center mt-12">
+          <v-icon size="144">mdi-account-multiple</v-icon>
+          <div class="text-h5">Group manager</div>
         </div>
-
-        <v-card>
-          <v-card-title class="pt-6 px-6">{{ $t("Sign in") }}</v-card-title>
-          <v-card-text class="px-6 pb-6">
-            <!-- OIDC -->
-            <v-btn
-              v-if="oidcEnabled"
-              block
-              size="large"
-              variant="outlined"
-              :loading="oidcLoading"
-              @click="signInWithOidc"
-            >
-              <v-icon start>mdi-openid</v-icon>
-              {{ $t("Sign in with SSO") }}
-            </v-btn>
+      </v-col>
+    </v-row>
+    <v-row justify="center">
+      <v-col cols="auto">
+        <v-card width="30em">
+          <v-card-title>{{ $t("Sign in") }}</v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col>
+                <v-btn
+                  v-if="oidcEnabled"
+                  block
+                  size="large"
+                  variant="outlined"
+                  :loading="oidcLoading"
+                  @click="signInWithOidc"
+                >
+                  <v-icon start>mdi-openid</v-icon>
+                  {{ $t("Sign in with SSO") }}
+                </v-btn>
+              </v-col>
+            </v-row>
 
             <!-- Divider between OIDC and password login -->
-            <template v-if="oidcEnabled && passwordEnabled">
-              <v-divider class="my-4">
-                <span class="text-medium-emphasis text-body-2">{{
-                  $t("or")
-                }}</span>
-              </v-divider>
-            </template>
+            <v-row v-if="oidcEnabled && passwordEnabled">
+              <v-col>
+                <v-divider>
+                  {{ $t("or") }}
+                </v-divider>
+              </v-col>
+            </v-row>
 
             <!-- Username / password -->
             <v-form v-if="passwordEnabled" @submit.prevent="submit">
-              <v-text-field
-                v-model="identifier"
-                :label="$t('Username')"
-                prepend-inner-icon="mdi-account-outline"
-                variant="outlined"
-                autocomplete="username"
-                class="mb-2"
-                hide-details
-              />
-              <v-text-field
-                v-model="password"
-                :label="$t('Password')"
-                type="password"
-                prepend-inner-icon="mdi-lock-outline"
-                variant="outlined"
-                autocomplete="current-password"
-                hide-details
-              />
-              <v-alert v-if="error" color="error" variant="tonal" class="mt-4">
-                {{ error }}
-              </v-alert>
-              <div
-                v-if="loginHint"
-                class="text-center mt-4 text-body-2"
-                v-html="loginHint"
-              />
-              <v-btn
-                type="submit"
-                color="primary"
-                size="large"
-                block
-                class="mt-6"
-                :loading="loading"
-              >
-                <v-icon start>mdi-login</v-icon>
-                {{ $t("Sign in") }}
-              </v-btn>
+              <v-row>
+                <v-col>
+                  <v-text-field
+                    v-model="identifier"
+                    :label="$t('Username')"
+                    prepend-inner-icon="mdi-account-outline"
+                    variant="outlined"
+                    autocomplete="username"
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <v-text-field
+                    v-model="password"
+                    :label="$t('Password')"
+                    type="password"
+                    prepend-inner-icon="mdi-lock-outline"
+                    variant="outlined"
+                    autocomplete="current-password"
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <v-btn
+                    type="submit"
+                    color="primary"
+                    size="large"
+                    block
+                    :loading="loading"
+                  >
+                    <v-icon start>mdi-login</v-icon>
+                    {{ $t("Sign in") }}
+                  </v-btn>
+                </v-col>
+              </v-row>
+              <v-row v-if="error">
+                <v-col>
+                  <v-alert color="error" variant="tonal">
+                    {{ error }}
+                  </v-alert>
+                </v-col>
+              </v-row>
             </v-form>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -98,7 +113,6 @@ const password = ref("");
 const loading = ref(false);
 const oidcLoading = ref(false);
 const error = ref<string | null>(null);
-const loginHint = import.meta.env.VITE_LOGIN_HINT;
 
 const oidcEnabled = isOidcConfigured();
 const passwordEnabled = !!import.meta.env.VITE_LOGIN_URL;
