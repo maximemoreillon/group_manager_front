@@ -136,7 +136,6 @@
                 <UsersOfGroup
                   :currentUserHasAdminRights="currentUserHasAdminRights"
                   :user_type="userType"
-                  @usersChanged="getGroup"
                 />
               </v-window-item>
             </v-window>
@@ -169,7 +168,6 @@
                 <GroupsOfGroups
                   :group_type="groupType"
                   :currentUserHasAdminRights="currentUserHasAdminRights"
-                  @groupsChanged="getGroup"
                 />
               </v-window-item>
             </v-window>

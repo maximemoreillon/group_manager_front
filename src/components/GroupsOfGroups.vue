@@ -8,9 +8,9 @@
     "
     :loading="loading"
     :items-length="total"
-    :items-per-page="50"
     :items-per-page-options="itemsPerPageOptions"
-    @update:options="loadGroups"
+    v-model:items-per-page="tableOptions.itemsPerPage"
+    v-model:page="tableOptions.page"
   >
     <template #top>
       <v-row align="center">
@@ -27,7 +27,7 @@
             v-model="includeSubgroups"
             :label="$t('Include subgroups')"
             hide-details
-            @update:model-value="reload"
+            @update:model-value="loadGroups"
           />
         </v-col>
       </v-row>
@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import AddGroupDialog from "@/components/AddGroupDialog.vue";
 import GroupsTable from "@/components/GroupsTable.vue";
@@ -74,8 +74,6 @@ const props = defineProps<{
   currentUserHasAdminRights: boolean;
 }>();
 
-const emit = defineEmits<{ groupsChanged: [] }>();
-
 const route = useRoute();
 const loading = ref(false);
 const groups = ref<any[]>([]);
@@ -83,19 +81,15 @@ const total = ref(0);
 const includeSubgroups = ref(false);
 const pendingRemove = ref<any>(null);
 const itemsPerPageOptions = [50, 100, 500, -1];
-
-let lastOptions = { page: 1, itemsPerPage: 50 };
+const tableOptions = ref({
+  page: 1,
+  itemsPerPage: 50,
+});
 
 const groupId = computed(() => route.params.group_id as string);
 
-async function loadGroups({
-  page,
-  itemsPerPage,
-}: {
-  page: number;
-  itemsPerPage: number;
-}) {
-  lastOptions = { page, itemsPerPage };
+async function loadGroups() {
+  const { itemsPerPage, page } = tableOptions.value;
   loading.value = true;
   groups.value = [];
   const url =
@@ -119,10 +113,6 @@ async function loadGroups({
   }
 }
 
-function reload() {
-  loadGroups(lastOptions);
-}
-
 async function addGroup(group: { _id: string }) {
   let url: string;
   let body: object;
@@ -135,7 +125,7 @@ async function addGroup(group: { _id: string }) {
   }
   try {
     await api.post(url, body);
-    emit("groupsChanged");
+    loadGroups();
   } catch (error) {
     console.error(error);
   }
@@ -150,9 +140,13 @@ async function confirmRemove() {
       : `/v3/groups/${groupId.value}/groups/${group._id}`;
   try {
     await api.delete(url);
-    emit("groupsChanged");
+    loadGroups(); // TODO: more optimistic updates
   } catch (error) {
     console.error(error);
   }
 }
+
+watch(tableOptions, loadGroups, { deep: true });
+
+onMounted(loadGroups);
 </script>

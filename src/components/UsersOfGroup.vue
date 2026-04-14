@@ -4,9 +4,9 @@
     :items="members"
     :headers="headers"
     :items-length="total"
-    :items-per-page="50"
     :items-per-page-options="itemsPerPageOptions"
-    @update:options="loadMembers"
+    v-model:items-per-page="tableOptions.itemsPerPage"
+    v-model:page="tableOptions.page"
   >
     <template #top>
       <v-row align="center">
@@ -14,7 +14,7 @@
           <AddUserDialog
             v-if="props.currentUserHasAdminRights"
             :as="props.user_type"
-            @usersChanged="$emit('usersChanged')"
+            @usersChanged="loadMembers"
           />
         </v-col>
         <v-spacer />
@@ -71,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import AddUserDialog from "@/components/AddUserDialog.vue";
@@ -83,8 +83,6 @@ const props = defineProps<{
   currentUserHasAdminRights: boolean;
 }>();
 
-const emit = defineEmits<{ usersChanged: [] }>();
-
 const { t } = useI18n();
 const route = useRoute();
 const loading = ref(false);
@@ -92,6 +90,11 @@ const members = ref<any[]>([]);
 const total = ref(0);
 const pendingRemove = ref<any>(null);
 const itemsPerPageOptions = [50, 100, 500, -1];
+
+const tableOptions = ref({
+  page: 1,
+  itemsPerPage: 50,
+});
 
 const groupId = computed(() => route.params.group_id as string);
 
@@ -113,14 +116,9 @@ const headers = computed(() => {
   return result;
 });
 
-async function loadMembers({
-  page,
-  itemsPerPage,
-}: {
-  page: number;
-  itemsPerPage: number;
-}) {
+async function loadMembers() {
   loading.value = true;
+  const { itemsPerPage, page } = tableOptions.value;
   try {
     const { data } = await api.get(
       `/v3/groups/${groupId.value}/${props.user_type}`,
@@ -147,9 +145,13 @@ async function confirmRemove() {
     await api.delete(
       `/v3/groups/${groupId.value}/${props.user_type}/${user._id}`,
     );
-    emit("usersChanged");
+    loadMembers(); // TODO: more optimistic updates
   } catch (error) {
     console.error(error);
   }
 }
+
+watch(tableOptions, loadMembers, { deep: true });
+
+onMounted(loadMembers);
 </script>
