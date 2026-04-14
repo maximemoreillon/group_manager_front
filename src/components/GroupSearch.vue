@@ -41,15 +41,7 @@
       v-model:items-per-page="itemsPerPage"
       :items-per-page-options="itemsPerPageOptions"
       @update:options="loadGroups"
-    >
-      <template #item.name="{ item }">
-        <span
-          class="text-primary cursor-pointer"
-          @click="$emit('selection', item)"
-          >{{ item.name }}</span
-        >
-      </template>
-    </GroupsTable>
+    />
   </div>
 
   <v-snackbar v-model="errorSnackbar" color="error" timeout="3000">
