@@ -1,9 +1,12 @@
 <template>
   <v-app>
     <template v-if="!route.meta.public">
-      <v-app-bar color="#333">
+      <v-app-bar color="app-bar">
         <v-app-bar-nav-icon @click="drawer = !drawer" />
-        <v-app-bar-title>Group manager</v-app-bar-title>
+        <v-app-bar-title>
+          <v-icon start> mdi-account-multiple </v-icon>
+          <span>Group manager</span>
+        </v-app-bar-title>
         <template #append>
           <LocaleSelector />
           <ThemeToggle />
