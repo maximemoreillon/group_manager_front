@@ -14,12 +14,18 @@
       <v-spacer />
       <v-btn exact :to="{ name: 'CreateGroup' }" color="primary">
         <v-icon start>mdi-account-multiple-plus</v-icon>
-        {{ $t("Create group") }}
+        <span>{{ $t("Create group") }}</span>
       </v-btn>
       <template #extension>
         <v-tabs v-model="relationTab">
-          <v-tab value="member">{{ $t("As member") }}</v-tab>
-          <v-tab value="administrator">{{ $t("As administrator") }}</v-tab>
+          <v-tab value="member">
+            <!-- <v-icon start> mdi-account </v-icon> -->
+            <span>{{ $t("As member") }}</span>
+          </v-tab>
+          <v-tab value="administrator">
+            <!-- <v-icon start> mdi-account-star </v-icon> -->
+            <span>{{ $t("As administrator") }}</span>
+          </v-tab>
         </v-tabs>
       </template>
     </v-toolbar>

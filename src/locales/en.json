@@ -57,5 +57,14 @@
   "or": "or",
   "Sign in failed": "Sign in failed",
   "Back to sign in": "Back to sign in",
-  "Signing in…": "Signing in…"
+  "Signing in…": "Signing in…",
+  "Officiality": "Officiality",
+  "Add child group": "Add child group",
+  "Add parent group": "Add parent group",
+  "Add group": "Add group",
+  "Add members": "Add members",
+  "Add administrators": "Add administrators",
+  "Add user": "Add user",
+  "Failed to join group": "Failed to join group",
+  "Service": "Service"
 }

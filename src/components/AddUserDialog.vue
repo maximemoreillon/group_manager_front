@@ -3,11 +3,11 @@
     <template #activator="{ props }">
       <v-btn color="primary" v-bind="props">
         <v-icon start>mdi-account-plus</v-icon>
-        Add {{ as || "user" }}
+        {{ dialogTitle }}
       </v-btn>
     </template>
     <v-card>
-      <v-card-title>Add {{ as || "user" }}</v-card-title>
+      <v-card-title>{{ dialogTitle }}</v-card-title>
       <v-card-text>
         <v-row>
           <v-col>
@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, computed, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { UserPicker, type User } from "@moreillon/group-manager-vue-picker";
@@ -67,6 +67,12 @@ const props = defineProps<{ as?: string }>();
 const emit = defineEmits<{ usersChanged: [] }>();
 
 const { t } = useI18n();
+
+const dialogTitle = computed(() => {
+  if (props.as === "members") return t("Add members");
+  if (props.as === "administrators") return t("Add administrators");
+  return t("Add user");
+});
 const route = useRoute();
 const { accessToken } = useAuth();
 const dialog = ref(false);
@@ -108,10 +114,3 @@ async function addSelectedUsers() {
   }
 }
 </script>
-
-<style>
-.user_picker,
-.group_picker {
-  max-height: 50vh;
-}
-</style>

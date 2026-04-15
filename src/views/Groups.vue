@@ -37,7 +37,7 @@
           />
         </v-window-item>
         <v-window-item value="search">
-          <GroupSearch @selection="groupSelected" />
+          <GroupSearch />
         </v-window-item>
       </v-window>
     </v-card-text>

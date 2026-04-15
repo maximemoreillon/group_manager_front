@@ -8,7 +8,12 @@ export default createVuetify({
       color: "primary",
     },
     VTextField: {
+      // variant: "outlined",
       variant: "underlined",
+    },
+    VSelect: {
+      variant: "outlined",
+      // variant: "underlined",
     },
   },
   theme: {

@@ -56,5 +56,14 @@
   "or": "または",
   "Sign in failed": "サインインに失敗しました",
   "Back to sign in": "サインイン画面に戻る",
-  "Signing in…": "サインイン中…"
+  "Signing in…": "サインイン中…",
+  "Officiality": "公式区分",
+  "Add child group": "子グループを追加",
+  "Add parent group": "親グループを追加",
+  "Add group": "グループを追加",
+  "Add members": "メンバーを追加",
+  "Add administrators": "管理者を追加",
+  "Add user": "ユーザーを追加",
+  "Failed to join group": "グループへの参加に失敗しました",
+  "Service": "サービス"
 }

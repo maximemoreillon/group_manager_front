@@ -11,17 +11,18 @@
     <v-divider />
     <v-card-text>
       <v-form ref="form" v-model="valid" @submit.prevent="createGroup">
-        <v-row align="center">
+        <v-row>
           <v-col>
             <v-text-field
               v-model="group.name"
-              label="Name"
+              :label="$t('Name')"
               :rules="nameRules"
               required
             />
           </v-col>
           <v-col cols="auto">
             <v-btn
+              class="mt-2"
               type="submit"
               :disabled="!valid"
               :loading="creating"

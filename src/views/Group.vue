@@ -315,8 +315,12 @@ async function joinGroup() {
     await api.post(`/v3/groups/${groupId.value}/members`, { user_id: "self" });
     getGroup();
   } catch (err) {
-    alert("Failed to join group");
     console.error(err);
+    snackbar.value = {
+      show: true,
+      message: t("Failed to join group"),
+      color: "error",
+    };
   } finally {
     joining.value = false;
   }

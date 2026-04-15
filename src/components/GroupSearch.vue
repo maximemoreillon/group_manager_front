@@ -1,19 +1,28 @@
 <template>
   <div>
-    <v-form @submit.prevent="searchGroups">
-      <v-row align="center" dense>
+    <v-form @submit.prevent="searchGroups" class="py-2">
+      <v-row align="center">
         <v-col>
-          <v-text-field v-model="search" label="Group name" hide-details />
-        </v-col>
-        <v-col cols="auto">
-          <v-btn type="submit" icon variant="plain" :loading="loading">
-            <v-icon>mdi-magnify</v-icon>
-          </v-btn>
+          <v-text-field
+            v-model="search"
+            :label="$t('Search')"
+            hide-details
+            append-inner-icon="mdi-magnify"
+            @click:append-inner="searchGroups"
+          />
+          <v-btn
+            type="submit"
+            icon
+            variant="plain"
+            :loading="loading"
+            style="display: none"
+          />
         </v-col>
       </v-row>
-      <v-row align="center" dense>
+      <v-row align="center">
         <v-col cols="auto">
           <v-select
+            :label="$t('Officiality')"
             v-model="officiality"
             :items="officialityItems"
             hide-details
@@ -55,8 +64,6 @@ import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import api from "@/api";
 import GroupsTable from "@/components/GroupsTable.vue";
-
-defineEmits<{ selection: [group: any] }>();
 
 const { t } = useI18n();
 const route = useRoute();

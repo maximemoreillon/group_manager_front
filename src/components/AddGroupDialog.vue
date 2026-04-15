@@ -3,11 +3,11 @@
     <template #activator="{ props }">
       <v-btn color="primary" v-bind="props">
         <v-icon start>mdi-account-multiple-plus</v-icon>
-        Add {{ as || "group" }} group
+        {{ dialogTitle }}
       </v-btn>
     </template>
     <v-card>
-      <v-card-title>Add {{ as || "group" }} group</v-card-title>
+      <v-card-title>{{ dialogTitle }}</v-card-title>
       <v-card-text>
         <GroupPicker
           :groupManagerApiUrl="groupManagerApiUrl"
@@ -26,29 +26,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import {
   GroupPicker,
   type GroupItem,
 } from "@moreillon/group-manager-vue-picker";
+import { useI18n } from "vue-i18n";
 import { useAuth } from "@/composables/useAuth";
 
-defineProps<{ as?: string }>();
+const props = defineProps<{ as?: string }>();
 const emit = defineEmits<{ groupAdd: [group: GroupItem] }>();
 
+const { t } = useI18n();
 const { accessToken } = useAuth();
 const dialog = ref(false);
 const groupManagerApiUrl = import.meta.env.VITE_GROUP_MANAGER_API_URL;
+
+const dialogTitle = computed(() => {
+  if (props.as === "child") return t("Add child group");
+  if (props.as === "parent") return t("Add parent group");
+  return t("Add group");
+});
 
 function groupSelected(group: GroupItem) {
   emit("groupAdd", group);
   dialog.value = false;
 }
 </script>
-
-<style>
-.user_picker,
-.group_picker {
-  max-height: 50vh;
-}
-</style>

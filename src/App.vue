@@ -76,3 +76,10 @@ function handleLogout() {
   router.push({ name: "Login" });
 }
 </script>
+
+<style>
+.user_picker,
+.group_picker {
+  height: 70vh;
+}
+</style>
