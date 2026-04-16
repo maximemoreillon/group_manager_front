@@ -148,7 +148,7 @@ async function confirmRemove() {
       : `/v3/groups/${groupId.value}/groups/${group._id}`;
   try {
     await api.delete(url);
-    loadGroups(); // TODO: more optimistic updates
+    loadGroups();
   } catch (error) {
     console.error(error);
     snackbar.value = { show: true, message: t("Failed to remove group"), color: "error" };

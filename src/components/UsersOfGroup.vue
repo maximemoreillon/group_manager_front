@@ -150,7 +150,7 @@ async function confirmRemove() {
     await api.delete(
       `/v3/groups/${groupId.value}/${props.user_type}/${user._id}`,
     );
-    loadMembers(); // TODO: more optimistic updates
+    loadMembers();
   } catch (error) {
     console.error(error);
     snackbar.value = { show: true, message: t("Failed to remove user"), color: "error" };
