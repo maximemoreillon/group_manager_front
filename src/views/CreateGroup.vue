@@ -1,14 +1,11 @@
 <template>
   <v-card max-width="30em" class="mx-auto">
-    <v-toolbar flat>
-      <v-toolbar-title>
-        <v-avatar start color="transparent">
-          <v-icon>mdi-account-multiple-plus</v-icon>
-        </v-avatar>
-        {{ $t("Create group") }}
-      </v-toolbar-title>
-    </v-toolbar>
-    <v-divider />
+    <template #prepend>
+      <v-avatar start color="transparent">
+        <v-icon>mdi-account-multiple-plus</v-icon>
+      </v-avatar>
+    </template>
+    <template #title>{{ $t("Create group") }}</template>
     <v-card-text>
       <v-form ref="form" v-model="valid" @submit.prevent="createGroup">
         <v-row>

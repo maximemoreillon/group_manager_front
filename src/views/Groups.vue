@@ -1,30 +1,27 @@
 <template>
   <v-card max-width="60em" class="mx-auto">
-    <v-toolbar flat>
-      <v-toolbar-title>
-        <v-avatar start color="transparent">
-          <v-icon>mdi-account-multiple</v-icon>
-        </v-avatar>
-        {{ $t("Groups") }}
-      </v-toolbar-title>
-      <v-spacer />
+    <template #prepend>
+      <v-avatar start color="transparent">
+        <v-icon>mdi-account-multiple</v-icon>
+      </v-avatar>
+    </template>
+    <template #title>{{ $t("Groups") }}</template>
+    <template #append>
       <v-btn exact :to="{ name: 'CreateGroup' }" color="primary">
         <v-icon start>mdi-account-multiple-plus</v-icon>
         {{ $t("Create group") }}
       </v-btn>
-      <template #extension>
-        <v-tabs v-model="tab">
-          <v-tab value="browse">
-            <v-icon start>mdi-file-tree</v-icon>
-            <span>{{ $t("Browse") }}</span>
-          </v-tab>
-          <v-tab value="search">
-            <v-icon start>mdi-magnify</v-icon>
-            <span>{{ $t("Search") }}</span>
-          </v-tab>
-        </v-tabs>
-      </template>
-    </v-toolbar>
+    </template>
+    <v-tabs v-model="tab">
+      <v-tab value="browse">
+        <v-icon start>mdi-file-tree</v-icon>
+        <span>{{ $t("Browse") }}</span>
+      </v-tab>
+      <v-tab value="search">
+        <v-icon start>mdi-magnify</v-icon>
+        <span>{{ $t("Search") }}</span>
+      </v-tab>
+    </v-tabs>
     <v-divider />
     <v-card-text>
       <v-window v-model="tab">

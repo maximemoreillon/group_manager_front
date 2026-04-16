@@ -8,12 +8,13 @@ export default createVuetify({
       color: "primary",
     },
     VTextField: {
-      // variant: "outlined",
       variant: "underlined",
     },
     VSelect: {
       variant: "outlined",
-      // variant: "underlined",
+    },
+    VTabs: {
+      color: "primary",
     },
   },
   theme: {
@@ -21,12 +22,11 @@ export default createVuetify({
     themes: {
       light: {
         colors: {
-          primary: "#c00000",
-          background: "#fafafa",
-          "app-bar": "#000000",
+          primary: "#b00000",
+          background: "#f5f5f5",
         },
       },
-      dark: { colors: { primary: "#c00000", "app-bar": "#2a2a2a" } },
+      dark: { colors: { primary: "#b02222" } },
     },
   },
 });

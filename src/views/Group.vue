@@ -9,47 +9,56 @@
       <v-col>
         <!-- Group metadata -->
         <v-card>
-          <v-toolbar flat>
-            <v-toolbar-title>
-              <v-avatar start color="transparent">
-                <v-img :src="group.avatar_src" v-if="group.avatar_src" />
-                <v-icon v-else>mdi-account-multiple</v-icon>
-              </v-avatar>
-
+          <template #prepend>
+            <v-avatar start color="transparent">
+              <v-img :src="group.avatar_src" v-if="group.avatar_src" />
+              <v-icon v-else>mdi-account-multiple</v-icon>
+            </v-avatar>
+          </template>
+          <template #title>
+            <v-card-title>
               {{ group.name }}
-            </v-toolbar-title>
-            <v-spacer />
-
-            <v-btn
-              v-if="currentUserIsMember"
-              :loading="leaving"
-              @click="leaveGroup"
-            >
-              <v-icon start>mdi-location-exit</v-icon>
-              {{ $t("Leave") }}
-            </v-btn>
-            <v-btn
-              v-else
-              :loading="joining"
-              :disabled="group.restricted"
-              @click="joinGroup"
-            >
-              <v-icon start>mdi-location-enter</v-icon>
-              {{ $t("Join") }}
-            </v-btn>
+            </v-card-title>
+          </template>
+          <template #append>
             <template v-if="currentUserHasAdminRights">
-              <v-btn
-                :disabled="!groupHasModifications"
-                :loading="updating"
-                @click="updateGroup"
-              >
-                <v-icon start>mdi-content-save</v-icon>
-                {{ $t("Save") }}
-              </v-btn>
-
-              <DeleteGroupDialog />
+              <v-row dense>
+                <v-col cols="auto">
+                  <v-btn
+                    v-if="currentUserIsMember"
+                    :loading="leaving"
+                    @click="leaveGroup"
+                  >
+                    <v-icon start>mdi-location-exit</v-icon>
+                    {{ $t("Leave") }}
+                  </v-btn>
+                  <v-btn
+                    v-else
+                    :loading="joining"
+                    :disabled="group.restricted"
+                    @click="joinGroup"
+                  >
+                    <v-icon start>mdi-location-enter</v-icon>
+                    {{ $t("Join") }}
+                  </v-btn>
+                </v-col>
+                <v-col cols="auto">
+                  <v-btn
+                    :disabled="!groupHasModifications"
+                    :loading="updating"
+                    @click="updateGroup"
+                  >
+                    <v-icon start>mdi-content-save</v-icon>
+                    {{ $t("Save") }}
+                  </v-btn>
+                </v-col>
+                <v-col cols="auto">
+                  <DeleteGroupDialog />
+                </v-col>
+              </v-row>
             </template>
-          </v-toolbar>
+          </template>
+
           <v-card-text>
             <v-row>
               <v-col>
@@ -116,15 +125,11 @@
     <v-row>
       <v-col>
         <v-card>
-          <v-toolbar flat>
-            <v-toolbar-title>{{ $t("Related users") }}</v-toolbar-title>
-            <template #extension>
-              <v-tabs v-model="membersTab">
-                <v-tab value="members">{{ $t("Members") }}</v-tab>
-                <v-tab value="administrators">{{ $t("Administrators") }}</v-tab>
-              </v-tabs>
-            </template>
-          </v-toolbar>
+          <template #title>{{ $t("Related users") }}</template>
+          <v-tabs v-model="membersTab">
+            <v-tab value="members">{{ $t("Members") }}</v-tab>
+            <v-tab value="administrators">{{ $t("Administrators") }}</v-tab>
+          </v-tabs>
           <v-divider />
           <v-card-text>
             <v-window v-model="membersTab">
@@ -148,15 +153,11 @@
     <v-row>
       <v-col>
         <v-card>
-          <v-toolbar flat>
-            <v-toolbar-title>{{ $t("Related groups") }}</v-toolbar-title>
-            <template #extension>
-              <v-tabs v-model="groupsTab">
-                <v-tab value="child">{{ $t("Subgroups") }}</v-tab>
-                <v-tab value="parent">{{ $t("Parent groups") }}</v-tab>
-              </v-tabs>
-            </template>
-          </v-toolbar>
+          <template #title>{{ $t("Related groups") }}</template>
+          <v-tabs v-model="groupsTab">
+            <v-tab value="child">{{ $t("Subgroups") }}</v-tab>
+            <v-tab value="parent">{{ $t("Parent groups") }}</v-tab>
+          </v-tabs>
           <v-divider />
           <v-card-text>
             <v-window v-model="groupsTab">

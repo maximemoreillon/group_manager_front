@@ -1,13 +1,11 @@
 <template>
   <v-card class="mx-auto" max-width="60em">
-    <v-toolbar>
-      <v-toolbar-title>
-        <v-avatar start color="transparent">
-          <v-icon>mdi-information-outline</v-icon>
-        </v-avatar>
-        Group manager GUI v{{ version }}
-      </v-toolbar-title>
-    </v-toolbar>
+    <template #prepend>
+      <v-avatar start color="transparent">
+        <v-icon>mdi-information-outline</v-icon>
+      </v-avatar>
+    </template>
+    <template #title>Group manager GUI v{{ version }}</template>
     <v-card-text>
       <v-row>
         <v-col>

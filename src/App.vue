@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <template v-if="!route.meta.public">
-      <v-app-bar color="app-bar">
+      <v-app-bar color="black">
         <v-app-bar-nav-icon @click="drawer = !drawer" />
         <v-app-bar-title>
           <v-icon start> mdi-account-multiple </v-icon>

@@ -1,34 +1,33 @@
 <template>
   <v-card max-width="60em" class="mx-auto">
-    <v-toolbar flat>
-      <v-toolbar-title v-if="user">
-        <v-avatar start color="transparent">
+    <template #prepend>
+      <v-avatar start color="transparent">
+        <template v-if="user">
           <v-img :src="user.avatar_src" v-if="user.avatar_src" />
           <v-icon v-else>mdi-account-multiple</v-icon>
-        </v-avatar>
-        <span>{{ user.display_name }}</span>
-      </v-toolbar-title>
-      <v-toolbar-title v-else>
-        <v-progress-circular indeterminate />
-      </v-toolbar-title>
-      <v-spacer />
+        </template>
+        <v-progress-circular v-else indeterminate />
+      </v-avatar>
+    </template>
+    <template #title>
+      <span v-if="user">{{ user.display_name }}</span>
+    </template>
+    <template #append>
       <v-btn exact :to="{ name: 'CreateGroup' }" color="primary">
         <v-icon start>mdi-account-multiple-plus</v-icon>
         <span>{{ $t("Create group") }}</span>
       </v-btn>
-      <template #extension>
-        <v-tabs v-model="relationTab">
-          <v-tab value="member">
-            <!-- <v-icon start> mdi-account </v-icon> -->
-            <span>{{ $t("As member") }}</span>
-          </v-tab>
-          <v-tab value="administrator">
-            <!-- <v-icon start> mdi-account-star </v-icon> -->
-            <span>{{ $t("As administrator") }}</span>
-          </v-tab>
-        </v-tabs>
-      </template>
-    </v-toolbar>
+    </template>
+    <v-tabs v-model="relationTab">
+      <v-tab value="member">
+        <!-- <v-icon start> mdi-account </v-icon> -->
+        <span>{{ $t("As member") }}</span>
+      </v-tab>
+      <v-tab value="administrator">
+        <!-- <v-icon start> mdi-account-star </v-icon> -->
+        <span>{{ $t("As administrator") }}</span>
+      </v-tab>
+    </v-tabs>
     <v-divider />
 
     <v-card-text>
