@@ -81,6 +81,10 @@ function handleLogout() {
 </script>
 
 <style>
+a {
+  color: rgb(var(--v-theme-primary));
+}
+
 .user_picker,
 .group_picker {
   height: 70vh;
