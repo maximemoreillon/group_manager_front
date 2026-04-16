@@ -33,6 +33,10 @@
       </v-form>
     </v-card-text>
   </v-card>
+
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    {{ snackbar.message }}
+  </v-snackbar>
 </template>
 
 <script setup lang="ts">
@@ -49,6 +53,7 @@ const form = ref();
 const valid = ref(false);
 const creating = ref(false);
 const group = ref({ name: "" });
+const snackbar = ref({ show: false, message: "", color: "" });
 const nameRules = [(v: string) => !!v || t("Name is required")];
 
 async function createGroup() {
@@ -61,6 +66,7 @@ async function createGroup() {
     router.push({ name: "Group", params: { group_id: data._id } });
   } catch (error: any) {
     console.error(error);
+    snackbar.value = { show: true, message: t("Failed to create group"), color: "error" };
   } finally {
     creating.value = false;
   }

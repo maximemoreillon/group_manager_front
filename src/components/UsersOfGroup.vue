@@ -51,6 +51,10 @@
     </template>
   </v-data-table-server>
 
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    {{ snackbar.message }}
+  </v-snackbar>
+
   <v-dialog
     :model-value="!!pendingRemove"
     max-width="400"
@@ -89,6 +93,7 @@ const loading = ref(false);
 const members = ref<any[]>([]);
 const total = ref(0);
 const pendingRemove = ref<any>(null);
+const snackbar = ref({ show: false, message: "", color: "" });
 const itemsPerPageOptions = [50, 100, 500, -1];
 
 const tableOptions = ref({
@@ -148,6 +153,7 @@ async function confirmRemove() {
     loadMembers(); // TODO: more optimistic updates
   } catch (error) {
     console.error(error);
+    snackbar.value = { show: true, message: t("Failed to remove user"), color: "error" };
   }
 }
 

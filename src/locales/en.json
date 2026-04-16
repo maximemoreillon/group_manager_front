@@ -66,5 +66,12 @@
   "Add administrators": "Add administrators",
   "Add user": "Add user",
   "Failed to join group": "Failed to join group",
+  "Failed to add group": "Failed to add group",
+  "Failed to remove group": "Failed to remove group",
+  "Failed to remove user": "Failed to remove user",
+  "Failed to load groups": "Failed to load groups",
+  "Failed to create group": "Failed to create group",
+  "Failed to export": "Failed to export",
+  "Failed to add users": "Failed to add users",
   "Service": "Service"
 }

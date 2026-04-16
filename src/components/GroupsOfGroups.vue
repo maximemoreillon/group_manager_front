@@ -43,6 +43,10 @@
     </template>
   </GroupsTable>
 
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    {{ snackbar.message }}
+  </v-snackbar>
+
   <v-dialog
     :model-value="!!pendingRemove"
     max-width="400"
@@ -65,6 +69,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
 import AddGroupDialog from "@/components/AddGroupDialog.vue";
 import GroupsTable from "@/components/GroupsTable.vue";
 import api from "@/api";
@@ -75,7 +80,9 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
+const { t } = useI18n();
 const loading = ref(false);
+const snackbar = ref({ show: false, message: "", color: "" });
 const groups = ref<any[]>([]);
 const total = ref(0);
 const includeSubgroups = ref(false);
@@ -128,6 +135,7 @@ async function addGroup(group: { _id: string }) {
     loadGroups();
   } catch (error) {
     console.error(error);
+    snackbar.value = { show: true, message: t("Failed to add group"), color: "error" };
   }
 }
 
@@ -143,6 +151,7 @@ async function confirmRemove() {
     loadGroups(); // TODO: more optimistic updates
   } catch (error) {
     console.error(error);
+    snackbar.value = { show: true, message: t("Failed to remove group"), color: "error" };
   }
 }
 

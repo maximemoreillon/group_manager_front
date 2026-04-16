@@ -111,6 +111,11 @@ async function addSelectedUsers() {
     dialog.value = false;
   } catch (error) {
     console.error(error);
+    snackbar.value = {
+      show: true,
+      message: t("Failed to add users"),
+      color: "error",
+    };
   }
 }
 </script>

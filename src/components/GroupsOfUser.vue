@@ -7,11 +7,16 @@
     :items-per-page-options="itemsPerPageOptions"
     @update:options="loadGroups"
   />
+
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    {{ snackbar.message }}
+  </v-snackbar>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
 import api from "@/api";
 import GroupsTable from "@/components/GroupsTable.vue";
 
@@ -23,10 +28,12 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
+const { t } = useI18n();
 const loading = ref(false);
 const groups = ref<any[]>([]);
 const total = ref(0);
 const itemsPerPageOptions = [50, 100, 500, -1];
+const snackbar = ref({ show: false, message: "", color: "" });
 
 const userId = computed(() => route.params.user_id as string);
 
@@ -55,6 +62,7 @@ async function loadGroups({
     groups.value = data.items;
   } catch (error) {
     console.error(error);
+    snackbar.value = { show: true, message: t("Failed to load groups"), color: "error" };
   } finally {
     loading.value = false;
   }
